@@ -31,4 +31,3 @@ jobs:
         password: ${{ secrets.FTP_PASSWORD }}
         server-dir: ${{ secrets.FTP_PATH }}
         exclude: | 
-          **/writable/**
