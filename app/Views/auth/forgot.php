@@ -56,30 +56,25 @@
             <!-- wrap @s -->
             <div class="nk-wrap nk-wrap-nosidebar">
                 <!-- content @s -->
-                <div class="nk-content " style="background-image: url(<?=site_url('assets/background-color.png'); ?>);
-                    background-size: cover; /* Adjust to 'contain' or other values as needed */
-                    background-position: center;
-                    background-repeat: no-repeat;
-                    margin: 0; /* Remove default body margin */">
-                    <div class="brand-logo pb-2 pt-5 text-white text-center">
-                        <a href="<?=site_url(); ?>" class="logo-link pt-4">
-                            <img class="logo-dark pt-5 " src="<?=site_url(); ?>assets/zend.png" srcset="<?=site_url(); ?>assets/zend.png 2x" alt="logo-dark" height="180">
-                        </a>
-                        <h3>Welcome to TIDREMS</h3>
-                        <p class="mx-5" style="font-style:italic;">Tax ID DIrect Remittance System for easy and secure Enrolment and Payment of government taxes.</p>
-                        <img class="logo-dark py-1 mb-2" src="<?=site_url(); ?>assets/delta.png" srcset="<?=site_url(); ?>assets/delta.png 2x" alt="logo-dark" height="60">
-                    </div>
-                    <div class="card card-bordered" style="border-radius:25px;border-bottom-left-radius: 0px;border-bottom-right-radius: 0px;">
-                        <div class="card-inner card-inner-lg">
-                            <div class="nk-block-head">
-                                <div class="nk-block-head-content">
-                                    <h5 class="nk-block-title"><?=translate_phrase('Reset password');?></h5>
-                                    <div class="nk-block-des">
-                                        <p><?=translate_phrase('If you forgot your password, well, then we’ll email you instructions to reset your password.');?></p>
+                <div class="nk-content ">
+                    <div class="nk-split nk-split-page nk-split-md">
+                        <div class="nk-split-content nk-block-area nk-block-area-column nk-auth-container bg-white">
+                            <div class="nk-block nk-block-middle nk-auth-body">
+                                <div class="brand-logo pb-5" style="display: flex;justify-content: center;    align-items: center;">
+                                    <a href="<?=site_url(); ?>" class="logo-link">
+                                        <img class="logo-light logo-img logo-img-lg" style="max-height:100px" src="<?=site_url(); ?>assets/logo.png" srcset="/demo1/images/logo2x.png 2x" alt="logo">
+                                        <img class="logo-dark logo-img logo-img-lg" style="max-height:100px" src="<?=site_url(); ?>assets/logo.png" srcset="/demo1/images/logo-dark2x.png 2x" alt="logo-dark">
+                                    </a>
+                                </div>
+                                <div class="nk-block-head">
+                                    <div class="nk-block-head-content">
+                                        <h5 class="nk-block-title"><?=translate_phrase('Reset password');?></h5>
+                                        <div class="nk-block-des">
+                                            <p><?=translate_phrase('If you forgot your password, well, then we will email you instructions to reset your password.');?></p>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <?php echo form_open_multipart('auth/forgot/code', array('id'=>'bb_ajax_form', 'class'=>'')); ?>
+                                <?php echo form_open_multipart('auth/forgot/code', array('id'=>'bb_ajax_form', 'class'=>'')); ?>
                             <div class="row"><div id="bb_ajax_msg"></div></div>
                                 <div class="form-group">
                                     <div class="form-label-group">
@@ -124,11 +119,52 @@
                             <div class="form-note-s2 pt-5 text-center">
                                 <a href="<?=site_url(''); ?>"><strong><?=translate_phrase('Return to login'); ?></strong></a>
                             </div>
+                            </div>
+                            <div class="nk-block nk-auth-footer">
+                                <div class="nk-block-between">
+                                    <ul class="nav nav-sm">
+                                        <li class="nav-item dropup"><a
+                                                class="dropdown-toggle dropdown-indicator has-indicator link link-primary fw-normal py-2 px-3"
+                                                data-bs-toggle="dropdown" data-offset="0,10"><small>English</small></a>
+                                            <div class="dropdown-menu dropdown-menu-sm dropdown-menu-end">
+                                                <ul class="language-list">
+                                                    <li><a href="#" class="language-item"><img
+                                                                src="<?=site_url(); ?>assets/images/flags/english.png" alt=""
+                                                                class="language-flag"><span
+                                                                class="language-name">English</span></a></li>
+                                                    <li><a href="#" class="language-item"><img
+                                                                src="<?=site_url(); ?>assets/images/flags/spanish.png" alt=""
+                                                                class="language-flag"><span
+                                                                class="language-name">Español</span></a></li>
+                                                    <li><a href="#" class="language-item"><img
+                                                                src="<?=site_url(); ?>assets/images/flags/french.png" alt=""
+                                                                class="language-flag"><span
+                                                                class="language-name">Français</span></a></li>
+                                                    <li><a href="#" class="language-item"><img
+                                                                src="<?=site_url(); ?>assets/images/flags/turkey.png" alt=""
+                                                                class="language-flag"><span
+                                                                class="language-name">Türkçe</span></a></li>
+                                                </ul>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="mt-3">
+                                    <p>&copy; <?=date('Y').' '.app_name;?>. All Rights Reserved.</p>
+                                </div>
+                            </div>
+                        </div>
+                            <div class="nk-split-content nk-split-stretch" style="flex-shrink: 0 !important; background-image: url(<?=site_url('assets/bg.webp'); ?>);
+                            background-position: center;
+                            background-color: rgba(0, 0, 0, 0.5);
+                            background-size: cover;
+                            opacity: 0.5;
+                            background-repeat: no-repeat;">
+                                
                         </div>
                     </div>
-                </div>   
-                
-            </div>
+                <!-- wrap @e -->
+                </div>
         </div><!-- .nk-split -->
     </div><!-- app body @e -->
     <!-- JavaScript -->
