@@ -152,7 +152,11 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="nk-split-content nk-split-stretch bg-abstract"></div>
+                            <div class="nk-split-content nk-split-stretch" style="flex-shrink: 0 !important;display: flex;
+                            color: white;height:100vh;
+                            justify-content: center;
+                            align-items: center; background: linear-gradient(to top, #3204fdba, #9907facc), url(<?=site_url('assets/bg.webp'); ?>) no-repeat top center;">
+                        </div>
                     </div>
                     <div class="brand-logo pb-2 pt-5 text-white text-center">
                         <a href="<?=site_url(); ?>" class="logo-link pt-4">
