@@ -31,3 +31,12 @@ jobs:
         password: ${{ secrets.FTP_PASSWORD }}
         server-dir: ${{ secrets.FTP_PATH }}
         exclude: | 
+          **/writable/**
+          **/system/**
+          **/.git*
+          **/.git*/**
+          **/.env*
+          **/.htaccess*
+          **/.DS_Store*
+          Constants.php
+          Database.php
