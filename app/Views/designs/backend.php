@@ -1343,7 +1343,7 @@
                                     </ul>
                                 </li>
                             </ul>
-                        </div><!-- .nk-header-menu -->
+                        </div><
                         <div class="nk-header-tools">
                             <ul class="nk-quick-nav">
                                 <li class="dropdown notification-dropdown me-n1">
