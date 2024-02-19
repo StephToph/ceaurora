@@ -10,10 +10,7 @@ class Dashboard extends BaseController {
         $log_id = $this->session->get('td_id');
        if(empty($log_id)) return redirect()->to(site_url('auth'));
 
-       if($this->Crud->check2('id', $log_id, 'setup', 0, 'user')> 0)return redirect()->to(site_url('auth/security'));
-       if($this->Crud->check2('id', $log_id, 'trade', 0, 'user')> 0)return redirect()->to(site_url('auth/security'));
-       if($this->Crud->check2('id', $log_id, 'state_id', 0, 'user')> 0)return redirect()->to(site_url('auth/profile'));
-       if($this->Crud->check2('id', $log_id, 'country_id', 0, 'user')> 0)return redirect()->to(site_url('auth/profile'));
+    
        $mod = 'dashboard';
         $role_id = $this->Crud->read_field('id', $log_id, 'user', 'role_id');
         $role = strtolower($this->Crud->read_field('id', $role_id, 'access_role', 'name'));
@@ -32,145 +29,10 @@ class Dashboard extends BaseController {
         $data['param3'] = $param3;
 
 
-            // record listing
-		if($param1 == 'tax_metric') {
-			$limit = $param2;
-			$offset = $param3;
-
-			$count = 0;
-			$rec_limit = 8;
-			$items = '	
-                <div class="nk-tb-item nk-tb-head">
-                    <div class="nk-tb-col tb-col-md"><span class="sub-text">'.translate_phrase('Date').'</span></div>
-                    <div class="nk-tb-col"><span class="sub-text">'.translate_phrase('Tax Account').'</span></div>
-                    <div class="nk-tb-col"><span class="sub-text">'.translate_phrase('Amount Paid').'</span></div>
-                    <div class="nk-tb-col"><span class="sub-text">'.translate_phrase('Reference').'</span></div>
-                    <div class="nk-tb-col tb-col-md"><span class="sub-text">'.translate_phrase('Method').'</span></div>
-                </div><!-- .nk-tb-item -->
-                    
-                
-            ';
-            $item = '';
-			if($limit == '') {$limit = $rec_limit;}
-			if($offset == '') {$offset = 0;}
-			
-            $date_type = $this->request->getPost('date_type');
-            $lga_id = $this->request->getPost('lga_id');
-            $territory = $this->request->getPost('territory');
-            $date_type = $this->request->getPost('date_type');
-            if(!empty($this->request->getPost('start_date'))) { $start_dates = $this->request->getPost('start_date'); } else { $start_dates = ''; }
-            if(!empty($this->request->getPost('end_date'))) { $end_dates = $this->request->getPost('end_date'); } else { $end_dates = ''; }
-            if($date_type == 'Today'){
-                $start_date = date('Y-m-d');
-                $end_date = date('Y-m-d');
-            } elseif($date_type == 'Yesterday'){
-                $start_date = date('Y-m-d', strtotime( '-1 days' ));
-                $end_date = date('Y-m-d', strtotime( '-1 days' ));
-            } elseif($date_type == 'Last_Week'){
-                $start_date = date('Y-m-d', strtotime( '-7 days' ));
-                $end_date = date('Y-m-d');
-            } elseif($date_type == 'Last_Month'){
-                $start_date = date('Y-m-d', strtotime( '-30 days' ));
-                $end_date = date('Y-m-d');
-            } elseif($date_type == 'Date_Range'){
-                $start_date = $start_dates;
-                $end_date = $end_dates;
-            } elseif($date_type == 'This_Year'){
-                $start_date = date('Y-01-01');
-                $end_date = date('Y-m-d');
-            } else {
-                $start_date = date('Y-m-01');
-                $end_date = date('Y-m-d');
-            }
-            
-            $search = $this->request->getVar('search');
-
-			if(!$log_id) {
-				$item = '<div class="text-center text-muted">Session Timeout! - Please login again</div>';
-			} else {
-				$query = $this->Crud->filter_history($limit, $offset, $log_id, $search, $lga_id, $territory);
-				$all_rec = $this->Crud->filter_history('', '', $log_id, $search, $lga_id, $territory);
-				if(!empty($all_rec)) { $count = count($all_rec); } else { $count = 0; }
-				$curr = '&#8358;';
-                
-				if(!empty($query)) {
-					foreach($query as $q) {
-                        $id = $q->id;
-                        $user_id = $q->user_id;
-                        $tax_id = $this->Crud->read_field('user_id', $user_id, 'virtual_account', 'acc_no');
-                        $payment_method = $q->payment_method;
-                        $ref = $q->ref;
-                        $remark = $q->remark;
-                        $amount = number_format((float)$q->amount, 2);
-                        $reg_date = date('M d, Y h:i A', strtotime($q->reg_date));
-
-                        // user 
-                        $user = $this->Crud->read_field('id', $user_id, 'user', 'fullname');
-                        
-                       
-
-                        $item .= '
-                            <div class="nk-tb-item">
-                                <div class="nk-tb-col tb-col-md">
-                                    <span class="text-dark">'.$reg_date.'</span>
-                                </div>
-                                <div class="nk-tb-col">
-                                    <div class="d-md-none">'.$reg_date.'</div>
-                                    <span class="fw-bold text-success">'.$tax_id.'</span><br>
-                                    <span class="fw-bold text-secondary">'.translate_phrase(strtoupper($user)).'</span>
-                                </div>
-                                <div class="nk-tb-col">
-                                    <span class="text-info">'.$curr.$amount.'</span>
-                                    <div class="d-md-none">
-                                        '.strtoupper($payment_method).'
-                                    </div>
-                                </div>
-                                <div class="nk-tb-col">
-                                    <span>'.$ref.'</span>
-                                </div>
-                                <div class="nk-tb-col tb-col-md">
-                                    '.strtoupper($payment_method).'
-                                </div>
-                                
-                            </div>
-                            
-                        ';
-                    }
-				}
-			}
-
-			$total = 0;
-			
-			if(empty($item)) {
-				$resp['item'] = '
-					<div class="text-center text-muted">
-						<br/><br/><br/><br/>
-						<i class="icon ni ni-tranx" style="font-size:150px;"></i><br/><br/>No Tax Payment Returned
-					</div>
-				';
-			} else {
-				$resp['item'] = $items.$item;
-			}
-
-			$more_record = $count - ($offset + $rec_limit);
-			$resp['left'] = $more_record;
-			$resp['total'] = $curr . number_format($total, 2);
-
-			if($count > ($offset + $rec_limit)) { // for load more records
-				$resp['limit'] = $rec_limit;
-				$resp['offset'] = $offset + $limit;
-			} else {
-				$resp['limit'] = 0;
-				$resp['offset'] = 0;
-			}
-
-			echo json_encode($resp);
-			die;
-		}
 
 
         $data['log_id'] = $log_id;
-        $data['username'] = $username;
+        $data['log_name'] = $username;
         $data['current_language'] = $this->session->get('current_language');
         $data['role'] = $role;
         $data['role_c'] = $role_c;
