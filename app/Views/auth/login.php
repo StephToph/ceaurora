@@ -77,10 +77,9 @@
                                 <?php echo form_open_multipart('auth/login', array('id'=>'bb_ajax_form', 'class'=>'')); ?>
                                     <div class="row mb-3"><div id="bb_ajax_msg"></div></div>
                                     <div class="form-group">
-                                        <div class="form-label-group"><label class="form-label" for="default-01">Email
-                                                or Username</label></div>
+                                        <div class="form-label-group"><label class="form-label" for="default-01">Email</label></div>
                                         <div class="form-control-wrap"><input type="text"
-                                                class="form-control form-control-lg" id="default-01"
+                                                class="form-control form-control-lg" name="email" id="default-01"
                                                 placeholder="Enter your email address or username"></div>
                                     </div>
                                     <div class="form-group">
@@ -92,15 +91,12 @@
                                                 data-target="password"><em
                                                     class="passcode-icon icon-show icon ni ni-eye"></em><em
                                                     class="passcode-icon icon-hide icon ni ni-eye-off"></em></a><input
-                                                type="password" class="form-control form-control-lg" id="password"
+                                                type="password" name="password" class="form-control form-control-lg" id="password"
                                                 placeholder="Enter your passcode"></div>
                                     </div>
                                     <div class="form-group"><button class="btn btn-lg btn-primary btn-block">Sign
                                             in</button></div>
                                 </form>
-                                <div class="form-note-s2 pt-4"> New on our platform? 
-                                    <a href="<?=site_url('auth/register'); ?>">Create an account</a>
-                                </div>
                             </div>
                             <div class="nk-block nk-auth-footer">
                                 <div class="nk-block-between">
