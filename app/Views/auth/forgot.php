@@ -9,10 +9,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="theme-color" content="green">
     <!-- Fav Icon  -->
-    <link rel="shortcut icon" href="<?=site_url(); ?>assets/zend.png">
+    <link rel="shortcut icon" href="<?=site_url(); ?>assets/fav.png">
     <!-- Page Title  -->
     <title><?=$title; ?></title>
-    <link rel="manifest" href="<?=site_url(); ?>manifest.webmanifest">
     <!-- StyleSheets  -->
     <link rel="stylesheet" href="<?=site_url(); ?>assets/css/dashlite.css">
     <link id="skin-default" rel="stylesheet" href="<?=site_url(); ?>assets/css/skins/theme-blue.css">
@@ -121,34 +120,7 @@
                             </div>
                             </div>
                             <div class="nk-block nk-auth-footer">
-                                <div class="nk-block-between">
-                                    <ul class="nav nav-sm">
-                                        <li class="nav-item dropup"><a
-                                                class="dropdown-toggle dropdown-indicator has-indicator link link-primary fw-normal py-2 px-3"
-                                                data-bs-toggle="dropdown" data-offset="0,10"><small>English</small></a>
-                                            <div class="dropdown-menu dropdown-menu-sm dropdown-menu-end">
-                                                <ul class="language-list">
-                                                    <li><a href="#" class="language-item"><img
-                                                                src="<?=site_url(); ?>assets/images/flags/english.png" alt=""
-                                                                class="language-flag"><span
-                                                                class="language-name">English</span></a></li>
-                                                    <li><a href="#" class="language-item"><img
-                                                                src="<?=site_url(); ?>assets/images/flags/spanish.png" alt=""
-                                                                class="language-flag"><span
-                                                                class="language-name">Español</span></a></li>
-                                                    <li><a href="#" class="language-item"><img
-                                                                src="<?=site_url(); ?>assets/images/flags/french.png" alt=""
-                                                                class="language-flag"><span
-                                                                class="language-name">Français</span></a></li>
-                                                    <li><a href="#" class="language-item"><img
-                                                                src="<?=site_url(); ?>assets/images/flags/turkey.png" alt=""
-                                                                class="language-flag"><span
-                                                                class="language-name">Türkçe</span></a></li>
-                                                </ul>
-                                            </div>
-                                        </li>
-                                    </ul>
-                                </div>
+                                
                                 <div class="mt-3">
                                     <p>&copy; <?=date('Y').' '.app_name;?>. All Rights Reserved.</p>
                                 </div>
@@ -158,7 +130,7 @@
                             background-position: center;
                             background-color: rgba(0, 0, 0, 0.5);
                             background-size: cover;
-                            opacity: 0.5;
+                            opacity: 0.9;
                             background-repeat: no-repeat;">
                                 
                         </div>
