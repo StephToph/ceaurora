@@ -1178,8 +1178,8 @@
         </div>
     </div>
         <!-- wrap @s -->
-        <div class="nk-wrap ">
-            <!-- main header @s -->
+        <!-- <div class="nk-wrap ">
+             main header @s 
             <div class="nk-sidebar nk-sidebar-fixed " data-content="sidebarMenu">
                 <div class="container-xl wide-xl">
                     <div class="nk-header-wrap">
@@ -1191,7 +1191,7 @@
                                 <img class="logo-light logo-img logo-img-lg" src="<?=site_url(); ?>assets/logo-white.png" srcset="<?=site_url(); ?>assets/logo-white.png 2x" style="max-width:70%" alt="logo">
                                 <img class="logo-dark logo-img logo-img-lg" src="<?=site_url(); ?>assets/logo-white.png" srcset="<?=site_url(); ?>assets/logo-white.png 2x" style="max-width:70%" alt="logo-dark">
                             </a>
-                        </div><!-- .nk-header-brand -->
+                        </div>
                         <div class="nk-header-menu" data-content="headerNav">
                             <div class="nk-header-mobile">
                                 <div class="nk-header-brand">
@@ -1204,7 +1204,8 @@
                                     <a href="#" class="nk-nav-toggle nk-quick-nav-icon" data-target="headerNav"><em class="icon ni ni-arrow-left"></em></a>
                                 </div>
                             </div>
-                            <!-- Menu -->
+                            
+                            
                             <ul class="nk-menu nk-menu-main mt-3">
                                 <li class="nk-menu-item <?php if($page_active == 'dashboard'){echo 'active';} ?>">
                                     <a href="<?=site_url('dashboard'); ?>" class="nk-menu-link">
@@ -1536,7 +1537,7 @@
             <div id="bb_ajax_msgs"></div>
                 
             <!-- wrap @e -->
-        </div>
+        </div> -->
         <!-- wrap @e -->
     </div>
     <div class="modal modal-center fade" tabindex="-1" id="modal" role="dialog" data-keyboard="false"
@@ -1556,8 +1557,12 @@
                                                 
     <div id="output"></div>
 </body>
-    <script src="<?=site_url();?>assets/js/bundle.js"></script>
-    <script src="<?=site_url();?>assets/js/scripts.js"></script>
+
+
+    <script src="<?=site_url(); ?>assets/js/bundle.js?ver=3.2.3"></script>
+    <script src="<?=site_url(); ?>assets/js/scripts.js?ver=3.2.3"></script>
+    <script src="<?=site_url(); ?>assets/js/demo-settingse5ca.js?ver=3.2.3"></script>
+    <script src="<?=site_url(); ?>assets/js/charts/chart-crme5ca.js?ver=3.2.3"></script>
    
     <script>
          var site_url = '<?=site_url(); ?>';
