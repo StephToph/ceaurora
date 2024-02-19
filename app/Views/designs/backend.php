@@ -108,144 +108,101 @@
                     <div class="nk-sidebar-content">
                         <div class="nk-sidebar-menu" data-simplebar>
                             <ul class="nk-menu">
-                                <li class="nk-menu-item"><a href="index.html" class="nk-menu-link"><span
-                                            class="nk-menu-icon"><em class="icon ni ni-dashboard-fill"></em></span><span
-                                            class="nk-menu-text">Dashboard</span></a></li>
-                                <li class="nk-menu-item has-sub"><a href="#" class="nk-menu-link nk-menu-toggle"><span
-                                            class="nk-menu-icon"><em class="icon ni ni-users-fill"></em></span><span
-                                            class="nk-menu-text">Lead</span></a>
+                                <!-- Dynamic Menu Items --> 
+                                <?php
+                                    $menu = '';
+                                    $modules = $this->Crud->read_single_order('parent', 0, 'access_module', 'priority', 'asc');
+                                    if(!empty($modules)) {
+                                        foreach($modules as $mod) {
+                                            // get level 2
+                                            $level2 = '';
+                                            if($this->Crud->mod_read($log_role_id, $mod->link) == 1) {
+                                                $mod_level2 = $this->Crud->read_single_order('parent', $mod->id, 'access_module', 'priority', 'asc');
+                                                if(!empty($mod_level2)) {
+                                                    $open = false;
+                                                    foreach($mod_level2 as $mod2) {
+                                                        if($this->Crud->mod_read($log_role_id, $mod2->link) == 1) {
+                                                            // add parent to first
+                                                            if(empty($level2)) {
+                                                                // $level2 = '
+                                                                //     <li>
+                                                                //         <a href="'.site_url($mod->link).'">'.$mod->name.'</a>
+                                                                //     </li>
+                                                                // ';
+                                                            }
+                                                            if($page_active == $mod2->link){$open = true; $a_active = 'active';} else {$a_active = '';}
+                                                            
+                                                            // add the rest
+                                                            $level2 .= '
+                                                                <li class="nk-menu-item '.$a_active.'">
+                                                                    <a href="'.site_url($mod2->link).'" class="nk-menu-link">'.$mod2->name.'</a>
+                                                                </li>
+                                                            '; 
+                                                        }
+                                                    }
+                                                    
+                                                    $level2 = '
+                                                        <ul class="nk-menu-sub">
+                                                            '.$level2.'
+                                                        </ul>
+                                                    ';
+                                                }
+
+                                                if($page_active == $mod->link){$a_active = 'active';} else {$a_active = '';}
+                                                if($level2){
+                                                    $topmenu = 'has-sub';
+                                                    $submenu = 'nk-menu-toggle';
+                                                    $dlink = 'javascript:;';
+                                                    $menu_arrow = '<span class="arrow"><i class="arrow-icon"></i></span>';
+                                                } else {
+                                                    $topmenu = '';
+                                                    $submenu = ''; 
+                                                    $dlink = site_url($mod->link);
+                                                    $menu_arrow = '';
+                                                }
+
+                                                $menu .= '
+                                                    <li class="nk-menu-item '.$topmenu .' '.$a_active.'">
+                                                        <a class="nk-menu-link '.$submenu.'" href="'.$dlink.'">
+                                                            <span class="nk-menu-icon">
+                                                                <em class="'.$mod->icon.'"></em>
+                                                            </span>
+                                                            <span class="nk-menu-text">'.$mod->name.'</span>
+                                                            '.$menu_arrow.'
+                                                        </a>
+                                                        '.$level2.'
+                                                    </li>
+                                                ';
+                                            }
+                                        }
+                                    }
+
+                                    echo $menu;
+                                ?>
+                                
+                                <!-- Modules and Roles -->
+                                <?php if($log_role == 'developer') { ?>
+                                <li class="nk-menu-item has-sub">
+                                    <a class="nk-menu-link nk-menu-toggle" href="javascript:;">
+                                        <span class="nk-menu-icon"><em class="icon ni ni-setting-alt-fill"></em></span>
+                                        <span class="nk-menu-text">Access Roles</span>
+                                    </a>
                                     <ul class="nk-menu-sub">
-                                        <li class="nk-menu-item"><a href="people.html" class="nk-menu-link"><span
-                                                    class="nk-menu-text">People</span></a></li>
-                                        <li class="nk-menu-item"><a href="organizations.html" class="nk-menu-link"><span
-                                                    class="nk-menu-text">Organization</span></a></li>
+                                        <li class="nk-menu-item <?php if($page_active=='app') {echo 'active';} ?>">
+                                            <a href="<?php echo site_url('settings/app'); ?>" class="nk-menu-link">Website Settings</a>
+                                        </li>
+                                        <li class="nk-menu-item <?php if($page_active=='module') {echo 'active';} ?>">
+                                            <a href="<?php echo site_url('settings/modules'); ?>" class="nk-menu-link">Modules</a>
+                                        </li>
+                                        <li class="nk-menu-item <?php if($page_active=='role') {echo 'active';} ?>">
+                                            <a href="<?php echo site_url('settings/roles'); ?>" class="nk-menu-link">Roles</a>
+                                        </li>
+                                        <li class="nk-menu-item <?php if($page_active=='access') {echo 'active';} ?>">
+                                            <a href="<?php echo site_url('settings/access'); ?>" class="nk-menu-link">Access CRUD</a>
+                                        </li>
                                     </ul>
                                 </li>
-                                <li class="nk-menu-item"><a href="customer-list.html" class="nk-menu-link"><span
-                                            class="nk-menu-icon"><em class="icon ni ni-user-list-fill"></em></span><span
-                                            class="nk-menu-text">Customers</span></a></li>
-                                <li class="nk-menu-item has-sub"><a href="#" class="nk-menu-link nk-menu-toggle"><span
-                                            class="nk-menu-icon"><em class="icon ni ni-cart-fill"></em></span><span
-                                            class="nk-menu-text">Sales</span></a>
-                                    <ul class="nk-menu-sub">
-                                        <li class="nk-menu-item"><a href="invoices.html" class="nk-menu-link"><span
-                                                    class="nk-menu-text">Invoices</span></a></li>
-                                        <li class="nk-menu-item"><a href="payment.html" class="nk-menu-link"><span
-                                                    class="nk-menu-text">Payment</span></a></li>
-                                        <li class="nk-menu-item"><a href="recent-sale.html" class="nk-menu-link"><span
-                                                    class="nk-menu-text">Recent Sale</span></a></li>
-                                        <li class="nk-menu-item"><a href="estimates.html" class="nk-menu-link"><span
-                                                    class="nk-menu-text">Estimates</span></a></li>
-                                        <li class="nk-menu-item"><a href="expenses.html" class="nk-menu-link"><span
-                                                    class="nk-menu-text">Expenses</span></a></li>
-                                    </ul>
-                                </li>
-                                <li class="nk-menu-item has-sub"><a href="#" class="nk-menu-link nk-menu-toggle"><span
-                                            class="nk-menu-icon"><em class="icon ni ni-tranx"></em></span><span
-                                            class="nk-menu-text">Transaction</span></a>
-                                    <ul class="nk-menu-sub">
-                                        <li class="nk-menu-item"><a href="deposit.html" class="nk-menu-link"><span
-                                                    class="nk-menu-text">Recent Deposits</span></a></li>
-                                        <li class="nk-menu-item"><a href="transaction.html" class="nk-menu-link"><span
-                                                    class="nk-menu-text"> All Transaction</span></a></li>
-                                        <li class="nk-menu-item"><a href="transfer-report.html"
-                                                class="nk-menu-link"><span class="nk-menu-text">Transfer
-                                                    Report</span></a></li>
-                                    </ul>
-                                </li>
-                                <li class="nk-menu-item has-sub"><a href="#" class="nk-menu-link nk-menu-toggle"><span
-                                            class="nk-menu-icon"><em class="icon ni ni-task-fill-c"></em></span><span
-                                            class="nk-menu-text">Task</span></a>
-                                    <ul class="nk-menu-sub">
-                                        <li class="nk-menu-item"><a href="running-task.html" class="nk-menu-link"><span
-                                                    class="nk-menu-text">Running Task</span></a></li>
-                                        <li class="nk-menu-item"><a href="archive-task.html" class="nk-menu-link"><span
-                                                    class="nk-menu-text">Archived Task</span></a></li>
-                                    </ul>
-                                </li>
-                                <li class="nk-menu-item has-sub"><a href="#" class="nk-menu-link nk-menu-toggle"><span
-                                            class="nk-menu-icon"><em class="icon ni ni-coin"></em></span><span
-                                            class="nk-menu-text">Account</span></a>
-                                    <ul class="nk-menu-sub">
-                                        <li class="nk-menu-item"><a href="client-payment.html"
-                                                class="nk-menu-link"><span class="nk-menu-text">Client
-                                                    Payment</span></a></li>
-                                        <li class="nk-menu-item"><a href="expense-management.html"
-                                                class="nk-menu-link"><span class="nk-menu-text">Expense
-                                                    Management</span></a></li>
-                                    </ul>
-                                </li>
-                                <li class="nk-menu-item has-sub"><a href="#" class="nk-menu-link nk-menu-toggle"><span
-                                            class="nk-menu-icon"><em class="icon ni ni-truck"></em></span><span
-                                            class="nk-menu-text">Product Management</span></a>
-                                    <ul class="nk-menu-sub">
-                                        <li class="nk-menu-item"><a href="products.html" class="nk-menu-link"><span
-                                                    class="nk-menu-text">Products</span></a></li>
-                                        <li class="nk-menu-item"><a href="warehouse.html" class="nk-menu-link"><span
-                                                    class="nk-menu-text">Warehouse</span></a></li>
-                                        <li class="nk-menu-item"><a href="product-transfer.html"
-                                                class="nk-menu-link"><span class="nk-menu-text">Product
-                                                    Transfer</span></a></li>
-                                    </ul>
-                                </li>
-                                <li class="nk-menu-item has-sub"><a href="#" class="nk-menu-link nk-menu-toggle"><span
-                                            class="nk-menu-icon"><em class="icon ni ni-growth-fill"></em></span><span
-                                            class="nk-menu-text">Report</span></a>
-                                    <ul class="nk-menu-sub">
-                                        <li class="nk-menu-item"><a href="dealing-info.html" class="nk-menu-link"><span
-                                                    class="nk-menu-text">Dealing Info</span></a></li>
-                                        <li class="nk-menu-item"><a href="client-report.html" class="nk-menu-link"><span
-                                                    class="nk-menu-text">Client Report</span></a></li>
-                                        <li class="nk-menu-item"><a href="expense-report.html"
-                                                class="nk-menu-link"><span class="nk-menu-text">Expense
-                                                    Report</span></a></li>
-                                    </ul>
-                                </li>
-                                <li class="nk-menu-item"><a href="employee.html" class="nk-menu-link"><span
-                                            class="nk-menu-icon"><em class="icon ni ni-layers-fill"></em></span><span
-                                            class="nk-menu-text">Employees</span></a></li>
-                                <li class="nk-menu-item"><a href="projects.html" class="nk-menu-link"><span
-                                            class="nk-menu-icon"><em
-                                                class="icon ni ni-list-index-fill"></em></span><span
-                                            class="nk-menu-text">Projects</span></a></li>
-                                <li class="nk-menu-item has-sub"><a href="#" class="nk-menu-link nk-menu-toggle"><span
-                                            class="nk-menu-icon"><em class="icon ni ni-coins"></em></span><span
-                                            class="nk-menu-text">Payroll</span></a>
-                                    <ul class="nk-menu-sub">
-                                        <li class="nk-menu-item"><a href="salary-grade.html" class="nk-menu-link"><span
-                                                    class="nk-menu-text">Salary grade</span></a></li>
-                                        <li class="nk-menu-item"><a href="employee-salary-list.html"
-                                                class="nk-menu-link"><span class="nk-menu-text">Employee Salary
-                                                    List</span></a></li>
-                                    </ul>
-                                </li>
-                                <li class="nk-menu-item"><a href="time-history.html" class="nk-menu-link"><span
-                                            class="nk-menu-icon"><em
-                                                class="icon ni ni-calendar-check-fill"></em></span><span
-                                            class="nk-menu-text">Attendance</span></a></li>
-                                <li class="nk-menu-item"><a href="subscription.html" class="nk-menu-link"><span
-                                            class="nk-menu-icon"><em class="icon ni ni-invest"></em></span><span
-                                            class="nk-menu-text">Subscription</span></a></li>
-                                <li class="nk-menu-item"><a href="notice-board.html" class="nk-menu-link"><span
-                                            class="nk-menu-icon"><em class="icon ni ni-notice"></em></span><span
-                                            class="nk-menu-text">Notice Board</span></a></li>
-                                <li class="nk-menu-item"><a href="support.html" class="nk-menu-link"><span
-                                            class="nk-menu-icon"><em
-                                                class="icon ni ni-chat-circle-fill"></em></span><span
-                                            class="nk-menu-text">Support</span></a></li>
-                                <li class="nk-menu-item"><a href="settings.html" class="nk-menu-link"><span
-                                            class="nk-menu-icon"><em
-                                                class="icon ni ni-setting-alt-fill"></em></span><span
-                                            class="nk-menu-text">Settings</span></a></li>
-                                <li class="nk-menu-heading">
-                                    <h6 class="overline-title text-primary-alt">Return to</h6>
-                                </li>
-                                <li class="nk-menu-item"><a href="../index.html" class="nk-menu-link"><span
-                                            class="nk-menu-icon"><em class="icon ni ni-dashlite-alt"></em></span><span
-                                            class="nk-menu-text">Main Dashboard</span></a></li>
-                                <li class="nk-menu-item"><a href="../components.html" class="nk-menu-link"><span
-                                            class="nk-menu-icon"><em class="icon ni ni-layers-fill"></em></span><span
-                                            class="nk-menu-text">All Components</span></a></li>
+                                <?php } ?>
                             </ul>
                         </div>
                     </div>
@@ -254,520 +211,303 @@
             <div class="nk-wrap ">
                 <div class="nk-header nk-header-fixed">
                     <div class="container-fluid">
-                        <div class="nk-header-wrap">
-                            <div class="nk-menu-trigger d-xl-none ms-n1"><a href="#"
-                                    class="nk-nav-toggle nk-quick-nav-icon" data-target="sidebarMenu"><em
-                                        class="icon ni ni-menu"></em></a></div>
-                            <div class="nk-header-brand d-xl-none"><a href="../index.html" class="logo-link"><img
-                                        class="logo-light logo-img" src="../images/logo.png"
-                                        srcset="/demo1/images/logo2x.png 2x" alt="logo"><img class="logo-dark logo-img"
-                                        src="../images/logo-dark.png" srcset="/demo1/images/logo-dark2x.png 2x"
-                                        alt="logo-dark"></a></div>
-                            
+                    <div class="nk-header-wrap">
+                            <div class="nk-menu-trigger d-xl-none ms-n1">
+                                <a href="javascript:;" class="nk-nav-toggle nk-quick-nav-icon" data-target="sidebarMenu"><em class="icon ni ni-menu"></em></a>
+                            </div>
+                            <div class="nk-header-brand d-xl-none">
+                                <a href="<?=site_url('dashboard');?>" class="logo-link nk-sidebar-logo">
+                                    <img class="logo-light logo-img logo-img-lg" src="<?=site_url();?>assets/logo.png?v=0" srcset="<?=site_url();?>assets/logo.png?v=0 2x" width="" alt="logo">
+                                    <img class="logo-dark logo-img logo-img-lg" src="<?=site_url();?>assets/logo.png?v=0" srcset="<?=site_url();?>assets/logo.png?v=0 2x" width="" alt="logo-dark">
+                                </a>
+                            </div>
+                            <div class="nk-header-search ms-3 ms-xl-0">
+                                <!-- <em class="icon ni ni-search"></em>
+                                <input type="text" class="form-control border-transparent form-focus-none" placeholder="Search anything"> -->
+                            </div>
                             <div class="nk-header-tools">
                                 <ul class="nk-quick-nav">
-                                    <li class="dropdown language-dropdown d-none d-sm-block me-n1"><a href="#"
-                                            class="dropdown-toggle nk-quick-nav-icon" data-bs-toggle="dropdown">
-                                            <div class="quick-icon border border-light"><img class="icon"
-                                                    src="../images/flags/english-sq.png" alt=""></div>
+                                    <!-- <li class="dropdown language-dropdown d-none d-sm-block me-n1">
+                                        <a href="javascript:;" class="dropdown-toggle nk-quick-nav-icon" data-bs-toggle="dropdown">
+                                            <div class="quick-icon border border-light">
+                                                <img class="icon" src="<?=site_url();?>assets/backend/images/flags/english-sq.png" alt="">
+                                            </div>
                                         </a>
                                         <div class="dropdown-menu dropdown-menu-end dropdown-menu-s1">
                                             <ul class="language-list">
-                                                <li><a href="#" class="language-item"><img
-                                                            src="../images/flags/english.png" alt=""
-                                                            class="language-flag"><span
-                                                            class="language-name">English</span></a></li>
-                                                <li><a href="#" class="language-item"><img
-                                                            src="../images/flags/spanish.png" alt=""
-                                                            class="language-flag"><span
-                                                            class="language-name">Español</span></a></li>
-                                                <li><a href="#" class="language-item"><img
-                                                            src="../images/flags/french.png" alt=""
-                                                            class="language-flag"><span
-                                                            class="language-name">Français</span></a></li>
-                                                <li><a href="#" class="language-item"><img
-                                                            src="../images/flags/turkey.png" alt=""
-                                                            class="language-flag"><span
-                                                            class="language-name">Türkçe</span></a></li>
+                                                <li>
+                                                    <a href="#" class="language-item">
+                                                        <img src="<?=site_url();?>assets/backend/images/flags/english.png" alt="" class="language-flag">
+                                                        <span class="language-name">English</span>
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a href="#" class="language-item">
+                                                        <img src="<?=site_url();?>assets/backend/images/flags/spanish.png" alt="" class="language-flag">
+                                                        <span class="language-name">Español</span>
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a href="#" class="language-item">
+                                                        <img src="<?=site_url();?>assets/backend/images/flags/french.png" alt="" class="language-flag">
+                                                        <span class="language-name">Français</span>
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a href="#" class="language-item">
+                                                        <img src="<?=site_url();?>assets/backend/images/flags/turkey.png" alt="" class="language-flag">
+                                                        <span class="language-name">Türkçe</span>
+                                                    </a>
+                                                </li>
                                             </ul>
                                         </div>
-                                    </li>
-                                    <li class="dropdown user-dropdown"><a href="#" class="dropdown-toggle"
-                                            data-bs-toggle="dropdown">
-                                            <div class="user-toggle">
-                                                <div class="user-avatar sm"><em class="icon ni ni-user-alt"></em></div>
-                                                <div class="user-info d-none d-md-block">
-                                                    <div class="user-status">Administrator</div>
-                                                    <div class="user-name dropdown-indicator">Abu Bin Ishityak</div>
-                                                </div>
-                                            </div>
+                                    </li> -->
+
+                                    <!-- <li class="dropdown chats-dropdown hide-mb-xs">
+                                        <a href="javascript:;" class="dropdown-toggle nk-quick-nav-icon" data-bs-toggle="dropdown">
+                                            <div class="icon-status icon-status-na"><em class="icon ni ni-comments"></em></div>
                                         </a>
-                                        <div class="dropdown-menu dropdown-menu-md dropdown-menu-end dropdown-menu-s1">
-                                            <div class="dropdown-inner user-card-wrap bg-lighter d-none d-md-block">
-                                                <div class="user-card">
-                                                    <div class="user-avatar"><span>AB</span></div>
-                                                    <div class="user-info"><span class="lead-text">Abu Bin
-                                                            Ishtiyak</span><span
-                                                            class="sub-text">info@softnio.com</span></div>
-                                                </div>
+                                        <div class="dropdown-menu dropdown-menu-xl dropdown-menu-end">
+                                            <div class="dropdown-head">
+                                                <span class="sub-title nk-dropdown-title">Recent Chats</span>
+                                                <a href="javascript:;">Setting</a>
                                             </div>
-                                            <div class="dropdown-inner">
-                                                <ul class="link-list">
-                                                    <li><a href="../user-profile-regular.html"><em
-                                                                class="icon ni ni-user-alt"></em><span>View
-                                                                Profile</span></a></li>
-                                                    <li><a href="../user-profile-setting.html"><em
-                                                                class="icon ni ni-setting-alt"></em><span>Account
-                                                                Setting</span></a></li>
-                                                    <li><a href="../user-profile-activity.html"><em
-                                                                class="icon ni ni-activity-alt"></em><span>Login
-                                                                Activity</span></a></li>
+                                            <div class="dropdown-body">
+                                                <ul class="chat-list">
+                                                    <li class="chat-item">
+                                                        <a class="chat-link" href="javascript:;">
+                                                            <div class="chat-media user-avatar">
+                                                                <span>IH</span>
+                                                                <span class="status dot dot-lg dot-gray"></span>
+                                                            </div>
+                                                            <div class="chat-info">
+                                                                <div class="chat-from">
+                                                                    <div class="name">Iliash Hossain</div>
+                                                                    <span class="time">Now</span>
+                                                                </div>
+                                                                <div class="chat-context">
+                                                                    <div class="text">You: Please confrim if you got my last messages.</div>
+                                                                    <div class="status delivered">
+                                                                        <em class="icon ni ni-check-circle-fill"></em>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li class="chat-item is-unread">
+                                                        <a class="chat-link" href="javascript:;">
+                                                            <div class="chat-media user-avatar bg-pink">
+                                                                <span>AB</span>
+                                                                <span class="status dot dot-lg dot-success"></span>
+                                                            </div>
+                                                            <div class="chat-info">
+                                                                <div class="chat-from">
+                                                                    <div class="name">Abu Bin Ishtiyak</div>
+                                                                    <span class="time">4:49 AM</span>
+                                                                </div>
+                                                                <div class="chat-context">
+                                                                    <div class="text">Hi, I am Ishtiyak, can you help me with this problem ?</div>
+                                                                    <div class="status unread">
+                                                                        <em class="icon ni ni-bullet-fill"></em>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li class="chat-item">
+                                                        <a class="chat-link" href="javascript:;">
+                                                            <div class="chat-media user-avatar">
+                                                                <img src="<?=site_url();?>assets/backend/images/avatar/b-sm.jpg" alt="">
+                                                            </div>
+                                                            <div class="chat-info">
+                                                                <div class="chat-from">
+                                                                    <div class="name">George Philips</div>
+                                                                    <span class="time">6 Apr</span>
+                                                                </div>
+                                                                <div class="chat-context">
+                                                                    <div class="text">Have you seens the claim from Rose?</div>
+                                                                </div>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li class="chat-item">
+                                                        <a class="chat-link" href="html/lms/message.html">
+                                                            <div class="chat-media user-avatar user-avatar-multiple">
+                                                                <div class="user-avatar">
+                                                                    <img src="<?=site_url();?>assets/backend/images/avatar/c-sm.jpg" alt="">
+                                                                </div>
+                                                                <div class="user-avatar">
+                                                                    <span>AB</span>
+                                                                </div>
+                                                            </div>
+                                                            <div class="chat-info">
+                                                                <div class="chat-from">
+                                                                    <div class="name">Softnio Group</div>
+                                                                    <span class="time">27 Mar</span>
+                                                                </div>
+                                                                <div class="chat-context">
+                                                                    <div class="text">You: I just bought a new computer but i am having some problem</div>
+                                                                    <div class="status sent">
+                                                                        <em class="icon ni ni-check-circle"></em>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li class="chat-item">
+                                                        <a class="chat-link" href="javascript:;">
+                                                            <div class="chat-media user-avatar">
+                                                                <img src="<?=site_url();?>assets/backend/images/avatar/a-sm.jpg" alt="">
+                                                                <span class="status dot dot-lg dot-success"></span>
+                                                            </div>
+                                                            <div class="chat-info">
+                                                                <div class="chat-from">
+                                                                    <div class="name">Larry Hughes</div>
+                                                                    <span class="time">3 Apr</span>
+                                                                </div>
+                                                                <div class="chat-context">
+                                                                    <div class="text">Hi Frank! How is you doing?</div>
+                                                                </div>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li class="chat-item">
+                                                        <a class="chat-link" href="javascript:;">
+                                                            <div class="chat-media user-avatar bg-purple">
+                                                                <span>TW</span>
+                                                            </div>
+                                                            <div class="chat-info">
+                                                                <div class="chat-from">
+                                                                    <div class="name">Tammy Wilson</div>
+                                                                    <span class="time">27 Mar</span>
+                                                                </div>
+                                                                <div class="chat-context">
+                                                                    <div class="text">You: I just bought a new computer but i am having some problem</div>
+                                                                    <div class="status sent">
+                                                                        <em class="icon ni ni-check-circle"></em>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </a>
+                                                    </li>
                                                 </ul>
                                             </div>
-                                            <div class="dropdown-inner">
-                                                <ul class="link-list">
-                                                    <li><a href="#"><em class="icon ni ni-signout"></em><span>Sign
-                                                                out</span></a></li>
-                                                </ul>
+                                            <div class="dropdown-foot center">
+                                                <a href="javascript:;">View All</a>
                                             </div>
                                         </div>
-                                    </li>
-                                    <li class="dropdown notification-dropdown me-n1"><a href="#"
-                                            class="dropdown-toggle nk-quick-nav-icon" data-bs-toggle="dropdown">
-                                            <div class="icon-status icon-status-info"><em class="icon ni ni-bell"></em>
-                                            </div>
+                                    </li> -->
+
+                                    <li class="dropdown notification-dropdown me-n1">
+                                        <a href="#" class="dropdown-toggle nk-quick-nav-icon" data-bs-toggle="dropdown">
+                                            <?php 
+                                                $sta = '';
+                                                if($this->Crud->check2('to_id', $log_id, 'new', '1', 'notify') > 0){
+                                                    $sta = 'icon-status-info';
+                                                }
+                                            
+                                            ?>
+                                            <div class="icon-status <?=$sta; ?>"><em class="icon ni ni-bell"></em></div>
                                         </a>
                                         <div class="dropdown-menu dropdown-menu-xl dropdown-menu-end dropdown-menu-s1">
-                                            <div class="dropdown-head"><span
-                                                    class="sub-title nk-dropdown-title">Notifications</span><a
-                                                    href="#">Mark All as Read</a></div>
+                                            <div class="dropdown-head">
+                                                <span class="sub-title nk-dropdown-title">Notifications</span>
+                                            </div>
                                             <div class="dropdown-body">
                                                 <div class="nk-notification">
-                                                    <div class="nk-notification-item dropdown-inner">
-                                                        <div class="nk-notification-icon"><em
-                                                                class="icon icon-circle bg-warning-dim ni ni-curve-down-right"></em>
-                                                        </div>
-                                                        <div class="nk-notification-content">
-                                                            <div class="nk-notification-text">You have requested to
-                                                                <span>Widthdrawl</span></div>
-                                                            <div class="nk-notification-time">2 hrs ago</div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="nk-notification-item dropdown-inner">
-                                                        <div class="nk-notification-icon"><em
-                                                                class="icon icon-circle bg-success-dim ni ni-curve-down-left"></em>
-                                                        </div>
-                                                        <div class="nk-notification-content">
-                                                            <div class="nk-notification-text">Your <span>Deposit
-                                                                    Order</span> is placed</div>
-                                                            <div class="nk-notification-time">2 hrs ago</div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="nk-notification-item dropdown-inner">
-                                                        <div class="nk-notification-icon"><em
-                                                                class="icon icon-circle bg-warning-dim ni ni-curve-down-right"></em>
-                                                        </div>
-                                                        <div class="nk-notification-content">
-                                                            <div class="nk-notification-text">You have requested to
-                                                                <span>Widthdrawl</span></div>
-                                                            <div class="nk-notification-time">2 hrs ago</div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="nk-notification-item dropdown-inner">
-                                                        <div class="nk-notification-icon"><em
-                                                                class="icon icon-circle bg-success-dim ni ni-curve-down-left"></em>
-                                                        </div>
-                                                        <div class="nk-notification-content">
-                                                            <div class="nk-notification-text">Your <span>Deposit
-                                                                    Order</span> is placed</div>
-                                                            <div class="nk-notification-time">2 hrs ago</div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="nk-notification-item dropdown-inner">
-                                                        <div class="nk-notification-icon"><em
-                                                                class="icon icon-circle bg-warning-dim ni ni-curve-down-right"></em>
-                                                        </div>
-                                                        <div class="nk-notification-content">
-                                                            <div class="nk-notification-text">You have requested to
-                                                                <span>Widthdrawl</span></div>
-                                                            <div class="nk-notification-time">2 hrs ago</div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="nk-notification-item dropdown-inner">
-                                                        <div class="nk-notification-icon"><em
-                                                                class="icon icon-circle bg-success-dim ni ni-curve-down-left"></em>
-                                                        </div>
-                                                        <div class="nk-notification-content">
-                                                            <div class="nk-notification-text">Your <span>Deposit
-                                                                    Order</span> is placed</div>
-                                                            <div class="nk-notification-time">2 hrs ago</div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="dropdown-foot center"><a href="#">View All</a></div>
-                                        </div>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="nk-content ">
-                    
-                </div>
-                <div class="nk-footer">
-                    <div class="container-fluid">
-                        <div class="nk-footer-wrap">
-                            <div class="nk-footer-copyright"> &copy; 2023 DashLite. Template by <a
-                                    href="https://softnio.com/" target="_blank">Softnio</a></div>
-                            <div class="nk-footer-links">
-                                <ul class="nav nav-sm">
-                                    <li class="nav-item dropup"><a href="#"
-                                            class="dropdown-toggle dropdown-indicator has-indicator nav-link"
-                                            data-bs-toggle="dropdown" data-offset="0,10"><span>English</span></a>
-                                        <div class="dropdown-menu dropdown-menu-sm dropdown-menu-end">
-                                            <ul class="language-list">
-                                                <li><a href="#" class="language-item"><span
-                                                            class="language-name">English</span></a></li>
-                                                <li><a href="#" class="language-item"><span
-                                                            class="language-name">Español</span></a></li>
-                                                <li><a href="#" class="language-item"><span
-                                                            class="language-name">Français</span></a></li>
-                                                <li><a href="#" class="language-item"><span
-                                                            class="language-name">Türkçe</span></a></li>
-                                            </ul>
-                                        </div>
-                                    </li>
-                                    <li class="nav-item"><a data-bs-toggle="modal" href="#region" class="nav-link"><em
-                                                class="icon ni ni-globe"></em><span class="ms-1">Select
-                                                Region</span></a></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-        <!-- wrap @s -->
-        <!-- <div class="nk-wrap ">
-             main header @s 
-            <div class="nk-sidebar nk-sidebar-fixed " data-content="sidebarMenu">
-                <div class="container-xl wide-xl">
-                    <div class="nk-header-wrap">
-                        <div class="nk-menu-trigger me-sm-2 d-lg-none">
-                            <a href="#" class="nk-nav-toggle nk-quick-nav-icon" data-target="headerNav"><em class="icon ni ni-menu"></em></a>
-                        </div>
-                        <div class="nk-header-brand">
-                            <a href="<?=site_url(); ?>" class="logo-link">
-                                <img class="logo-light logo-img logo-img-lg" src="<?=site_url(); ?>assets/logo-white.png" srcset="<?=site_url(); ?>assets/logo-white.png 2x" style="max-width:70%" alt="logo">
-                                <img class="logo-dark logo-img logo-img-lg" src="<?=site_url(); ?>assets/logo-white.png" srcset="<?=site_url(); ?>assets/logo-white.png 2x" style="max-width:70%" alt="logo-dark">
-                            </a>
-                        </div>
-                        <div class="nk-header-menu" data-content="headerNav">
-                            <div class="nk-header-mobile">
-                                <div class="nk-header-brand">
-                                    <a href="<?=site_url(); ?>" class="logo-link">
-                                        <img class="logo-light logo-img logo-img-lg" src="<?=site_url(); ?>assets/logo-white.png" srcset="<?=site_url(); ?>assets/logo-white.png 2x"  style="max-width:70%" alt="logo">
-                                        <img class="logo-dark logo-img logo-img-lg" src="<?=site_url(); ?>assets/logo-white.png" srcset="<?=site_url(); ?>assets/logo-white.png 2x" style="max-width:70%"  alt="logo-dark">
-                                    </a>
-                                </div>
-                                <div class="nk-menu-trigger me-n2">
-                                    <a href="#" class="nk-nav-toggle nk-quick-nav-icon" data-target="headerNav"><em class="icon ni ni-arrow-left"></em></a>
-                                </div>
-                            </div>
-                            
-                            
-                            <ul class="nk-menu nk-menu-main mt-3">
-                                <li class="nk-menu-item <?php if($page_active == 'dashboard'){echo 'active';} ?>">
-                                    <a href="<?=site_url('dashboard'); ?>" class="nk-menu-link">
-                                        <span class="nk-menu-text"><?=translate_phrase('Dashboard');?></span>
-                                    </a>
-                                </li>
-                                <li class="nk-menu-item <?php if($page_active == 'payments/tax'){echo 'active';} ?>">
-                                    <a href="<?=site_url('payments/tax'); ?>" class="nk-menu-link">
-                                        <span class="nk-menu-text"><?=translate_phrase('Tax Invoices'); ?></span>
-                                    </a>
-                                </li>
-                                <li class="nk-menu-item <?php if($page_active == 'payments/transaction'){echo 'active';} ?>">
-                                    <a href="<?=site_url('payments/transaction'); ?>" class="nk-menu-link">
-                                        <span class="nk-menu-text"><?=translate_phrase('Transactions'); ?></span>
-                                    </a>
-                                </li>
-                                <?php
-                                    if($log_role != 'personal' && $log_role != 'business'){?>
-                                    <li class="nk-menu-item <?php if($page_active == 'tax_check'){echo 'active';} ?>">
-                                        <a href="<?=site_url('dashboard/tax_check'); ?>" class="nk-menu-link">
-                                            <span class="nk-menu-text"><?=translate_phrase('Tax Check');?></span>
-                                        </a>
-                                    </li>
-                                <?php } ?>
-                                <li class="nk-menu-item active has-sub">
-                                    <a href="javascript:;" class="nk-menu-link nk-menu-toggle">
-                                        <span class="nk-menu-text">Menu</span>
-                                    </a>
-                                    <ul class="nk-menu-sub">
-                                        <?php
-                                            $menu = '';
-                                            $modules = $this->Crud->read_single_order('parent', 0, 'access_module', 'priority', 'asc');
-                                            if(!empty($modules)) {
-                                                foreach($modules as $mod) {
-                                                    if($mod->link == 'dashboard')continue;
-                                                    if($mod->link == 'dashboard/tax_check' || $mod->link == 'payments/tax')continue;
-                                                    // get level 2
-                                                    $level2 = '';
-                                                    if($this->Crud->mod_read($log_role_id, $mod->link) == 1) {
-                                                        $mod_level2 = $this->Crud->read_single_order('parent', $mod->id, 'access_module', 'priority', 'asc');
-                                                        if(!empty($mod_level2)) {
-                                                            $open = false;
-                                                            foreach($mod_level2 as $mod2) {
-                                                                if($this->Crud->mod_read($log_role_id, $mod2->link) == 1) {
-                                                                    // add parent to first
-                                                                    if(empty($level2)) {
-                                                                        // $level2 = '
-                                                                        //     <li>
-                                                                        //         <a href="'.site_url($mod->link).'">'.$mod->name.'</a>
-                                                                        //     </li>
-                                                                        // ';
-                                                                    }
-                                                                    if($page_active == $mod2->link){$open = true; $a_active = 'active';} else {$a_active = '';}
-                                                                    
-                                                                    // add the rest
-                                                                    $level2 .= '
-                                                                        <li class="nk-menu-item '.$a_active.'">
-                                                                            <a href="'.site_url($mod2->link).'" class="nk-menu-link">'.translate_phrase($mod2->name).'</a>
-                                                                        </li>
-                                                                    '; 
+                                                    <?php 
+                                                        $notify = $this->Crud->read2('to_id', $log_id, 'new', 1, 'notify');
+                                                        if(!empty($notify)){
+                                                           
+                                                            $a = 0;
+                                                            foreach($notify as $n){
+                                                                if($a>5) continue;
+                                                                $pos = 'left';
+                                                                $code = 'success';
+
+                                                                if($n->item == 'withdraw' || $n->item == 'transact'){
+                                                                    $pos = 'right';
+                                                                    $code = 'danger';
                                                                 }
-                                                            }
+                                                           
+                                                    ?><a href="javascript:;" onclick="mark_read(<?=$n->id; ?>)">
+                                                        <div class="nk-notification-item dropdown-inner">
                                                             
-                                                            $level2 = '
-                                                                <ul class="nk-menu-sub">
-                                                                    '.$level2.'
-                                                                </ul>
-                                                            ';
+                                                                <div class="nk-notification-icon">
+                                                                    <em class="icon icon-circle bg-<?=$code; ?>-dim ni ni-curve-down-<?=$pos; ?>"></em>
+                                                                </div>
+                                                                <div class="nk-notification-content">
+                                                                    <div class="nk-notification-text"><?=ucwords($n->content); ?></div>
+                                                                    <div class="nk-notification-time"><?=$this->Crud->timespan(strtotime($n->reg_date));; ?></div>
+                                                                </div>
+                                                            
+                                                        </div><!-- .dropdown-inner -->
+                                                    </a>
+                                                    <?php 
+                                                        $a++;
                                                         }
 
-                                                        if($page_active == $mod->link){$a_active = 'active';} else {$a_active = '';}
-                                                        if($level2){
-                                                            $topmenu = 'has-sub';
-                                                            $submenu = 'nk-menu-toggle';
-                                                            $dlink = 'javascript:;';
-                                                            $menu_arrow = '<span class="arrow"><i class="arrow-icon"></i></span>';
-                                                        } else {
-                                                            $topmenu = '';
-                                                            $submenu = ''; 
-                                                            $dlink = site_url($mod->link);
-                                                            $menu_arrow = '';
-                                                        }
-
-                                                        $menu .= '
-                                                            <li class="nk-menu-item '.$topmenu .' '.$a_active.'">
-                                                                <a class="nk-menu-link '.$submenu.'" href="'.$dlink.'">
-                                                                    <span class="nk-menu-icon">
-                                                                        <em class="'.$mod->icon.'"></em>
-                                                                    </span>
-                                                                    <span class="nk-menu-text">'.translate_phrase($mod->name).'</span>
-                                                                    '.$menu_arrow.'
-                                                                </a>
-                                                                '.$level2.'
-                                                            </li>
-                                                        ';
+                                                    } else {
+                                                        echo '<div class="text-center">No Notification</div>';
                                                     }
-                                                }
-                                            }
-
-                                            echo $menu;
-                                        ?>
-                                         <!-- Modules and log_roles -->
-                                        <?php if($log_role == 'developer' || $log_role == 'administrator') { ?>
-                                        <li class="nk-menu-item has-sub">
-                                            <a class="nk-menu-link nk-menu-toggle" href="javascript:;">
-                                                <span class="nk-menu-icon"><em
-                                                        class="icon ni ni-setting-alt-fill"></em></span>
-                                                <span class="nk-menu-text"><?=translate_phrase('Access Roles');?></span>
-                                            </a>
-                                            <ul class="nk-menu-sub mb-5">
-                                                <li class="nk-menu-item <?php if($page_active=='language') {echo 'active';} ?>">
-                                                    <a href="<?php echo site_url('settings/language'); ?>"
-                                                        class="nk-menu-link"><?=translate_phrase('Language Settings'); ?></a>
-                                                </li>
-                                                <?php if($log_role == 'developer'){?>
-                                                    <li
-                                                        class="nk-menu-item <?php if($page_active=='module') {echo 'active';} ?>">
-                                                        <a href="<?php echo site_url('settings/modules'); ?>"
-                                                            class="nk-menu-link"><?=translate_phrase('Modules'); ?></a>
+                                                    ?>
+                                                </div>
+                                            </div><!-- .nk-dropdown-body -->
+                                            <div class="dropdown-foot center">
+                                                <a href="<?=site_url('notification/list'); ?>">View All</a>
+                                            </div>
+                                        </div>
+                                    </li>
+                                <li class="dropdown user-dropdown">
+                                        <a href="javascript:;" class="dropdown-toggle me-n1" data-bs-toggle="dropdown">
+                                            <div class="user-toggle">
+                                                <div class="user-avatar sm">
+                                                    <em class="icon ni ni-user-alt"></em>
+                                                </div>
+                                                <div class="user-info d-none d-xl-block">
+                                                    <div class="user-status user-status-active"><?=ucwords($log_role);?></div>
+                                                    <div class="user-name dropdown-indicator"><?=$log_name;?></div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                        <div class="dropdown-menu dropdown-menu-md dropdown-menu-end">
+                                            <div class="dropdown-inner user-card-wrap bg-lighter d-none d-md-block">
+                                                <div class="user-card">
+                                                    <div class="user-avatar">
+                                                        <img alt="" height="40px" src="<?=site_url($log_user_img);?>" />
+                                                    </div>
+                                                    <div class="user-info">
+                                                        <span class="lead-text"><?=$log_name;?></span>
+                                                        <span class="sub-text"><?=ucwords($log_role);?></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="dropdown-inner">
+                                                <ul class="link-list">
+                                                    <li><a href="<?=site_url('profile');?>"><em class="icon ni ni-user-alt"></em><span>Profile</span></a></li>
+                                                    <!-- <li><a href="html/lms/admin-profile-setting.html"><em class="icon ni ni-setting-alt"></em><span>Account Setting</span></a>
                                                     </li>
-                                                    <li class="nk-menu-item <?php if($page_active=='role') {echo 'active';} ?>">
-                                                        <a href="<?php echo site_url('settings/roles'); ?>"
-                                                            class="nk-menu-link"><?=translate_phrase('Roles'); ?></a>
+                                                    <li><a href="html/lms/admin-profile-activity.html"><em class="icon ni ni-activity-alt"></em><span>Login Activity</span></a>
+                                                    </li> -->
+                                                    <!-- <li><a class="dark-switch" href="javascript:;"><em class="icon ni ni-moon"></em><span>Dark Mode</span></a></li> -->
+                                                </ul>
+                                            </div>
+                                            <div class="dropdown-inner">
+                                                <ul class="link-list">
+                                                    <li><a href="<?=site_url('auth/logout');?>"><em class="icon ni ni-signout"></em><span>Sign out</span></a>
                                                     </li>
-                                                    <li
-                                                        class="nk-menu-item <?php if($page_active=='access') {echo 'active';} ?>">
-                                                        <a href="<?php echo site_url('settings/access'); ?>"
-                                                            class="nk-menu-link"><?=translate_phrase('Access CRUD'); ?></a>
-                                                    </li>
-                                                <?php } ?>
-                                            </ul>
-                                        </li>
-                                        <?php } ?>
-
-                                    </ul>
-                                </li>
-                            </ul>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
-                        <div class="nk-header-tools">
-                            <ul class="nk-quick-nav">
-                                <li class="dropdown notification-dropdown me-n1">
-                                    <a href="#" class="dropdown-toggle nk-quick-nav-icon" data-bs-toggle="dropdown">
-                                        <?php 
-                                            $sta = '';
-                                            if($this->Crud->check2('to_id', $log_id, 'new', '1', 'notify') > 0){
-                                                $sta = 'icon-status-info';
-                                            }
-                                        
-                                        ?>
-                                        <div class="icon-status <?=$sta; ?>"><em class="icon ni ni-bell"></em></div>
-                                    </a>
-                                    <div class="dropdown-menu dropdown-menu-xl dropdown-menu-end dropdown-menu-s1">
-                                        <div class="dropdown-head">
-                                            <span class="sub-title nk-dropdown-title"><?=translate_phrase('Notifications'); ?></span>
-                                        </div>
-                                        <div class="dropdown-body">
-                                            <div class="nk-notification">
-                                                <?php 
-                                                    $notify = $this->Crud->read2('to_id', $log_id, 'new', 1, 'notify');
-                                                    if(!empty($notify)){
-                                                        
-                                                        $a = 0;
-                                                        foreach($notify as $n){
-                                                            if($a>5) continue;
-                                                            $pos = 'left';
-                                                            $code = 'success';
-
-                                                            if($n->item == 'withdraw' || $n->item == 'transact'){
-                                                                $pos = 'right';
-                                                                $code = 'danger';
-                                                            }
-                                                        
-                                                ?><a href="javascript:;" onclick="mark_read(<?=$n->id; ?>)">
-                                                    <div class="nk-notification-item dropdown-inner">
-
-                                                        <div class="nk-notification-icon">
-                                                            <em
-                                                                class="icon icon-circle bg-<?=$code; ?>-dim ni ni-curve-down-<?=$pos; ?>"></em>
-                                                        </div>
-                                                        <div class="nk-notification-content">
-                                                            <div class="nk-notification-text">
-                                                                <?=(ucwords($n->content)); ?></div>
-                                                            <div class="nk-notification-time">
-                                                                <?=$this->Crud->timespan(strtotime($n->reg_date));; ?>
-                                                            </div>
-                                                        </div>
-
-                                                    </div><!-- .dropdown-inner -->
-                                                </a>
-                                                <?php 
-                                                    $a++;
-                                                    }
-
-                                                } else {
-                                                    echo '<div class="text-center">'.translate_phrase('No Notification').'</div>';
-                                                }
-                                                ?>
-                                            </div>
-                                        </div><!-- .nk-dropdown-body -->
-                                        <div class="dropdown-foot center">
-                                            <a href="<?=site_url('notification/list'); ?>"><?=translate_phrase('View All'); ?></a>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li class="dropdown language-dropdown d-sm-block me-n1">
-                                    <a href="javascript:;" class="dropdown-toggle nk-quick-nav-icon" data-bs-toggle="dropdown">
-                                        <div class="quick-icon border border-light">
-                                            <?php
-                                                $flags = $current_language;
-                                                // echo $flags;
-                                                if($current_language == 'Hausa' || $current_language == 'Igbo' || $current_language == 'Yoruba')$flags = 'Nigerian';
-
-                                            ?>
-                                            <img class="icon" src="<?=site_url(); ?>assets/images/flags/<?=strtolower($flags); ?>.png" alt="">
-                                        </div>
-                                    </a>
-                                    <div class="dropdown-menu dropdown-menu-end dropdown-menu-s1">
-                                        <ul class="language-list">
-                                        <?php
-                                            $lang = $this->Crud->read_single_order('status', 1,'language_code', 'name', 'asc');
-                                            if(!empty($lang)){
-                                                foreach($lang as $l){
-                                                    $l_name = $l->name;
-                                                    if($l->name == 'Hausa' || $l->name == 'Igbo' || $l->name == 'Yoruba')$l_name = 'Nigerian';
-                                            
-                                        ?>
-                                            <li>
-                                                <a href="javascript:;" onclick="lang_session(<?=$l->id; ?>)" class="language-item">
-                                                    <img src="<?=site_url(); ?>assets/images/flags/<?=strtolower($l_name); ?>.png" alt="" class="language-flag">
-                                                    <span class="language-name"><?=$l->name; ?></span>
-                                                </a>
-                                            </li>
-                                            <?php
-
-                                                }
-                                                }
-                                            ?>
-                                        </ul>
-                                    </div>
-                                </li><!-- .dropdown -->
-                                <li class="hide-mb-sm"><a href="<?=site_url('logout'); ?>" class="nk-quick-nav-icon"><em class="icon ni ni-signout"></em></a></li>
-                                <li class="dropdown user-dropdown order-sm-first">
-                                    <a href="#" class="dropdown-toggle" data-bs-toggle="dropdown">
-                                        <div class="user-toggle">
-                                            <div class="user-avatar sm">
-                                                <em class="icon ni ni-user-alt"></em>
-                                            </div>
-                                            <div class="user-info d-none d-xl-block">
-                                                <div class="user-status text-white user-status-unverified"><?=strtoupper($log_role); ?></div>
-                                                <div class="user-name dropdown-indicator"><?=ucwords($username); ?></div>
-                                            </div>
-                                        </div>
-                                    </a>
-                                    <div class="dropdown-menu dropdown-menu-md dropdown-menu-end dropdown-menu-s1 is-light">
-                                        <div class="dropdown-inner user-card-wrap bg-lighter d-none d-md-block">
-                                            <div class="user-card">
-                                                <div class="user-avatar">
-                                                    <span>AB</span>
-                                                </div>
-                                                <div class="user-info">
-                                                    <span class="lead-text"><?=ucwords($username); ?></span>
-                                                    <span class="sub-text"><?=ucwords($email); ?></span>
-                                                </div>
-                                                <div class="user-action">
-                                                    <a class="btn btn-icon me-n2" href="<?=site_url('profile'); ?>"><em class="icon ni ni-setting"></em></a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="dropdown-inner">
-                                            <ul class="link-list">
-                                                <li><a href="<?=site_url('profile'); ?>"><em class="icon ni ni-user-alt"></em><span>View Profile</span></a></li>
-                                                <li><a href="<?=site_url('activity'); ?>"><em class="icon ni ni-activity-alt"></em><span>Login Activity</span></a></li>
-                                            </ul>
-                                        </div>
-                                        <div class="dropdown-inner">
-                                            <ul class="link-list">
-                                                <li><a href="<?=site_url('auth/logout'); ?>"><em class="icon ni ni-signout"></em><span>Sign out</span></a></li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </li><!-- .dropdown -->
-                            </ul><!-- .nk-quick-nav -->
-                        </div><!-- .nk-header-tools -->
-                    </div><!-- .nk-header-wrap -->
-                </div><!-- .container-fliud -->
-            </div>
-            
-            <?=$this->renderSection('content');?>
-
+                    </div>
+                </div>
+                
+                <?=$this->renderSection('content');?>
+        
             <!-- content @e -->
             <div class="nk-footer nk-footer-fluid bg-lighter">
                 <div class="container-xl wide-lg">
@@ -810,7 +550,7 @@
             <div id="bb_ajax_msgs"></div>
                 
             <!-- wrap @e -->
-        </div> -->
+        </div>
         <!-- wrap @e -->
     </div>
     <div class="modal modal-center fade" tabindex="-1" id="modal" role="dialog" data-keyboard="false"
