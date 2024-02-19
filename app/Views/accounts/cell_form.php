@@ -13,7 +13,7 @@ $this->Crud = new Crud();
         <div class="row">
             <div class="col-sm-12 text-center">
                 <h3><b><?=translate_phrase('Are you sure?');?></b></h3>
-                <input type="hidden" name="d_dept_id" value="<?php if(!empty($d_id)){echo $d_id;} ?>" />
+                <input type="hidden" name="d_cell_id" value="<?php if(!empty($d_id)){echo $d_id;} ?>" />
             </div>
             
             <div class="col-sm-12 text-center">
@@ -26,18 +26,56 @@ $this->Crud = new Crud();
 
     <!-- insert/edit view -->
     <?php if($param2 == 'edit' || $param2 == '') { ?>
-        
+        <div class="row">
+            <div class="col-sm-12"><div id="bb_ajax_msg"></div></div>
+        </div>
+
         
         <div class="row">
-            <input type="hidden" name="dept_id" value="<?php if(!empty($e_id)){echo $e_id;} ?>" />
+            <input type="hidden" name="cell_id" value="<?php if(!empty($e_id)){echo $e_id;} ?>" />
             <div class="col-sm-12 mb-3">
                 <div class="form-group">
                     <label for="name">*<?=translate_phrase('Name'); ?></label>
                     <input class="form-control" type="text" id="name" name="name" value="<?php if(!empty($e_name)) {echo $e_name;} ?>" required>
                 </div>
             </div>
+            <div class="col-sm-12 mb-3">
+                <div class="form-group">
+                    <label for="name">*<?=translate_phrase('Location'); ?></label>
+                    <input class="form-control" type="text" id="location" name="location" value="<?php if(!empty($e_location)) {echo $e_location;} ?>" required>
+                </div>
+            </div>
+            
         </div>
-        <label for="name">*<?=translate_phrase('Role');?></label>
+        <div class="row" id="containers">
+            <div class="col-sm-6 mb-3">
+                <div class="form-group">
+                    <label for="name">*<?=translate_phrase('Meeting Day'); ?></label>
+                    <select class="form-select2 js-select2">
+                        <option value="">Select</option>
+                        <option value="Sunday">Sunday</option>
+                        <option value="Monday">Monday</option>
+                        <option value="Tuesday">Tuesday</option>
+                        <option value="Wednesday">Wednesday</option>
+                        <option value="Thursday">Thursday</option>
+                        <option value="Friday">Friday</option>
+                        <option value="Saturday">Saturday</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-sm-6 mb-3">
+                <div class="form-group">
+                    <label for="name">*<?=translate_phrase('Meeting Time'); ?></label>
+                    <input class="form-control" type="time" id="location" name="time[]" value="<?php if(!empty($e_location)) {echo $e_location;} ?>" required>
+                    <button style="display:none;"  class="btn btn-icon btn-outline-danger deleteBtns" type="button"><i class="icon ni ni-trash"></i> </button>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12 mb-3 text-center">
+            <button id="addMore_days" class="btn btn-ico btn-outline-info" type="button"><i class="icon ni ni-plus-c"></i>  <?=translate_phrase('Add More Days');?></button>
+        </div>
+
+        <label for="name">*<?=translate_phrase('Cell Role');?></label>
         <div class="row" id="container">
             <?php if(!empty($e_roles)){$a = 0;
                 foreach($e_roles as $k => $val){
@@ -48,7 +86,7 @@ $this->Crud = new Crud();
                     ?>
                 <div class="col-sm-12 mb-3 ">
                     <div class="form-group input-group">
-                        <input class="form-control" type="text" id="role" placeholder="Enter Department Roles" name="roles[]" value="<?php if(!empty($val)) {echo $val;} ?>" <?=$req; ?>>
+                        <input class="form-control" type="text" id="role" placeholder="Enter Cell Roles" name="roles[]" value="<?php if(!empty($val)) {echo $val;} ?>" <?=$req; ?>>
                         <button <?=$r_val; ?>  class="btn btn-icon btn-outline-danger deleteBtn" type="button"><i class="icon ni ni-trash"></i> </button>
                     </div>
                     
@@ -56,7 +94,7 @@ $this->Crud = new Crud();
            <?php $a++; }} else {?>
                 <div class="col-sm-12 mb-3 ">
                     <div class="form-group input-group">
-                        <input class="form-control" type="text" id="role" placeholder="Enter Department Roles" name="roles[]" value="<?php if(!empty($val)) {echo $val;} ?>" required>
+                        <input class="form-control" type="text" id="role" placeholder="Enter Cell Roles" name="roles[]" value="<?php if(!empty($val)) {echo $val;} ?>" required>
                         <button style="display:none;" class="btn btn-icon btn-outline-danger deleteBtn" type="button"><i class="icon ni ni-trash"></i> </button>
                     </div>
                     
@@ -74,10 +112,6 @@ $this->Crud = new Crud();
                 </button>
             </div>
         </div>
-        <div class="row">
-            <div class="col-sm-12"><div id="bb_ajax_msg"></div></div>
-        </div>
-
     <?php } ?>
 <?php echo form_close(); ?>
 <script>
@@ -96,6 +130,26 @@ $this->Crud = new Crud();
         
         // Add event listener to delete button
         div.querySelector('.deleteBtn').addEventListener('click', function() {
+            div.parentNode.removeChild(div);
+        });
+        
+        container.appendChild(div);
+    });
+
+    document.getElementById('addMore_days').addEventListener('click', function() {
+        var container = document.getElementById('containers');
+        var div = container.children[0].cloneNode(true);
+        
+        // Clear input value of the cloned div
+        div.querySelector('input').value = '';
+        div.querySelector('input').removeAttribute('required');
+        
+        
+        // Show delete button in the cloned div
+        div.querySelector('.deleteBtns').style.display = 'inline-block';
+        
+        // Add event listener to delete button
+        div.querySelector('.deleteBtns').addEventListener('click', function() {
             div.parentNode.removeChild(div);
         });
         

@@ -16,9 +16,9 @@
                 <div class="nk-block-head nk-block-head-sm">
                     <div class="nk-block-between">
                         <div class="nk-block-head-content">
-                            <h3 class="nk-block-title page-title"><?=translate_phrase('Department');?></h3>
+                            <h3 class="nk-block-title page-title"><?=translate_phrase('Cell');?></h3>
                             <div class="nk-block-des text-soft">
-                                <p><?=translate_phrase('You have total');?> <span id="counta"></span> <?=translate_phrase('department(s).');?></p>
+                                <p><?=translate_phrase('You have total');?> <span id="counta"></span> <?=translate_phrase('cell(s).');?></p>
                             </div>
                         </div><!-- .nk-block-head-content -->
                     </div><!-- .nk-block-between -->
@@ -38,7 +38,7 @@
                                             </li>
                                             <li class="btn-toolbar-sep"></li><!-- li -->
                                             <li>
-                                                <a href="javascript:;" pageTitle="Add Department" class="btn btn-outline-primary btn-icon pop" pageName="<?=site_url('accounts/dept/manage'); ?>"><em class="icon ni ni-plus-c"></em></a>
+                                                <a href="javascript:;" pageTitle="Add Cell" class="btn btn-outline-primary btn-icon pop" pageName="<?=site_url('accounts/cell/manage'); ?>"><em class="icon ni ni-plus-c"></em></a>
                                             </li><!-- li -->
                                            
                                         </ul><!-- .btn-toolbar -->
@@ -96,7 +96,7 @@
         //alert(status);
 
         $.ajax({
-            url: site_url + 'accounts/dept/load' + methods,
+            url: site_url + 'accounts/cell/load' + methods,
             type: 'post',
             data: { search: search },
             success: function (data) {
