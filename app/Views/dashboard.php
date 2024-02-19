@@ -20,8 +20,7 @@
 <script src="<?php echo base_url(); ?>/assets/js/jquery.min.js"></script>
 <script>
     $(function() {
-        load('', '');
-        metric_load();
+        
     });
 
     $('.typeBtn').click(function() {

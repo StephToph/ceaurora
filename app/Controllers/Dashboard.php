@@ -21,7 +21,7 @@ class Dashboard extends BaseController {
         if($role_r == 0){
             return redirect()->to(site_url('profile'));	
         }
-        $username = $this->Crud->read_field('id', $log_id, 'user', 'fullname');
+        $username = $this->Crud->read_field('id', $log_id, 'user', 'surname').' '.$this->Crud->read_field('id', $log_id, 'user', 'firstname');
         
         $data['log_id'] = $log_id;
         $data['param1'] = $param1;
@@ -36,7 +36,7 @@ class Dashboard extends BaseController {
         $data['current_language'] = $this->session->get('current_language');
         $data['role'] = $role;
         $data['role_c'] = $role_c;
-        $data['title'] = translate_phrase('Dashboard').' | '.app_name;
+        $data['title'] = translate_phrase('Dashboard').' - '.app_name;
         $data['page_active'] = $mod;
         return view('dashboard', $data);
     }
@@ -67,7 +67,7 @@ class Dashboard extends BaseController {
         $data['current_language'] = $this->session->get('current_language');
         $data['role'] = $role;
         $data['role_c'] = $role_c;
-        $data['title'] = translate_phrase('Frequently Asked Questions').' | '.app_name;
+        $data['title'] = translate_phrase('Frequently Asked Questions').' - '.app_name;
         $data['page_active'] = $mod;
         return view('designs/faq', $data);
     }
@@ -250,7 +250,7 @@ class Dashboard extends BaseController {
 			return view($mod.'_form', $data);
 		} else { // view for main page
 			
-			$data['title'] = translate_phrase('Tax Status Check').' | '.app_name;
+			$data['title'] = translate_phrase('Tax Status Check').' - '.app_name;
 			$data['page_active'] = 'dashboard/tax_check';
 			return view($mod, $data);
 		}

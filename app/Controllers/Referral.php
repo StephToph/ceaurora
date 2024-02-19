@@ -196,7 +196,7 @@ class Referral extends BaseController {
 			return view('referral/form', $data);
         } else { // view for main page
 
-            $data['title'] = translate_phrase('Referral').' | ' . app_name;
+            $data['title'] = translate_phrase('Referral').' - ' . app_name;
             $data['page_active'] = $mod;
             return view($mod, $data);
         }

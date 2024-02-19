@@ -45,7 +45,7 @@ class Auth extends BaseController {
         }
         
         $data['current_language'] = $this->session->get('current_language');
-        $data['title'] =  $multilingual->_ph('Sign In').' | '.app_name;
+        $data['title'] =  $multilingual->_ph('Sign In').' - '.app_name;
         $data['msg'] = $msg;
         return view('auth/login', $data);
     }
@@ -63,34 +63,53 @@ class Auth extends BaseController {
             $email = $this->request->getVar('email');
             $password = $this->request->getVar('password');
 
-			$data['email'] = $email;
-			$data['password'] = $password;
-            
-			$resp = $this->Crud->api('post', 'login', $data);
-			// echo $resp;
-			$resp = json_decode($resp);
-			if($resp->status == true) {
-				$this->session->set('td_id', $resp->data->id);
-				echo $this->Crud->msg($resp->code, translate_phrase($resp->msg));
-				echo '<script>window.location.replace("'.site_url('dashboard').'");</script>';
-				$this->session->set('td_auth_message', '');
-				
-			} else {
-				if($resp->msg == translate_phrase('Account not Activated, Please validate account')){
-					echo $this->Crud->msg($resp->code, translate_phrase($resp->msg));
-					$id = $this->Crud->read_field('email', $email, 'user', 'id');
-					$this->session->set('td_id', $id);
-					echo '<script>window.location.replace("'.site_url('auth/otp').'");</script>';
-				} else {
-					echo $this->Crud->msg($resp->code, translate_phrase($resp->msg));
+			if($email && $password) {
+				$password = md5($password);
+				$type = 'email';
+				$query = $this->Crud->read2('email', $email, 'password', $password, 'user');
+				if(empty($query)) {
+					$type = 'phone';
+					$query = $this->Crud->read2('phone', $email, 'password', $password, 'user');
+	
+					
 				}
-				
+	
+				if(empty($query)) {
+					$msg = 'Invalid Authentication!';
+					echo $this->Crud->msg('warning', translate_phrase($msg));
+						
+				} else {
+					$act = $this->Crud->check2($type, $email, 'activate', 0, 'user');
+					if ($act > 0) {
+						$msg = 'Account not Activated, Please validate account';
+						echo $this->Crud->msg('danger', translate_phrase($msg));
+						$id = $this->Crud->read_field('email', $email, 'user', 'id');
+						$this->session->set('td_id', $id);
+						echo '<script>window.location.replace("'.site_url('auth/otp').'");</script>';
+					} else {
+						$status = true;
+						$msg = 'Login Successful!';
+						$code = 'success';
+						$id = $this->Crud->read_field($type, $email, 'user', 'id');
+	
+						$this->Crud->updates('id', $id, 'user', array('last_log'=> date(fdate)));
+						///// store activities
+						$codes = $this->Crud->read_field('id', $id, 'user', 'firstname').' '.$this->Crud->read_field('id', $id, 'user', 'surname');
+						$action = $codes . ' logged in ';
+						$this->Crud->activity('authentication', $id, $action);
+						$this->session->set('td_id', $id);
+						echo $this->Crud->msg('success', translate_phrase($msg));
+						echo '<script>window.location.replace("'.site_url('dashboard').'");</script>';
+						$this->session->set('td_auth_message', '');
+					}
+				}
 			}
+			
             die;
         }
         
         $data['current_language'] = $this->session->get('current_language');
-        $data['title'] =  $multilingual->_ph('Sign In').' | '.app_name;
+        $data['title'] =  $multilingual->_ph('Sign In').' - '.app_name;
         $data['msg'] = $msg;
         return view('auth/login', $data);
     }
@@ -179,7 +198,7 @@ class Auth extends BaseController {
 		}
         
         $data['current_language'] = $this->session->get('current_language');
-        $data['title'] = translate_phrase('Reset Password').' | '.app_name;
+        $data['title'] = translate_phrase('Reset Password').' - '.app_name;
         return view('auth/forgot', $data);
     }
 	
@@ -290,7 +309,7 @@ class Auth extends BaseController {
 		
         $data['current_language'] = $this->session->get('current_language');
 		$data['user_id'] = $log_id;
-        $data['title'] = translate_phrase('One Time Password').' | '.app_name;
+        $data['title'] = translate_phrase('One Time Password').' - '.app_name;
         return view('auth/otp', $data);
     }
 
@@ -479,7 +498,7 @@ class Auth extends BaseController {
         }
         
         $data['current_language'] = $this->session->get('current_language');
-        $data['title'] = translate_phrase('Register').' | '.app_name;
+        $data['title'] = translate_phrase('Register').' - '.app_name;
         return view('auth/register', $data);
     }
 
@@ -545,7 +564,7 @@ class Auth extends BaseController {
 		$user_id = $this->session->get('td_id');
 		if(!empty($this->session->get('td_id'))){
 			///// store activities
-			$code = $this->Crud->read_field('id', $user_id, 'user', 'fullname');
+			$code = $this->Crud->read_field('id', $user_id, 'user', 'firstname').' '.$this->Crud->read_field('id', $user_id, 'user', 'surname');
 			$action = $code.translate_phrase(' logged out ');
 			
 			$this->Crud->activity('authentication', $user_id, $action);
@@ -681,7 +700,7 @@ class Auth extends BaseController {
 		if($param1 == 'manage'){
 			return view('auth/profile_form', $data);
 		} else {
-			$data['title'] = translate_phrase('Profile').' | '.app_name;
+			$data['title'] = translate_phrase('Profile').' - '.app_name;
 			$data['page_active'] = 'profile';
 			return view('auth/profile', $data);
 
@@ -768,7 +787,7 @@ class Auth extends BaseController {
 		$data['qrcode'] = $qrcode;
 		
 
-		$data['title'] = translate_phrase('Profile View').' | '.app_name;
+		$data['title'] = translate_phrase('Profile View').' - '.app_name;
 		$data['page_active'] = 'auth/profile_view';
 		return view('auth/profile_view', $data);
 
@@ -881,7 +900,7 @@ class Auth extends BaseController {
 		if($param1 == 'manage'){
 			return view('auth/profile_form', $data);
 		} else {
-			$data['title'] = translate_phrase('Payment Setup').' | '.app_name;
+			$data['title'] = translate_phrase('Payment Setup').' - '.app_name;
 			$data['page_active'] = 'auth/security';
 			return view('auth/security', $data);
 
@@ -943,7 +962,7 @@ class Auth extends BaseController {
 		if($param1 == 'manage'){
 			return view('auth/profile_form', $data);
 		} else {
-			$data['title'] = translate_phrase('Bank Account Setup').' | '.app_name;
+			$data['title'] = translate_phrase('Bank Account Setup').' - '.app_name;
 			$data['page_active'] = 'auth/bank';
 			return view('auth/bank', $data);
 
@@ -984,7 +1003,7 @@ class Auth extends BaseController {
 		
         $data['current_language'] = $this->session->get('current_language');
 
-		$data['title'] =  translate_phrase('Change Password').' | '.app_name;
+		$data['title'] =  translate_phrase('Change Password').' - '.app_name;
 		$data['page_active'] = 'profile';
 
 		return view('profile/password', $data);

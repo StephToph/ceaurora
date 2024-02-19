@@ -401,14 +401,14 @@ class Accounts extends BaseController {
 			$data['order_sort'] = '0, "asc"'; // default ordering (0, 'asc')
 			$data['no_sort'] = '1,6'; // sort disable columns (1,3,5)
 		
-			$data['title'] = translate_phrase('Administrators').' | '.app_name;
+			$data['title'] = translate_phrase('Administrators').' - '.app_name;
 			$data['page_active'] = $mod;
 			return view($mod, $data);
 		}
 	}
 
 	//Customer
-	public function personal($param1='', $param2='', $param3='') {
+	public function dept($param1='', $param2='', $param3='') {
 		// check session login
 		if($this->session->get('td_id') == ''){
 			$request_uri = uri_string();
@@ -416,7 +416,7 @@ class Accounts extends BaseController {
 			return redirect()->to(site_url('auth'));
 		} 
 
-        $mod = 'accounts/personal';
+        $mod = 'accounts/dept';
 
         $log_id = $this->session->get('td_id');
         $role_id = $this->Crud->read_field('id', $log_id, 'user', 'role_id');
@@ -432,9 +432,8 @@ class Accounts extends BaseController {
         $data['role'] = $role;
         $data['role_c'] = $role_c;
        
-		if($this->Crud->check2('id', $log_id, 'setup', 0, 'user')> 0)return redirect()->to(site_url('auth/security'));
-		if($this->Crud->check2('id', $log_id, 'trade', 0, 'user')> 0)return redirect()->to(site_url('auth/security'));
-		$table = 'user';
+		
+		$table = 'dept';
 		$form_link = site_url($mod);
 		if($param1){$form_link .= '/'.$param1;}
 		if($param2){$form_link .= '/'.$param2.'/';}
@@ -449,40 +448,32 @@ class Accounts extends BaseController {
 		
 		// manage record
 		if($param1 == 'manage') {
-			$role_ids =  $this->Crud->read_field('name', 'Personal', 'access_role', 'id');
-						
 			// prepare for delete
 			if($param2 == 'delete') {
 				if($param3) {
 					$edit = $this->Crud->read_single('id', $param3, $table);
-                    //echo var_dump($edit);
 					if(!empty($edit)) {
 						foreach($edit as $e) {
 							$data['d_id'] = $e->id;
 						}
 					}
-					
-					if($this->request->getMethod() == 'post'){
-                        $del_id =  $this->request->getVar('d_customer_id');
-                        $role_id =  $this->Crud->read_field('name', 'Personal', 'access_role', 'id');
-						$datas['role_id'] = $role_id;
-                        $datas['log_id'] = $log_id;
-                        
-						// print_r($datas);
-						// //$role_id . ' ' . $log_id;
-						// die;
-						
-                        $del = $this->Crud->api('delete', 'users/delete/'.$del_id, $datas);
 
-						$del = json_decode($del);
-                        if($del->status == true){	
-                        
-							echo $this->Crud->msg($del->code, translate_phrase($del->msg));
+					if($this->request->getMethod() == 'post'){
+						$del_id = $this->request->getVar('d_dept_id');
+						///// store activities
+						$by = $this->Crud->read_field('id', $log_id, 'user', 'firstname');
+						$code = $this->Crud->read_field('id', $del_id, 'dept', 'name');
+						$action = $by.' deleted Department ('.$code.') Record';
+
+						if($this->Crud->deletes('id', $del_id, $table) > 0) {
+							
+							$this->Crud->activity('user', $del_id, $action);
+							echo $this->Crud->msg('success', 'Department Deleted');
 							echo '<script>location.reload(false);</script>';
 						} else {
-							echo $this->Crud->msg('danger', translate_phrase('Please try later'));
+							echo $this->Crud->msg('danger', 'Please try later');
 						}
-						die;	
+						exit;	
 					}
 				}
 			} else {
@@ -493,96 +484,58 @@ class Accounts extends BaseController {
 						if(!empty($edit)) {
 							foreach($edit as $e) {
 								$data['e_id'] = $e->id;
-								$data['e_fullname'] = $e->fullname;
-								$data['e_email'] = $e->email;
-								$data['e_phone'] = $e->phone;
-								$data['e_country_id'] = $e->country_id;
-								$data['e_state_id'] = $e->state_id;
-								$data['e_role_id'] = $e->role_id;
-								$data['e_trade'] = $e->trade;
-								$data['e_address'] = $e->address;
-								$data['e_activate'] = $e->activate;
-								$data['e_img'] = $e->img_id;
-								
+								$data['e_name'] = $e->name;
+								$data['roles'] = $e->roles;
 							}
 						}
 					}
-				}
-				
+				} 
+
 				if($this->request->getMethod() == 'post'){
-					$user_i =  $this->request->getVar('user_id');
-					$fullname = $this->request->getPost('name');
-					$phone = $this->request->getPost('phone');
-					$email = $this->request->getPost('email');
-					$password =  $this->request->getVar('password');
-					$role =  $this->request->getVar('role');
-					$ban =  $this->request->getVar('ban');
-					$trade =  $this->request->getVar('trade');
+					$dept_id = $this->request->getVar('dept_id');
+					$name = $this->request->getVar('name');
+					$roles = $this->request->getVar('roles');
 
-					$data['trade'] = $trade;
-					$data['role'] = $role;
-					$data['password'] = $password;
-					$data['fullname'] = $fullname;
-					$data['email'] = $email;
-					$data['phone'] = $phone;
-					$data['ban'] = $ban;
-                    $data['log_id'] = $log_id;
-					$data['role_id'] = $role_ids;
-
-					
+					$ins_data['name'] = $name;
+					$ins_data['roles'] = json_encode($roles);
+					// print_r($roles);
+					// die;
 					// do create or update
-					if($user_i) {
-						$trade_id = $this->Crud->read_field('id', $user_i, 'user', 'trade');
-                        $update = $this->Crud->api('post', 'users/update/' . $user_i, $data);
-                        $update = json_decode($update);
-						//print_r($update);
-						if($update->status == true){
+					if($dept_id) {
+						$upd_rec = $this->Crud->updates('id', $dept_id, $table, $ins_data);
+						if($upd_rec > 0) {
+							///// store activities
+							$by = $this->Crud->read_field('id', $log_id, 'user', 'firstname');
+							$code = $this->Crud->read_field('id', $dept_id, 'dept', 'name');
+							$action = $by.' updated Department ('.$code.') Record';
+							$this->Crud->activity('user', $dept_id, $action);
 
-							if($trade != $trade_id){
-								if($this->Crud->check2('id', $user_i, 'duration', '', 'user') > 0){
-									$this->Crud->updates('id', $user_i, 'user', array('setup'=> 0));
-								} else {
-									$trans = $this->Crud->read2('user_id', $user_i, 'status', 'pending', 'transaction');
-									$duration = $this->Crud->read_field('id', $user_i, 'user', 'duration');
-									$trades = $this->Crud->read_field('id', $trade, 'trade', 'medium');
-
-									$amount = $this->Crud->trade_duration($trades, $duration);
-									if(!empty($trans)){
-										foreach($trans as $t){
-											if($t->amount != $t->balance){
-												$paid = (float)$t->amount - (float)$t->balance;
-												$tran_data['balance'] = (float)$amount - (float)$paid;
-											}else {
-												$tran_data['balance'] = $amount;
-											}
-											$tran_data['amount'] = $amount;
-
-											$this->Crud->updates('id', $t->id, 'transaction', $tran_data);
-										}
-									} else {
-										$this->Crud->updates('id', $user_i, 'user', array('setup'=> 0));
-									}
-								}
-							}
-							
-							echo $this->Crud->msg('success', translate_phrase($update->msg));
+							echo $this->Crud->msg('success', 'Record Updated');
 							echo '<script>location.reload(false);</script>';
 						} else {
-							echo $this->Crud->msg($update->code, translate_phrase($update->msg));	
+							echo $this->Crud->msg('info', 'No Changes');	
 						}
-                        die;
-					} else{
-                        $add = $this->Crud->api('post', 'users/post', $data);
-                        $add = json_decode($add);
-						if($add->status == true){
-							echo $this->Crud->msg('success', translate_phrase($add->msg));
-							echo '<script>location.reload(false);</script>';
+					} else {
+						if($this->Crud->check('name', $name, $table) > 0) {
+							echo $this->Crud->msg('warning', 'Record Already Exist');
 						} else {
-							echo $this->Crud->msg($add->code, translate_phrase($add->msg));	
+							$ins_rec = $this->Crud->create($table, $ins_data);
+							if($ins_rec > 0) {
+								///// store activities
+								$by = $this->Crud->read_field('id', $log_id, 'user', 'firstname');
+								$code = $this->Crud->read_field('id', $ins_rec, 'dept', 'name');
+								$action = $by.' created Department ('.$code.') Record';
+								$this->Crud->activity('user', $ins_rec, $action);
+
+								echo $this->Crud->msg('success', 'Record Created');
+								echo '<script>location.reload(false);</script>';
+							} else {
+								echo $this->Crud->msg('danger', 'Please try later');	
+							}	
 						}
-                        die;
-                    }
-						
+					}
+
+					die;	
 				}
 			}
 		}
@@ -597,22 +550,12 @@ class Accounts extends BaseController {
             if(empty($limit)) {$limit = $rec_limit;}
 			if(empty($offset)) {$offset = 0;}
 			
-			if(!empty($this->request->getVar('start_date'))){$start_date = $this->request->getVar('start_date');}else{$start_date = '';}
-			if(!empty($this->request->getVar('end_date'))){$end_date = $this->request->getVar('end_date');}else{$end_date = '';}
-
-			if(!empty($this->request->getPost('state_id'))) { $state_id = $this->request->getPost('state_id'); } else { $state_id = ''; }
-			if(!empty($this->request->getPost('status'))) { $status = $this->request->getPost('status'); } else { $status = ''; }
-			if(!empty($this->request->getPost('ref_status'))) { $ref_status = $this->request->getPost('ref_status'); } else { $ref_status = ''; }
 			$search = $this->request->getPost('search');
-
-			if(empty($ref_status))$ref_status = 0;
+			
 			$items = '
 				<div class="nk-tb-item nk-tb-head">
-					<div class="nk-tb-col"><span class="sub-text">'.translate_phrase('Accounts').'</span></div>
-					<div class="nk-tb-col"><span class="sub-text">'.translate_phrase('Tax ID').'</span></div>
-					<div class="nk-tb-col tb-col-mb"><span class="sub-text">'.translate_phrase('Territory').'</span></div>
-					<div class="nk-tb-col tb-col-md"><span class="sub-text">'.translate_phrase('Trade Line').'</span></div>
-					<div class="nk-tb-col tb-col-md"><span class="sub-text">'.translate_phrase('Status').'</span></div>
+					<div class="nk-tb-col"><span class="sub-text">'.translate_phrase('Name').'</span></div>
+					<div class="nk-tb-col"><span class="sub-text">'.translate_phrase('Role(s)').'</span></div>
 					<div class="nk-tb-col nk-tb-col-tools">
 						<ul class="nk-tb-actions gx-1 my-n1">
 							
@@ -629,66 +572,34 @@ class Accounts extends BaseController {
 			if(!$log_id) {
 				$item = '<div class="text-center text-muted">'.translate_phrase('Session Timeout! - Please login again').'</div>';
 			} else {
-				$role_id = $this->Crud->read_field('name', 'Personal', 'access_role', 'id');
-
-				$all_rec = $this->Crud->filter_users('', '', '', $log_id, $role_id, $state_id, $status, $search, '', '', $start_date, $end_date);
+				
+				$all_rec = $this->Crud->filter_dept('', '', '', $log_id, $search);
                 // $all_rec = json_decode($all_rec);
 				if(!empty($all_rec)) { $counts = count($all_rec); } else { $counts = 0; }
 
-				$query = $this->Crud->filter_users($limit, $offset, '', $log_id, $role_id, $state_id, $status, $search, '', '', $start_date, $end_date);
+				$query = $this->Crud->filter_dept($limit, $offset, '', $log_id, $search);
 				$data['count'] = $counts;
 				
 
 				if(!empty($query)) {
 					foreach ($query as $q) {
 						$id = $q->id;
-						$fullname = $q->fullname;
-						$email = $q->email;
-						$phone = $q->phone;
-						$territory = strtoupper(str_replace('_', ' ', $this->Crud->read_field('id', $q->territory, 'territory', 'name')));
-						$tax_id = $this->Crud->read_field('user_id', $q->id, 'virtual_account', 'acc_no');
-						$address = $q->address;
-						$city = $this->Crud->read_field('id', $q->lga_id, 'city', 'name');
-						$trade = $this->Crud->read_field('id', $q->trade, 'trade', 'name');
-						$img = $this->Crud->image($q->img_id, 'big');
-						$activate = $q->activate;
-						$u_role = $this->Crud->read_field('id', $q->role_id, 'access_role', 'name');
-						$reg_date = date('M d, Y h:ia', strtotime($q->reg_date));
-
-						$status = '<span class="text-danger">Owing</span>';
-						
-						$next_pay = $this->Crud->read_field2('user_id', $id, 'payment_type', 'tax', 'transaction', 'payment_date');
-						if(date(fdate) > $next_pay){
-							$status = '<span class="text-success">Paid</span>';
-
+						$name = $q->name;
+						$roles = $q->roles;
+						$rolesa = json_decode($roles);
+						$rols = '';
+						if(!empty($rolesa)){
+							foreach($rolesa as $r => $val){
+								$rols .= $val.', ';
+							}
 						}
-
-						if(empty($tax_id)){
-							$tax_id = '
-							<div id="virtual_resp_"'.$id.'>
-								<button class="btn btn-info  m-2" onclick="virtual_create('.$id.');" type="button">Generate Virtual Account/Tax ID</button>
-							</div>
-							';
-						}
-						$approved = '';
-						if ($activate == 1) {
-							$a_color = 'success';
-							$approve_text = 'Account Activated';
-							$approved = '<span class="text-primary"><i class="ri-check-circle-line"></i></span> ';
-						} else {
-							$a_color = 'danger';
-							$approve_text = 'Account Deactivated';
-							$approved = '<span class="text-danger"><i class="ri-check-circle-line"></i></span> ';
-						}
-
 						// add manage buttons
 						if ($role_u != 1) {
 							$all_btn = '';
 						} else {
 							$all_btn = '
-								<li><a href="' . site_url($mod . '/view/' . $id) . '" class="text-success" pageTitle="View ' . $fullname . '" pageName=""><em class="icon ni ni-eye"></em><span>'.translate_phrase('View Details').'</span></a></li>
-								<li><a href="javascript:;" class="text-primary pop" pageTitle="Edit ' . $fullname . '" pageName="' . site_url($mod . '/manage/edit/' . $id) . '"><em class="icon ni ni-edit-alt"></em><span>'.translate_phrase('Edit').'</span></a></li>
-								<li><a href="javascript:;" class="text-danger pop" pageTitle="Delete ' . $fullname . '" pageName="' . site_url($mod . '/manage/delete/' . $id) . '"><em class="icon ni ni-trash-alt"></em><span>'.translate_phrase('Delete').'</span></a></li>
+								<li><a href="javascript:;" class="text-primary pop" pageTitle="Edit ' . $name . '" pageName="' . site_url($mod . '/manage/edit/' . $id) . '"><em class="icon ni ni-edit-alt"></em><span>'.translate_phrase('Edit').'</span></a></li>
+								<li><a href="javascript:;" class="text-danger pop" pageTitle="Delete ' . $name . '" pageName="' . site_url($mod . '/manage/delete/' . $id) . '"><em class="icon ni ni-trash-alt"></em><span>'.translate_phrase('Delete').'</span></a></li>
 								
 								
 							';
@@ -697,29 +608,12 @@ class Accounts extends BaseController {
 						$item .= '
 							<div class="nk-tb-item">
 								<div class="nk-tb-col">
-									<div class="user-card">
-										<div class="user-avatar ">
-											<img alt="" src="' . site_url($img) . '" height="40px"/>
-										</div>
-										<div class="user-info">
-											<span class="tb-lead">' . ucwords($fullname) . ' <span class="dot dot-' . $a_color . ' ms-1"></span></span>
-											<span>' . $email . '</span><br>
-											<span>' . $u_role . '</span>
-										</div>
+									<div class="user-info">
+										<span class="tb-lead">' . ucwords($name) . ' </span>
 									</div>
 								</div>
 								<div class="nk-tb-col tb-col">
-									<span class="text-dark"><b>' . $tax_id . '</b></span>
-								</div>
-								<div class="nk-tb-col tb-col-mb">
-									'.$address.'<br>
-									<span>' . ucwords($city) . ', '.$territory.'</span>
-								</div>
-								<div class="nk-tb-col tb-col-md">
-									<span class="tb-amount">' . $trade . ' </span>
-								</div>
-								<div class="nk-tb-col tb-col-md">
-									<span class="tb-amount">' . $status . ' </span>
+									<span class="text-dark"><b>' . ucwords(rtrim($rols, ', ')) . '</b></span>
 								</div>
 								<div class="nk-tb-col nk-tb-col-tools">
 									<ul class="nk-tb-actions gx-1">
@@ -747,7 +641,7 @@ class Accounts extends BaseController {
 				$resp['item'] = $items.'
 					<div class="text-center text-muted">
 						<br/><br/><br/><br/>
-						<i class="ni ni-users" style="font-size:150px;"></i><br/><br/>'.translate_phrase('No Personal Account Returned').'
+						<i class="ni ni-building" style="font-size:150px;"></i><br/><br/>'.translate_phrase('No Department Returned').'
 					</div>
 				';
 			} else {
@@ -882,7 +776,7 @@ class Accounts extends BaseController {
 				$data['v_business_name'] = $this->Crud->read_field('id', $user_id, 'user', 'business_name');
 				$data['v_business_address'] = $this->Crud->read_field('id', $user_id, 'user', 'business_address');
 			}
-			$data['title'] = translate_phrase('Account View').' | '.app_name;
+			$data['title'] = translate_phrase('Account View').' - '.app_name;
 			$data['page_active'] = $mod;
 			return view($mod.'_view', $data);
 		}
@@ -890,7 +784,7 @@ class Accounts extends BaseController {
 			return view($mod.'_form', $data);
 		} else { // view for main page
 			
-			$data['title'] = translate_phrase('Personal Account').' | '.app_name;
+			$data['title'] = translate_phrase('Departments').' - '.app_name;
 			$data['page_active'] = $mod;
 			return view($mod, $data);
 		}
@@ -1345,7 +1239,7 @@ class Accounts extends BaseController {
 				$data['v_business_name'] = $this->Crud->read_field('id', $user_id, 'user', 'business_name');
 				$data['v_business_address'] = $this->Crud->read_field('id', $user_id, 'user', 'business_address');
 			}
-			$data['title'] = translate_phrase('Account View').' | '.app_name;
+			$data['title'] = translate_phrase('Account View').' - '.app_name;
 			$data['page_active'] = $mod;
 			return view($mod.'_view', $data);
 		}
@@ -1353,7 +1247,7 @@ class Accounts extends BaseController {
 			return view($mod.'_form', $data);
 		} else { // view for main page
 			
-			$data['title'] = translate_phrase('Business Account').' | '.app_name;
+			$data['title'] = translate_phrase('Business Account').' - '.app_name;
 			$data['page_active'] = $mod;
 			return view($mod, $data);
 		}
@@ -1949,7 +1843,7 @@ class Accounts extends BaseController {
 				$data['v_business_name'] = $this->Crud->read_field('id', $user_id, 'user', 'business_name');
 				$data['v_business_address'] = $this->Crud->read_field('id', $user_id, 'user', 'business_address');
 			}
-			$data['title'] = translate_phrase('Account View').' | '.app_name;
+			$data['title'] = translate_phrase('Account View').' - '.app_name;
 			$data['page_active'] = $mod;
 			return view($mod.'_view', $data);
 		}
@@ -1957,7 +1851,7 @@ class Accounts extends BaseController {
 			return view($mod.'_form', $data);
 		} else { // view for main page
 			
-			$data['title'] = translate_phrase('Tax Masters').' | '.app_name;
+			$data['title'] = translate_phrase('Tax Masters').' - '.app_name;
 			$data['page_active'] = $mod;
 			return view($mod, $data);
 		}
@@ -2550,7 +2444,7 @@ class Accounts extends BaseController {
 				$data['v_business_name'] = $this->Crud->read_field('id', $user_id, 'user', 'business_name');
 				$data['v_business_address'] = $this->Crud->read_field('id', $user_id, 'user', 'business_address');
 			}
-			$data['title'] = translate_phrase('Account View').' | '.app_name;
+			$data['title'] = translate_phrase('Account View').' - '.app_name;
 			$data['page_active'] = $mod;
 			return view($mod.'_view', $data);
 		}
@@ -2559,7 +2453,7 @@ class Accounts extends BaseController {
 			return view($mod.'_form', $data);
 		} else { // view for main page
 			
-			$data['title'] = translate_phrase('Field Operative').' | '.app_name;
+			$data['title'] = translate_phrase('Field Operative').' - '.app_name;
 			$data['page_active'] = $mod;
 			return view($mod, $data);
 		}
@@ -3249,7 +3143,7 @@ class Accounts extends BaseController {
 			return view($mod.'_form', $data);
 		} else { // view for main page
 			
-			$data['title'] = translate_phrase('OTP Check').' | '.app_name;
+			$data['title'] = translate_phrase('OTP Check').' - '.app_name;
 			$data['page_active'] = 'dashboard/otp_check';
 			return view($mod, $data);
 		}
@@ -3551,7 +3445,7 @@ class Accounts extends BaseController {
 			return view('accounts/'.$mod.'_form', $data);
 		} else { // view for main page
 			
-			$data['title'] = translate_phrase('Virtual Assign').' | '.app_name;
+			$data['title'] = translate_phrase('Virtual Assign').' - '.app_name;
 			$data['page_active'] = 'accounts/virtual_assign';
 			return view('accounts/'.$mod, $data);
 		}

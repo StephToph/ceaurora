@@ -961,7 +961,7 @@ class CLI
             }
 
             // Set the columns borders
-            $table .= '| ' . implode(' | ', $tableRows[$row]) . ' |' . PHP_EOL;
+            $table .= '| ' . implode(' - ', $tableRows[$row]) . ' |' . PHP_EOL;
 
             // Set the thead and table borders-bottom
             if (isset($cols) && (($row === 0 && ! empty($thead)) || ($row + 1 === $totalRows))) {

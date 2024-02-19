@@ -683,7 +683,7 @@ class Wallets extends BaseController {
 			return view($mod.'_form', $data);
 		} else { // view for main page
 			
-			$data['title'] = translate_phrase('Transactions').' | '.app_name;
+			$data['title'] = translate_phrase('Transactions').' - '.app_name;
 			$data['page_active'] = $mod;
 			return view($mod, $data);
 		}

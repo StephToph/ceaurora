@@ -640,7 +640,7 @@ class Settings extends BaseController {
 			return view('setting/trade_form', $data);
 		} else { // view for main page
 			
-			$data['title'] = translate_phrase('Trade Line').' | '.app_name;
+			$data['title'] = translate_phrase('Trade Line').' - '.app_name;
 			$data['page_active'] = 'trade';
 			
 			return view('setting/trade', $data);
@@ -900,7 +900,7 @@ class Settings extends BaseController {
 			return view('setting/territory_form', $data);
 		} else { // view for main page
 			
-			$data['title'] = translate_phrase('Territory').' | '.app_name;
+			$data['title'] = translate_phrase('Territory').' - '.app_name;
 			$data['page_active'] = 'territory';
 			
 			return view('setting/territory', $data);

@@ -2,7 +2,8 @@
     use App\Models\Crud;
     $this->Crud = new Crud();
     
-    $username = $this->Crud->read_field('id', $log_id, 'user', 'fullname');
+    $username = $this->Crud->read_field('id', $log_id, 'user', 'surname').' '.$this->Crud->read_field('id', $log_id, 'user', 'firstname');
+    $log_name = $this->Crud->read_field('id', $log_id, 'user', 'surname').' '.$this->Crud->read_field('id', $log_id, 'user', 'firstname');
     $email = $this->Crud->read_field('id', $log_id, 'user', 'email');
     $log_role_id = $this->Crud->read_field('id', $log_id, 'user', 'role_id');
 	$log_role = strtolower($this->Crud->read_field('id', $log_role_id, 'access_role', 'name'));
@@ -11,18 +12,6 @@
     $balance = 0;
     $earnings = 0;
     $withdrawns = 0;
-
-    $query = $this->Crud->read_single('user_id', $log_id, 'wallet');
-    if(!empty($query)) {
-        foreach($query as $q) {
-            if($q->type == 'credit') {
-                $earnings += (float)$q->amount;
-            } else {
-                $withdrawns += (float)$q->amount;
-            }
-        }
-        $balance = $earnings - $withdrawns;
-    }
 
     
     header("Access-Control-Allow-Origin: *");  // Replace * with the specific origin(s) you want to allow
@@ -46,7 +35,7 @@
     <title><?=$title; ?></title>
     <!-- StyleSheets  -->
     <link rel="stylesheet" href="<?=site_url(); ?>assets/css/dashlitee5ca.css?ver=3.2.3">
-    <link id="skin-default" rel="stylesheet" href="<?=site_url(); ?>assets/css/themee5ca.css?ver=3.2.3">
+    <link id="skin-default" rel="stylesheet" href="<?=site_url(); ?>assets/css/skins/theme-egyptian.css?ver=3.2.3">
     <style>
         
        @media (max-width: 768px) {
@@ -90,7 +79,7 @@
 <body class="nk-body bg-lighter npc-general has-sidebar ">
     <div class="nk-app-root">
         <div class="nk-main ">
-            <div class="nk-sidebar nk-sidebar-fixed " data-content="sidebarMenu">
+            <div class="nk-sidebar nk-sidebar-fixed is-dark" data-content="sidebarMenu">
                 <div class="nk-sidebar-element nk-sidebar-head">
                     <div class="nk-menu-trigger"><a href="#" class="nk-nav-toggle nk-quick-nav-icon d-xl-none"
                         data-target="sidebarMenu"><em class="icon ni ni-arrow-left"></em></a><a href="#"
@@ -209,7 +198,7 @@
                 </div>
             </div>
             <div class="nk-wrap ">
-                <div class="nk-header nk-header-fixed">
+                <div class="nk-header nk-header-fixed bg-white">
                     <div class="container-fluid">
                     <div class="nk-header-wrap">
                             <div class="nk-menu-trigger d-xl-none ms-n1">
@@ -572,10 +561,8 @@
 </body>
 
 
-    <script src="<?=site_url(); ?>assets/js/bundle.js?ver=3.2.3"></script>
-    <script src="<?=site_url(); ?>assets/js/scripts.js?ver=3.2.3"></script>
-    <script src="<?=site_url(); ?>assets/js/demo-settingse5ca.js?ver=3.2.3"></script>
-    <script src="<?=site_url(); ?>assets/js/charts/chart-crme5ca.js?ver=3.2.3"></script>
+    <script src="<?=site_url(); ?>assets/js/bundlee5ca.js?ver=3.2.3"></script>
+    <script src="<?=site_url(); ?>assets/js/scriptse5ca.js?ver=3.2.3"></script>
    
     <script>
          var site_url = '<?=site_url(); ?>';
