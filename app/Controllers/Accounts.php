@@ -1007,7 +1007,7 @@ class Accounts extends BaseController {
         $data['role_c'] = $role_c;
        
 		
-		$table = 'cells';
+		$table = 'user';
 		$form_link = site_url($mod);
 		if($param1){$form_link .= '/'.$param1;}
 		if($param2){$form_link .= '/'.$param2.'/';}
@@ -1200,7 +1200,7 @@ class Accounts extends BaseController {
 					$ins_data['title'] = $title;
 					$ins_data['firstname'] = $firstname;
 					$ins_data['othername'] = $othername;
-					$ins_data['lastname'] = $lastname;
+					$ins_data['surname'] = $lastname;
 					$ins_data['email'] = $email;
 					$ins_data['phone'] = $phone;
 					$ins_data['gender'] = $gender;
@@ -1221,32 +1221,32 @@ class Accounts extends BaseController {
 						if($upd_rec > 0) {
 							///// store activities
 							$by = $this->Crud->read_field('id', $log_id, 'user', 'firstname');
-							$code = $this->Crud->read_field('id', $membership_id, 'dept', 'name');
-							$action = $by.' updated Department ('.$code.') Record';
+							$code = $this->Crud->read_field('id', $membership_id, 'user', 'firstname');
+							$action = $by.' updated Membership ('.$code.') Record';
 							$this->Crud->activity('user', $membership_id, $action);
 
-							echo $this->Crud->msg('success', 'Record Updated');
+							echo $this->Crud->msg('success', 'Membership Updated');
 							echo '<script>location.reload(false);</script>';
 						} else {
 							echo $this->Crud->msg('info', 'No Changes');	
 						}
 					} else {
-						if($this->Crud->check('name', $name, $table) > 0) {
-							echo $this->Crud->msg('warning', 'Record Already Exist');
+						if($this->Crud->check('firstname', $firstname, $table) > 0) {
+							echo $this->Crud->msg('warning', 'Membership Already Exist');
 						} else {
+							$role_id = $this->Crud->read_field('name', 'Member', 'access_role', 'id');
 							$ins_data['role_id'] = $role_id;
 							$ins_data['activate'] = 1;
 							$ins_data['reg_date'] = date(fdate);
-							$ins_data['cell_id'] = $cell_id;
 							$ins_rec = $this->Crud->create($table, $ins_data);
 							if($ins_rec > 0) {
 								///// store activities
 								$by = $this->Crud->read_field('id', $log_id, 'user', 'firstname');
 								$code = $this->Crud->read_field('id', $ins_rec, 'dept', 'name');
-								$action = $by.' created Department ('.$code.') Record';
+								$action = $by.' created Membership ('.$code.') Record';
 								$this->Crud->activity('user', $ins_rec, $action);
 
-								echo $this->Crud->msg('success', 'Record Created');
+								echo $this->Crud->msg('success', 'Membership Created');
 								echo '<script>location.reload(false);</script>';
 							} else {
 								echo $this->Crud->msg('danger', 'Please try later');	
