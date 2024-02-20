@@ -731,16 +731,16 @@ class Accounts extends BaseController {
 					}
 
 					if($this->request->getMethod() == 'post'){
-						$del_id = $this->request->getVar('d_dept_id');
+						$del_id = $this->request->getVar('d_cell_id');
 						///// store activities
 						$by = $this->Crud->read_field('id', $log_id, 'user', 'firstname');
-						$code = $this->Crud->read_field('id', $del_id, 'dept', 'name');
-						$action = $by.' deleted Department ('.$code.') Record';
+						$code = $this->Crud->read_field('id', $del_id, 'cell', 'name');
+						$action = $by.' deleted Cell ('.$code.') Record';
 
 						if($this->Crud->deletes('id', $del_id, $table) > 0) {
 							
 							$this->Crud->activity('user', $del_id, $action);
-							echo $this->Crud->msg('success', 'Department Deleted');
+							echo $this->Crud->msg('success', 'Cell Deleted');
 							echo '<script>location.reload(false);</script>';
 						} else {
 							echo $this->Crud->msg('danger', 'Please try later');
@@ -756,31 +756,46 @@ class Accounts extends BaseController {
 						if(!empty($edit)) {
 							foreach($edit as $e) {
 								$data['e_id'] = $e->id;
+								$data['e_location'] = $e->location;
 								$data['e_name'] = $e->name;
 								$data['e_roles'] = json_decode($e->roles);
+								$data['e_time'] = json_decode($e->time);
 							}
 						}
 					}
 				} 
 
 				if($this->request->getMethod() == 'post'){
-					$dept_id = $this->request->getVar('dept_id');
+					$cell_id = $this->request->getVar('cell_id');
 					$name = $this->request->getVar('name');
 					$roles = $this->request->getVar('roles');
-
+					$location = $this->request->getVar('location');
+					$times = $this->request->getVar('times');
+					$days = $this->request->getVar('days');
+					
+					$time = [];
+					for($i=0;$i < count($days);$i++ ){
+						$day = $days[$i];
+						// echo $day;
+						$time[$day] = $times[$i];
+					}
+					// print_r($time);
+					// print_r($days);
+					// die;
 					$ins_data['name'] = $name;
 					$ins_data['roles'] = json_encode($roles);
-					// print_r($roles);
-					// die;
+					$ins_data['location'] = $location;
+					$ins_data['time'] = json_encode($time);
+					
 					// do create or update
-					if($dept_id) {
-						$upd_rec = $this->Crud->updates('id', $dept_id, $table, $ins_data);
+					if($cell_id) {
+						$upd_rec = $this->Crud->updates('id', $cell_id, $table, $ins_data);
 						if($upd_rec > 0) {
 							///// store activities
 							$by = $this->Crud->read_field('id', $log_id, 'user', 'firstname');
-							$code = $this->Crud->read_field('id', $dept_id, 'dept', 'name');
+							$code = $this->Crud->read_field('id', $cell_id, 'dept', 'name');
 							$action = $by.' updated Department ('.$code.') Record';
-							$this->Crud->activity('user', $dept_id, $action);
+							$this->Crud->activity('user', $cell_id, $action);
 
 							echo $this->Crud->msg('success', 'Record Updated');
 							echo '<script>location.reload(false);</script>';
@@ -826,9 +841,10 @@ class Accounts extends BaseController {
 			
 			$items = '
 				<div class="nk-tb-item nk-tb-head">
-					<div class="nk-tb-col"><span class="sub-text">'.translate_phrase('Name').'</span></div>
-					<div class="nk-tb-col"><span class="sub-text">'.translate_phrase('Role(s)').'</span></div>
-					<div class="nk-tb-col"><span class="sub-text">'.translate_phrase('Day/Time').'</span></div>
+					<div class="nk-tb-col"><span class="sub-text text-dark">'.translate_phrase('Name').'</span></div>
+					<div class="nk-tb-col nk-tb-col-md"><span class="sub-text text-dark">'.translate_phrase('Location').'</span></div>
+					<div class="nk-tb-col"><span class="sub-text text-dark">'.translate_phrase('Role(s)').'</span></div>
+					<div class="nk-tb-col nk-tb-col-md"><span class="sub-text text-dark">'.('Day/Time').'</span></div>
 					<div class="nk-tb-col nk-tb-col-tools">
 						<ul class="nk-tb-actions gx-1 my-n1">
 							
@@ -846,11 +862,11 @@ class Accounts extends BaseController {
 				$item = '<div class="text-center text-muted">'.translate_phrase('Session Timeout! - Please login again').'</div>';
 			} else {
 				
-				$all_rec = $this->Crud->filter_cell('', '', '', $log_id, $search);
+				$all_rec = $this->Crud->filter_cell('', '', $search);
                 // $all_rec = json_decode($all_rec);
 				if(!empty($all_rec)) { $counts = count($all_rec); } else { $counts = 0; }
 
-				$query = $this->Crud->filter_cell($limit, $offset, '', $log_id, $search);
+				$query = $this->Crud->filter_cell($limit, $offset, $search);
 				$data['count'] = $counts;
 				
 
@@ -858,6 +874,8 @@ class Accounts extends BaseController {
 					foreach ($query as $q) {
 						$id = $q->id;
 						$name = $q->name;
+						$location = $q->location;
+						$time = $q->time;
 						$roles = $q->roles;
 						$rolesa = json_decode($roles);
 						$rols = '';
@@ -865,6 +883,11 @@ class Accounts extends BaseController {
 							foreach($rolesa as $r => $val){
 								$rols .= $val.', ';
 							}
+						}
+
+						$times = '<span class="text-danger">No Meeting Time</span>';
+						if(!empty($time)){
+							$times = '<a href="javascript:;" class="text-primary pop" pageTitle="View Time " pageName="' . site_url($mod . '/manage/view/' . $id) . '"><em class="icon ni ni-eye"></em> <span>'.translate_phrase('View Meeting Time').'</span></a>';
 						}
 						// add manage buttons
 						if ($role_u != 1) {
@@ -885,8 +908,14 @@ class Accounts extends BaseController {
 										<span class="tb-lead">' . ucwords($name) . ' </span>
 									</div>
 								</div>
+								<div class="nk-tb-col tb-col-md">
+									<span class="text-dark">' . ucwords($location) . '</span>
+								</div>
 								<div class="nk-tb-col tb-col">
 									<span class="text-dark"><b>' . ucwords(rtrim($rols, ', ')) . '</b></span>
+								</div>
+								<div class="nk-tb-col tb-col-md">
+									<span class="text-dark">' . ($times) . '</span>
 								</div>
 								<div class="nk-tb-col nk-tb-col-tools">
 									<ul class="nk-tb-actions gx-1">
@@ -947,6 +976,330 @@ class Accounts extends BaseController {
 		} else { // view for main page
 			
 			$data['title'] = translate_phrase('Cells').' - '.app_name;
+			$data['page_active'] = $mod;
+			return view($mod, $data);
+		}
+    }
+
+	//Customer
+	public function membership($param1='', $param2='', $param3='') {
+		// check session login
+		if($this->session->get('td_id') == ''){
+			$request_uri = uri_string();
+			$this->session->set('td_redirect', $request_uri);
+			return redirect()->to(site_url('auth'));
+		} 
+
+        $mod = 'accounts/membership';
+
+        $log_id = $this->session->get('td_id');
+        $role_id = $this->Crud->read_field('id', $log_id, 'user', 'role_id');
+        $role = strtolower($this->Crud->read_field('id', $role_id, 'access_role', 'name'));
+        $role_c = $this->Crud->module($role_id, $mod, 'create');
+        $role_r = $this->Crud->module($role_id, $mod, 'read');
+        $role_u = $this->Crud->module($role_id, $mod, 'update');
+        $role_d = $this->Crud->module($role_id, $mod, 'delete');
+        if($role_r == 0){
+            return redirect()->to(site_url('dashboard'));	
+        }
+        $data['log_id'] = $log_id;
+        $data['role'] = $role;
+        $data['role_c'] = $role_c;
+       
+		
+		$table = 'cells';
+		$form_link = site_url($mod);
+		if($param1){$form_link .= '/'.$param1;}
+		if($param2){$form_link .= '/'.$param2.'/';}
+		if($param3){$form_link .= $param3;}
+		
+		// pass parameters to view
+		$data['param1'] = $param1;
+		$data['param2'] = $param2;
+		$data['param3'] = $param3;
+		$data['form_link'] = $form_link;
+        $data['current_language'] = $this->session->get('current_language');
+		
+		// manage record
+		if($param1 == 'manage') {
+			// prepare for delete
+			if($param2 == 'delete') {
+				if($param3) {
+					$edit = $this->Crud->read_single('id', $param3, $table);
+					if(!empty($edit)) {
+						foreach($edit as $e) {
+							$data['d_id'] = $e->id;
+						}
+					}
+
+					if($this->request->getMethod() == 'post'){
+						$del_id = $this->request->getVar('d_cell_id');
+						///// store activities
+						$by = $this->Crud->read_field('id', $log_id, 'user', 'firstname');
+						$code = $this->Crud->read_field('id', $del_id, 'cell', 'name');
+						$action = $by.' deleted Cell ('.$code.') Record';
+
+						if($this->Crud->deletes('id', $del_id, $table) > 0) {
+							
+							$this->Crud->activity('user', $del_id, $action);
+							echo $this->Crud->msg('success', 'Cell Deleted');
+							echo '<script>location.reload(false);</script>';
+						} else {
+							echo $this->Crud->msg('danger', 'Please try later');
+						}
+						exit;	
+					}
+				}
+			} else {
+				// prepare for edit
+				if($param2 == 'edit') {
+					if($param3) {
+						$edit = $this->Crud->read_single('id', $param3, $table);
+						if(!empty($edit)) {
+							foreach($edit as $e) {
+								$data['e_id'] = $e->id;
+								$data['e_location'] = $e->location;
+								$data['e_name'] = $e->name;
+								$data['e_roles'] = json_decode($e->roles);
+								$data['e_time'] = json_decode($e->time);
+							}
+						}
+					}
+				} 
+
+				if($this->request->getMethod() == 'post'){
+					$cell_id = $this->request->getVar('cell_id');
+					$name = $this->request->getVar('name');
+					$roles = $this->request->getVar('roles');
+					$location = $this->request->getVar('location');
+					$times = $this->request->getVar('times');
+					$days = $this->request->getVar('days');
+					
+					$time = [];
+					for($i=0;$i < count($days);$i++ ){
+						$day = $days[$i];
+						// echo $day;
+						$time[$day] = $times[$i];
+					}
+					// print_r($time);
+					// print_r($days);
+					// die;
+					$ins_data['name'] = $name;
+					$ins_data['roles'] = json_encode($roles);
+					$ins_data['location'] = $location;
+					$ins_data['time'] = json_encode($time);
+					
+					// do create or update
+					if($cell_id) {
+						$upd_rec = $this->Crud->updates('id', $cell_id, $table, $ins_data);
+						if($upd_rec > 0) {
+							///// store activities
+							$by = $this->Crud->read_field('id', $log_id, 'user', 'firstname');
+							$code = $this->Crud->read_field('id', $cell_id, 'dept', 'name');
+							$action = $by.' updated Department ('.$code.') Record';
+							$this->Crud->activity('user', $cell_id, $action);
+
+							echo $this->Crud->msg('success', 'Record Updated');
+							echo '<script>location.reload(false);</script>';
+						} else {
+							echo $this->Crud->msg('info', 'No Changes');	
+						}
+					} else {
+						if($this->Crud->check('name', $name, $table) > 0) {
+							echo $this->Crud->msg('warning', 'Record Already Exist');
+						} else {
+							$ins_rec = $this->Crud->create($table, $ins_data);
+							if($ins_rec > 0) {
+								///// store activities
+								$by = $this->Crud->read_field('id', $log_id, 'user', 'firstname');
+								$code = $this->Crud->read_field('id', $ins_rec, 'dept', 'name');
+								$action = $by.' created Department ('.$code.') Record';
+								$this->Crud->activity('user', $ins_rec, $action);
+
+								echo $this->Crud->msg('success', 'Record Created');
+								echo '<script>location.reload(false);</script>';
+							} else {
+								echo $this->Crud->msg('danger', 'Please try later');	
+							}	
+						}
+					}
+
+					die;	
+				}
+			}
+		}
+
+		if($param1 == 'get_dept_role'){
+			if(!empty($param2)){
+				
+				$li = '';
+				$dept = $this->Crud->read_field('id', $param2, 'dept', 'name');
+				$dept_role = $this->Crud->read_field('id', $param2, 'dept', 'roles');
+				if($dept != 'member'){
+					$li = '<option value="">Select Deparment Role</option>';
+					if(!empty($dept_role)){
+						foreach(json_decode($dept_role) as $r => $val){
+							$li .= '<option value="'.$val.'">'.ucwords($val).'</option>';
+						}
+					}
+				}
+				$resp['list'] = $li;
+				$resp['script'] = '<script>$("#dept_resp").show(500);</script>';
+
+				echo json_encode($resp);
+				die;
+			}
+		}
+
+        // record listing
+		if($param1 == 'load') {
+			$limit = $param2;
+			$offset = $param3;
+
+			$rec_limit = 25;
+			$item = '';
+            if(empty($limit)) {$limit = $rec_limit;}
+			if(empty($offset)) {$offset = 0;}
+			
+			$search = $this->request->getPost('search');
+			
+			$items = '
+				<div class="nk-tb-item nk-tb-head">
+					<div class="nk-tb-col"><span class="sub-text text-dark">'.translate_phrase('Name').'</span></div>
+					<div class="nk-tb-col nk-tb-col-md"><span class="sub-text text-dark">'.translate_phrase('Location').'</span></div>
+					<div class="nk-tb-col"><span class="sub-text text-dark">'.translate_phrase('Role(s)').'</span></div>
+					<div class="nk-tb-col nk-tb-col-md"><span class="sub-text text-dark">'.('Day/Time').'</span></div>
+					<div class="nk-tb-col nk-tb-col-tools">
+						<ul class="nk-tb-actions gx-1 my-n1">
+							
+						</ul>
+					</div>
+				</div><!-- .nk-tb-item -->
+		
+				
+			';
+			$a = 1;
+
+            //echo $status;
+			$log_id = $this->session->get('td_id');
+			if(!$log_id) {
+				$item = '<div class="text-center text-muted">'.translate_phrase('Session Timeout! - Please login again').'</div>';
+			} else {
+				
+				$all_rec = $this->Crud->filter_cell('', '', $search);
+                // $all_rec = json_decode($all_rec);
+				if(!empty($all_rec)) { $counts = count($all_rec); } else { $counts = 0; }
+
+				$query = $this->Crud->filter_cell($limit, $offset, $search);
+				$data['count'] = $counts;
+				
+
+				if(!empty($query)) {
+					foreach ($query as $q) {
+						$id = $q->id;
+						$name = $q->name;
+						$location = $q->location;
+						$time = $q->time;
+						$roles = $q->roles;
+						$rolesa = json_decode($roles);
+						$rols = '';
+						if(!empty($rolesa)){
+							foreach($rolesa as $r => $val){
+								$rols .= $val.', ';
+							}
+						}
+
+						$times = '<span class="text-danger">No Meeting Time</span>';
+						if(!empty($time)){
+							$times = '<a href="javascript:;" class="text-primary pop" pageTitle="View Time " pageName="' . site_url($mod . '/manage/view/' . $id) . '"><em class="icon ni ni-eye"></em> <span>'.translate_phrase('View Meeting Time').'</span></a>';
+						}
+						// add manage buttons
+						if ($role_u != 1) {
+							$all_btn = '';
+						} else {
+							$all_btn = '
+								<li><a href="javascript:;" class="text-primary pop" pageTitle="Edit ' . $name . '" pageName="' . site_url($mod . '/manage/edit/' . $id) . '"><em class="icon ni ni-edit-alt"></em><span>'.translate_phrase('Edit').'</span></a></li>
+								<li><a href="javascript:;" class="text-danger pop" pageTitle="Delete ' . $name . '" pageName="' . site_url($mod . '/manage/delete/' . $id) . '"><em class="icon ni ni-trash-alt"></em><span>'.translate_phrase('Delete').'</span></a></li>
+								
+								
+							';
+						}
+
+						$item .= '
+							<div class="nk-tb-item">
+								<div class="nk-tb-col">
+									<div class="user-info">
+										<span class="tb-lead">' . ucwords($name) . ' </span>
+									</div>
+								</div>
+								<div class="nk-tb-col tb-col-md">
+									<span class="text-dark">' . ucwords($location) . '</span>
+								</div>
+								<div class="nk-tb-col tb-col">
+									<span class="text-dark"><b>' . ucwords(rtrim($rols, ', ')) . '</b></span>
+								</div>
+								<div class="nk-tb-col tb-col-md">
+									<span class="text-dark">' . ($times) . '</span>
+								</div>
+								<div class="nk-tb-col nk-tb-col-tools">
+									<ul class="nk-tb-actions gx-1">
+										<li>
+											<div class="drodown">
+												<a href="#" class="dropdown-toggle btn btn-icon btn-trigger" data-bs-toggle="dropdown"><em class="icon ni ni-more-h"></em></a>
+												<div class="dropdown-menu dropdown-menu-end">
+													<ul class="link-list-opt no-bdr">
+														' . $all_btn . '
+													</ul>
+												</div>
+											</div>
+										</li>
+									</ul>
+								</div>
+							</div><!-- .nk-tb-item -->
+						';
+						$a++;
+					}
+				}
+				
+			}
+			
+			if(empty($item)) {
+				$resp['item'] = $items.'
+					<div class="text-center text-muted">
+						<br/><br/><br/><br/>
+						<i class="ni ni-tranx" style="font-size:150px;"></i><br/><br/>'.translate_phrase('No Cell Returned').'
+					</div>
+				';
+			} else {
+				$resp['item'] = $items . $item;
+				if($offset >= 25){
+					$resp['item'] = $item;
+				}
+				
+			}
+
+			$resp['count'] = $counts;
+
+			$more_record = $counts - ($offset + $rec_limit);
+			$resp['left'] = $more_record;
+
+			if($counts > ($offset + $rec_limit)) { // for load more records
+				$resp['limit'] = $rec_limit;
+				$resp['offset'] = $offset + $limit;
+			} else {
+				$resp['limit'] = 0;
+				$resp['offset'] = 0;
+			}
+
+			echo json_encode($resp);
+			die;
+		}
+
+		if($param1 == 'manage') { // view for form data posting
+			return view($mod.'_form', $data);
+		} else { // view for main page
+			
+			$data['title'] = translate_phrase('Membership').' - '.app_name;
 			$data['page_active'] = $mod;
 			return view($mod, $data);
 		}
@@ -1495,454 +1848,5 @@ class Accounts extends BaseController {
         ];
     }
 
-	  //Beneficiary List
-	public function check_otp($param1='', $param2='', $param3='') {
-		// check session login
-		if($this->session->get('td_id') == ''){
-			$request_uri = uri_string();
-			$this->session->set('td_redirect', $request_uri);
-			return redirect()->to(site_url('auth'));
-		} 
-
-        $mod = 'check_otp';
-
-        $log_id = $this->session->get('td_id');
-        $role_id = $this->Crud->read_field('id', $log_id, 'user', 'role_id');
-        $role = strtolower($this->Crud->read_field('id', $role_id, 'access_role', 'name'));
-        $role_c = $this->Crud->module($role_id, 'accounts/'.$mod, 'create');
-        $role_r = $this->Crud->module($role_id, 'accounts/'.$mod, 'read');
-        $role_u = $this->Crud->module($role_id, 'accounts/'.$mod, 'update');
-        $role_d = $this->Crud->module($role_id, 'accounts/'.$mod, 'delete');
-        if($role_r == 0){
-            return redirect()->to(site_url('dashboard'));	
-        }
-        $data['log_id'] = $log_id;
-        $data['role'] = $role;
-        $data['role_c'] = $role_c;
-       
-		$table = 'user';
-		$form_link = site_url('accounts/'.$mod);
-		if($param1){$form_link .= '/'.$param1;}
-		if($param2){$form_link .= '/'.$param2.'/';}
-		if($param3){$form_link .= $param3;}
-		
-		// pass parameters to view
-		$data['param1'] = $param1;
-		$data['param2'] = $param2;
-		$data['param3'] = $param3;
-		$data['form_link'] = $form_link;
-		
-		// manage record
-		if($param1 == 'manage') {
-						
-			// prepare for delete
-			if($param2 == 'delete') {
-				if($param3) {
-					$edit = $this->Crud->read_single('id', $param3, $table);
-                    //echo var_dump($edit);
-					if(!empty($edit)) {
-						foreach($edit as $e) {
-							$data['d_id'] = $e->id;
-						}
-					}
-					
-					if($this->request->getMethod() == 'post'){
-                        $del_id =  $this->request->getVar('d_vendor_id');
-                        
-                        $del = $this->Crud->deletes('id', $del_id, 'beneficiary');
-
-                        if($del > 0){	
-                        
-							echo $this->Crud->msg('success', translate_phrase('Beneficiary  Deleted Successfully'));
-							echo '<script>location.reload(false);</script>';
-						} else {
-							echo $this->Crud->msg('danger', translate_phrase('Please try later'));
-						}
-						die;	
-					}
-				}
-			} else {
-				// prepare for edit
-				if($param2 == 'edit') {
-					if($param3) {
-						
-						$edit = $this->Crud->read_single('id', $param3, $table);
-						if(!empty($edit)) {
-							foreach($edit as $e) {
-								$data['e_id'] = $e->id;
-								$data['e_activate'] = $e->activate;
-								$data['e_role_id'] = $e->role_id;
-							}
-						}
-						
-					}
-				}
-				
-				if($this->request->getMethod() == 'post'){
-					$user_i = $this->request->getPost('user_id');
-					$role = $this->request->getPost('role');
-					$password = $this->request->getPost('password');
-					
-					$role_ids =  $this->Crud->read_field('name', 'Business', 'access_role', 'id');
-			
-					if($this->request->getPost('ban')) { $set_activate = 1; } else { $set_activate = 0; }
-					
-					$data['password'] = md5($password);
-					$data['activate'] = $set_activate;
-					$data['role'] = $role;
-					$data['role_id'] = $role_ids;
-					
-					
-					// do create or update
-					if($user_i) {
-                        $update = $this->Crud->api('post', 'users/update/' . $user_i, $data);
-                        $update = json_decode($update);
-						
-						if($update->status == true){
-							echo $this->Crud->msg('success', translate_phrase($update->msg));
-							echo '<script>location.reload(false);</script>';
-						} else {
-							echo $this->Crud->msg($update->code, translate_phrase($update->msg));	
-						}
-                        die;
-					} 
-						
-				}
-			}
-		}
-
-        if($param1 == 'validate'){
-            if(!empty($param2)){
-                if($this->Crud->check('phone', $param2, 'user') > 0){
-					$otp = $this->Crud->read_field('phone', $param2, 'user', 'otp');
-					if(empty($otp)){
-						echo $this->Crud->msg('danger', 'No OTP Exist for this Phone Number');
-					} else{
-						echo $this->Crud->msg('success', 'The OTP is <b>'.$otp.'</b>');
-					}
-				} else{
-					echo $this->Crud->msg('danger', 'Phone Number Does not Exist');
-				}
-            } else {
-                echo $this->Crud->msg('danger', 'Phone Number cannot be Empty');
-               
-            } 
-            
-            die;
-        }
-
-        
-        $data['current_language'] = $this->session->get('current_language');
-		if($param1 == 'manage') { // view for form data posting
-			return view($mod.'_form', $data);
-		} else { // view for main page
-			
-			$data['title'] = translate_phrase('OTP Check').' - '.app_name;
-			$data['page_active'] = 'dashboard/otp_check';
-			return view($mod, $data);
-		}
-    }
-
-	  //Beneficiary List
-	public function virtual_assign($param1='', $param2='', $param3='') {
-		// check session login
-		if($this->session->get('td_id') == ''){
-			$request_uri = uri_string();
-			$this->session->set('td_redirect', $request_uri);
-			return redirect()->to(site_url('auth'));
-		} 
-
-        $mod = 'virtual_assign';
-
-        $log_id = $this->session->get('td_id');
-        $role_id = $this->Crud->read_field('id', $log_id, 'user', 'role_id');
-        $role = strtolower($this->Crud->read_field('id', $role_id, 'access_role', 'name'));
-        $role_c = $this->Crud->module($role_id, 'accounts/'.$mod, 'create');
-        $role_r = $this->Crud->module($role_id, 'accounts/'.$mod, 'read');
-        $role_u = $this->Crud->module($role_id, 'accounts/'.$mod, 'update');
-        $role_d = $this->Crud->module($role_id, 'accounts/'.$mod, 'delete');
-        if($role_r == 0){
-            return redirect()->to(site_url('dashboard'));	
-        }
-        $data['log_id'] = $log_id;
-        $data['role'] = $role;
-        $data['role_c'] = $role_c;
-       
-		$table = 'user';
-		$form_link = site_url('accounts/'.$mod);
-		if($param1){$form_link .= '/'.$param1;}
-		if($param2){$form_link .= '/'.$param2.'/';}
-		if($param3){$form_link .= $param3;}
-		
-		// pass parameters to view
-		$data['param1'] = $param1;
-		$data['param2'] = $param2;
-		$data['param3'] = $param3;
-		$data['form_link'] = rtrim($form_link, '/');
-		
-		// manage record
-		if($param1 == 'manage') {
-						
-			// prepare for delete
-			if($param2 == 'assign') {
-				if($param3) {
-					$edit = $this->Crud->read_single('id', $param3, $table);
-                    //echo var_dump($edit);
-					if(!empty($edit)) {
-						foreach($edit as $e) {
-							$data['d_id'] = $e->id;
-						}
-					}
-					
-					if($this->request->getMethod() == 'post'){
-                        $virtual_id =  $this->request->getVar('virtual_id');
-                        $user_id =  $this->request->getVar('user_id');
-                        
-                        $del = $this->Crud->updates('id', $virtual_id, 'virtual_account', array('user_id'=>$user_id));
-
-                        if($del > 0){	
-							echo $this->Crud->msg('success', translate_phrase('Virtual Account Assigned'));
-							echo '<script>location.reload(false);</script>';
-						} else {
-							echo $this->Crud->msg('danger', translate_phrase('Please try later'));
-						}
-						die;	
-					}
-				}
-			
-			} elseif($param2 == 'generate'){
-				if($this->request->getMethod() == 'post'){
-					$tax_no = $this->request->getPost('tax_no');
-
-					if(!empty($tax_no)) {
-						$p_data['account_name']= 'Zend Tax Account';
-						$p_data['bvn']= "";
-						$id = 0;$e_id = 0;
-						$user_id = 0;
-						for($i =1; $i <= $tax_no; $i++){	
-							$virtual = $this->Crud->providus('post', 'PiPCreateReservedAccountNumber', $p_data);
-							$virtuals =json_decode($virtual);
-							if(empty($virtuals)){
-								$resp = $e_id.' Error';
-								$e_id++;
-							} else{
-								if($virtuals->requestSuccessful == true){
-									$v_data['acc_no'] = $virtuals->account_number;
-									$v_data['user_id'] = $user_id;
-									$v_data['response'] = $virtual;
-									$v_data['reg_date'] = date(fdate);
-									$this->Crud->create('virtual_account',  $v_data);
-
-									///// store activities
-									$id++;
-									$resp = $id.' Virtual Account/Tax ID Generated Successfully';
-									$this->Crud->activity('profile', $user_id, 'Tax ID Generated');
-
-								} else {
-									$resp = $e_id.' Error';
-									$e_id++;
-								}
-							}
-						}
-
-						echo $this->Crud->msg('info', $resp);
-						echo '<script>location.reload(false);</script>';
-					}
-					
-					die;	
-				}
-
-			} else {
-				// prepare for edit
-				if($param2 == 'edit') {
-					if($param3) {
-						
-						$edit = $this->Crud->read_single('id', $param3, $table);
-						if(!empty($edit)) {
-							foreach($edit as $e) {
-								$data['e_id'] = $e->id;
-								$data['e_activate'] = $e->activate;
-								$data['e_role_id'] = $e->role_id;
-							}
-						}
-						
-					}
-				}
-				
-				if($this->request->getMethod() == 'post'){
-					$user_i = $this->request->getPost('user_id');
-					$role = $this->request->getPost('role');
-					$password = $this->request->getPost('password');
-					
-					$role_ids =  $this->Crud->read_field('name', 'Business', 'access_role', 'id');
-			
-					if($this->request->getPost('ban')) { $set_activate = 1; } else { $set_activate = 0; }
-					
-					$data['password'] = md5($password);
-					$data['activate'] = $set_activate;
-					$data['role'] = $role;
-					$data['role_id'] = $role_ids;
-					
-					
-					// do create or update
-					if($user_i) {
-                        $update = $this->Crud->api('post', 'users/update/' . $user_i, $data);
-                        $update = json_decode($update);
-						
-						if($update->status == true){
-							echo $this->Crud->msg('success', translate_phrase($update->msg));
-							echo '<script>location.reload(false);</script>';
-						} else {
-							echo $this->Crud->msg($update->code, translate_phrase($update->msg));	
-						}
-                        die;
-					} 
-						
-				}
-			}
-		}
-
-        if($param1 == 'validate'){
-            if(!empty($param2)){
-                if($this->Crud->check('phone', $param2, 'user') > 0){
-					$otp = $this->Crud->read_field('phone', $param2, 'user', 'otp');
-					if(empty($otp)){
-						echo $this->Crud->msg('danger', 'No OTP Exist for this Phone Number');
-					} else{
-						echo $this->Crud->msg('success', 'The OTP is <b>'.$otp.'</b>');
-					}
-				} else{
-					echo $this->Crud->msg('danger', 'Phone Number Does not Exist');
-				}
-            } else {
-                echo $this->Crud->msg('danger', 'Phone Number cannot be Empty');
-               
-            } 
-            
-            die;
-        }
-
-		// record listing
-		if($param1 == 'load') {
-			$limit = $param2;
-			$offset = $param3;
-
-			$rec_limit = 25;
-			$item = '';
-            if(empty($limit)) {$limit = $rec_limit;}
-			if(empty($offset)) {$offset = 0;}
-			
-			$search = $this->request->getPost('search');
-			if(!empty($this->request->getVar('territory'))){$territory = $this->request->getVar('territory');}else{$territory = '';}
-
-
-			$items = '
-				<div class="nk-tb-item nk-tb-head">
-					<div class="nk-tb-col"><span class="text-dark sub-text"><b>'.translate_phrase('Unassigned Virtual Account').'</b></span></div>
-					<div class="nk-tb-col nk-tb-col-tools">
-						<ul class="nk-tb-actions gx-1 my-n1">
-							
-						</ul>
-					</div>
-				</div><!-- .nk-tb-item -->
-		
-				
-			';
-			$a = 1;
-
-            //echo $status;
-			$log_id = $this->session->get('td_id');
-			if(!$log_id) {
-				$item = '<div class="text-center text-muted">'.translate_phrase('Session Timeout! - Please login again').'</div>';
-			} else {
-				
-				$all_rec = $this->Crud->read_single('user_id', 0, 'virtual_account', '', '');
-                // $all_rec = json_decode($all_rec);
-				if(!empty($all_rec)) { $counts = count($all_rec); } else { $counts = 0; }
-
-				$query = $this->Crud->read_single('user_id', 0, 'virtual_account', $limit, $offset);
-				$data['count'] = $counts;
-
-				
-				if(!empty($query)) {
-					foreach ($query as $q) {
-						$id = $q->id;
-						$acc_no = $q->acc_no;
-						$reg_date = date('M d, Y h:ia', strtotime($q->reg_date));
-
-
-						// add manage buttons
-						if ($role_u != 1) {
-							$all_btn = '';
-						} else {
-							$all_btn = '
-								<a href="javascript:;" class="text-primary pop" pageTitle="Assign Virtual Account" pageName="' . site_url('accounts/'.$mod . '/manage/assign/' . $id) . '"><em class="icon ni ni-check-circle"></em><span>'.translate_phrase('Assign Virtual Account').'</span></a>
-								
-							';
-						}
-
-						$item .= '
-							<div class="nk-tb-item">
-								<div class="nk-tb-col">
-									<div class="user-card">
-										<div class="user-info">
-											<span class="tb-lead">' . ucwords($acc_no) . '</span>
-										</div>
-									</div>
-								</div>
-								<div class="nk-tb-col nk-tb-col-tools">
-									' . $all_btn . '
-								</div>
-							</div><!-- .nk-tb-item -->
-						';
-						$a++;
-					}
-				}
-				
-				
-			}
-			
-			if(empty($item)) {
-				$resp['item'] = $items.'
-					<div class="text-center text-muted">
-						<br/><br/><br/><br/>
-						<i class="ni ni-cc-secure" style="font-size:150px;"></i><br/><br/>'.translate_phrase('No Virtual Account Returned').'
-					</div>
-				';
-			} else {
-				$resp['item'] = $items . $item;
-				if($offset >= 25){
-					$resp['item'] = $item;
-				}
-				
-			}
-
-			$resp['count'] = $counts;
-
-			$more_record = $counts - ($offset + $rec_limit);
-			$resp['left'] = $more_record;
-
-			if($counts > ($offset + $rec_limit)) { // for load more records
-				$resp['limit'] = $rec_limit;
-				$resp['offset'] = $offset + $limit;
-			} else {
-				$resp['limit'] = 0;
-				$resp['offset'] = 0;
-			}
-
-			echo json_encode($resp);
-			die;
-		}
-        
-        $data['current_language'] = $this->session->get('current_language');
-		if($param1 == 'manage') { // view for form data posting
-			return view('accounts/'.$mod.'_form', $data);
-		} else { // view for main page
-			
-			$data['title'] = translate_phrase('Virtual Assign').' - '.app_name;
-			$data['page_active'] = 'accounts/virtual_assign';
-			return view('accounts/'.$mod, $data);
-		}
-    }
 
 }

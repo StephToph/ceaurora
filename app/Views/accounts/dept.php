@@ -10,7 +10,7 @@
 
 <?=$this->section('content');?>
 <div class="nk-content" >
-    <div class="container wide-xl mt-3">
+    <div class="container-fluid mt-3">
         <div class="nk-content-inner">
             <div class="nk-content-body">
                 <div class="nk-block-head nk-block-head-sm">
