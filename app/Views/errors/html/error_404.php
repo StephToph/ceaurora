@@ -19,7 +19,7 @@
     <div class="nk-app-root">
         <div class="nk-main ">
             <div class="nk-wrap nk-wrap-nosidebar">
-                <div class="nk-content" style="background-image: url(<?=site_url('assets/sitebk.png'); ?>);background-size: cover;">
+                <div class="nk-content" >
                     <div class="nk-block nk-block-middle wide-md mx-auto">
                         <div class="nk-block-content nk-error-ld text-center">
                             <img class="nk-error-gfx" src="<?=site_url();?>/assets/images/gfx/error-404.svg" alt="">
