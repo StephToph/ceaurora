@@ -152,6 +152,35 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="col-md-6 col-lg-4 col-xxl-3">
+                                    <div class="form-group"><label class="form-label">Department</label>
+                                        <div class="form-control-wrap">
+                                            <select class="form-select js-select2" id="dept_id" name="dept_id"
+                                                data-placeholder="Select Department" onchange="dept_role();">
+                                                <option value="">Select</option>
+                                                <?php
+                                                    $parent  = $this->Crud->read_order('dept', 'name', 'asc');
+                                                    if(!empty($parent)){
+                                                        foreach($parent as $p){
+                                                            echo '<option value="'.$p->id.'">'.ucwords($p->name).'</option>';
+                                                        }
+                                                    }
+                                                ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-lg-4 col-xxl-3" id="dept_resp" style="display:none;">
+                                    <div class="form-group"><label class="form-label">Department Role</label>
+                                        <div class="form-control-wrap">
+                                            <select class="form-select js-select2" id="dept_role_id" name="dept_role_id"
+                                                data-placeholder="Select Role">
+                                                <option value="">Select</option>
+                                               
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
                                 
                                 <div class="col-sm-12 mb-3 text-center">
                                     <div class="form-group  mt-4"><button type="submit"
@@ -177,6 +206,20 @@
     $(function() {
         // load('', '');
     });
+
+    function dept_role(){
+        var dept_id = $('#dept_id').val();
+        $.ajax({
+            url: site_url + 'accounts/membership/get_dept_role/' + dept_id,
+            type: 'get',
+            success: function (data) {
+                var dt = JSON.parse(data);
+                $('#dept_role_id').html(dt.list);
+                $('#bb_ajax_msg').html(dt.script);
+                
+            }
+        });
+    }
 
     function posit(){
         var position = $('#family_position').val();

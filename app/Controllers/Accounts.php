@@ -1129,6 +1129,28 @@ class Accounts extends BaseController {
 			}
 		}
 
+		if($param1 == 'get_dept_role'){
+			if(!empty($param2)){
+				
+				$li = '';
+				$dept = $this->Crud->read_field('id', $param2, 'dept', 'name');
+				$dept_role = $this->Crud->read_field('id', $param2, 'dept', 'roles');
+				if($dept != 'member'){
+					$li = '<option value="">Select Deparment Role</option>';
+					if(!empty($dept_role)){
+						foreach(json_decode($dept_role) as $r => $val){
+							$li .= '<option value="'.$val.'">'.ucwords($val).'</option>';
+						}
+					}
+				}
+				$resp['list'] = $li;
+				$resp['script'] = '<script>$("#dept_resp").show(500);</script>';
+
+				echo json_encode($resp);
+				die;
+			}
+		}
+
         // record listing
 		if($param1 == 'load') {
 			$limit = $param2;
