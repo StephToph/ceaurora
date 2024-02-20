@@ -408,7 +408,7 @@ class Accounts extends BaseController {
 	}
 
 	//Customer
-	public function personal($param1='', $param2='', $param3='') {
+	public function dept($param1='', $param2='', $param3='') {
 		// check session login
 		if($this->session->get('td_id') == ''){
 			$request_uri = uri_string();
@@ -416,7 +416,7 @@ class Accounts extends BaseController {
 			return redirect()->to(site_url('auth'));
 		} 
 
-        $mod = 'accounts/personal';
+        $mod = 'accounts/dept';
 
         $log_id = $this->session->get('td_id');
         $role_id = $this->Crud->read_field('id', $log_id, 'user', 'role_id');
@@ -432,9 +432,8 @@ class Accounts extends BaseController {
         $data['role'] = $role;
         $data['role_c'] = $role_c;
        
-		if($this->Crud->check2('id', $log_id, 'setup', 0, 'user')> 0)return redirect()->to(site_url('auth/security'));
-		if($this->Crud->check2('id', $log_id, 'trade', 0, 'user')> 0)return redirect()->to(site_url('auth/security'));
-		$table = 'user';
+		
+		$table = 'dept';
 		$form_link = site_url($mod);
 		if($param1){$form_link .= '/'.$param1;}
 		if($param2){$form_link .= '/'.$param2.'/';}

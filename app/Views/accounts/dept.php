@@ -9,10 +9,10 @@
 <?=$this->endSection();?>
 
 <?=$this->section('content');?>
-<div class="nk-content" style="background-image: url(<?=site_url('assets/sitebk.png'); ?>);background-size: cover;">
+<div class="nk-content" >
     <div class="container wide-xl ">
-        <div class="nk-content-inner mt-5">
-            <div class="nk-content-body mt-5">
+        <div class="nk-content-inner">
+            <div class="nk-content-body">
                 <div class="nk-block-head nk-block-head-sm">
                     <div class="nk-block-between">
                         <div class="nk-block-head-content">
@@ -77,25 +77,6 @@
                                                                         </div>
                                                                         <div class="dropdown-body dropdown-body-rg">
                                                                             <div class="row gx-6 gy-3">
-                                                                                <div class="col-12">
-                                                                                    <div class="form-group">
-                                                                                        <label class="overline-title overline-title-alt"><?=translate_phrase('LGA');?></label>
-                                                                                        <select class="form-select js-select2" data-search="on" id="state_id" onchange="load('', '')">
-                                                                                            <option value="0"><?=translate_phrase('All LGA');?></option>
-                                                                                            <?php
-                                                                                                $state = $this->Crud->read_single_order('state_id', 316, 'city', 'name', 'asc');
-                                                                                                if(!empty($state)){
-                                                                                                    foreach($state as $s){
-                                                                                                        echo '
-                                                                                                            <option value="'.$s->id.'">'.$s->name.'</option>
-                                                                                                        ';
-                                                                                                    }
-                                                                                                }
-
-                                                                                            ?>
-                                                                                        </select>
-                                                                                    </div>
-                                                                                </div>
                                                                                 <div class="col-12">
                                                                                     <div class="form-group">
                                                                                         <label class="overline-title overline-title-alt"><?=translate_phrase('Active Status');?></label>
