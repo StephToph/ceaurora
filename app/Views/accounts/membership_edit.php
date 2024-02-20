@@ -30,7 +30,7 @@
                                 <div class="col-md-6 col-lg-4 col-xxl-3">
                                     <div class="form-group"><label class="form-label">Title</label>
                                         <div class="form-control-wrap">
-                                            <select class="form-select js-select2" data-placeholder="Select Title" required>
+                                            <select class="form-select js-select2" name="title" id="title" data-placeholder="Select Title" required>
                                                 <option value="">Select Title</option>
                                                 <option value="Brother">Brother</option>
                                                 <option value="Sister">Sister</option>
@@ -210,7 +210,12 @@
                                         </div>
                                     </div>
                                 </div>
-                                
+                                <div class="col-md-6 col-lg-4 col-xxl-3">
+                                    <div class="form-group">
+                                        <label class="form-label" for="password"><?php if(!empty($e_id)) { echo translate_phrase('Reset Password'); } else { echo translate_phrase('*Password'); } ?></label>
+                                        <input class="form-control" type="text" id="password" name="password" <?php if(empty($e_id)) { echo 'required'; } ?>>
+                                    </div>
+                                </div>
                                 <div class="col-sm-12 mb-3 text-center">
                                     <div class="form-group  mt-4"><button type="submit"
                                             class="btn btn-primary">Save Membership</button></div>
@@ -231,6 +236,7 @@
 
 <script>var site_url = '<?php echo site_url(); ?>';</script>
 <script src="<?php echo base_url(); ?>/assets/js/jquery.min.js"></script>
+<script src="<?php echo site_url(); ?>assets/js/jsform.js"></script>
 <script>
     $(function() {
         // load('', '');
