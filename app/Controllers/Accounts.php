@@ -705,7 +705,7 @@ class Accounts extends BaseController {
         $data['role_c'] = $role_c;
        
 		
-		$table = 'cell';
+		$table = 'cells';
 		$form_link = site_url($mod);
 		if($param1){$form_link .= '/'.$param1;}
 		if($param2){$form_link .= '/'.$param2.'/';}
@@ -828,6 +828,7 @@ class Accounts extends BaseController {
 				<div class="nk-tb-item nk-tb-head">
 					<div class="nk-tb-col"><span class="sub-text">'.translate_phrase('Name').'</span></div>
 					<div class="nk-tb-col"><span class="sub-text">'.translate_phrase('Role(s)').'</span></div>
+					<div class="nk-tb-col"><span class="sub-text">'.translate_phrase('Day/Time').'</span></div>
 					<div class="nk-tb-col nk-tb-col-tools">
 						<ul class="nk-tb-actions gx-1 my-n1">
 							
@@ -845,11 +846,11 @@ class Accounts extends BaseController {
 				$item = '<div class="text-center text-muted">'.translate_phrase('Session Timeout! - Please login again').'</div>';
 			} else {
 				
-				$all_rec = $this->Crud->filter_dept('', '', '', $log_id, $search);
+				$all_rec = $this->Crud->filter_cell('', '', '', $log_id, $search);
                 // $all_rec = json_decode($all_rec);
 				if(!empty($all_rec)) { $counts = count($all_rec); } else { $counts = 0; }
 
-				$query = $this->Crud->filter_dept($limit, $offset, '', $log_id, $search);
+				$query = $this->Crud->filter_cell($limit, $offset, '', $log_id, $search);
 				$data['count'] = $counts;
 				
 
@@ -913,7 +914,7 @@ class Accounts extends BaseController {
 				$resp['item'] = $items.'
 					<div class="text-center text-muted">
 						<br/><br/><br/><br/>
-						<i class="ni ni-building" style="font-size:150px;"></i><br/><br/>'.translate_phrase('No Department Returned').'
+						<i class="ni ni-tranx" style="font-size:150px;"></i><br/><br/>'.translate_phrase('No Cell Returned').'
 					</div>
 				';
 			} else {
