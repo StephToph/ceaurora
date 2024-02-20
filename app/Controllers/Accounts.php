@@ -1195,6 +1195,7 @@ class Accounts extends BaseController {
 					$cell_id = $this->request->getVar('cell_id');
 					$cell_role_id = $this->request->getVar('cell_role_id');
 					$title = $this->request->getVar('title');
+					$password = $this->request->getVar('password');
 					
 					
 					$ins_data['title'] = $title;
@@ -1214,6 +1215,7 @@ class Accounts extends BaseController {
 					$ins_data['dept_role'] = $dept_role_id;
 					$ins_data['cell_id'] = $cell_id;
 					$ins_data['cell_role'] = $cell_role_id;
+					if($password) { $ins_data['password'] = md5($password); }
 					
 					// do create or update
 					if($membership_id) {
