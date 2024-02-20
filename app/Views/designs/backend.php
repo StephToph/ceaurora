@@ -2,7 +2,7 @@
     use App\Models\Crud;
     $this->Crud = new Crud();
     
-    $username = $this->Crud->read_field('id', $log_id, 'user', 'fullname');
+    $username = $this->Crud->read_field('id', $log_id, 'user', 'surname').' '.$this->Crud->read_field('id', $log_id, 'user', 'firstname');
     $email = $this->Crud->read_field('id', $log_id, 'user', 'email');
     $log_role_id = $this->Crud->read_field('id', $log_id, 'user', 'role_id');
 	$log_role = strtolower($this->Crud->read_field('id', $log_role_id, 'access_role', 'name'));
@@ -11,18 +11,6 @@
     $balance = 0;
     $earnings = 0;
     $withdrawns = 0;
-
-    $query = $this->Crud->read_single('user_id', $log_id, 'wallet');
-    if(!empty($query)) {
-        foreach($query as $q) {
-            if($q->type == 'credit') {
-                $earnings += (float)$q->amount;
-            } else {
-                $withdrawns += (float)$q->amount;
-            }
-        }
-        $balance = $earnings - $withdrawns;
-    }
 
     
     header("Access-Control-Allow-Origin: *");  // Replace * with the specific origin(s) you want to allow
@@ -574,8 +562,6 @@
 
     <script src="<?=site_url(); ?>assets/js/bundle.js?ver=3.2.3"></script>
     <script src="<?=site_url(); ?>assets/js/scripts.js?ver=3.2.3"></script>
-    <script src="<?=site_url(); ?>assets/js/demo-settingse5ca.js?ver=3.2.3"></script>
-    <script src="<?=site_url(); ?>assets/js/charts/chart-crme5ca.js?ver=3.2.3"></script>
    
     <script>
          var site_url = '<?=site_url(); ?>';

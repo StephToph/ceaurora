@@ -21,7 +21,7 @@ class Dashboard extends BaseController {
         if($role_r == 0){
             return redirect()->to(site_url('profile'));	
         }
-        $username = $this->Crud->read_field('id', $log_id, 'user', 'fullname');
+        $username = $this->Crud->read_field('id', $log_id, 'user', 'surname').' '.$this->Crud->read_field('id', $log_id, 'user', 'firstname');
         
         $data['log_id'] = $log_id;
         $data['param1'] = $param1;
