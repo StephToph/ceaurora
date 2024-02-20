@@ -47,32 +47,68 @@ $this->Crud = new Crud();
             </div>
             
         </div>
-        <div class="row" id="containers">
-            <div class="col-sm-6 mb-3">
-                <div class="form-group">
-                    <label for="name">*<?=translate_phrase('Meeting Day'); ?></label>
-                    <select class="form-select2 js-select2">
-                        <option value="">Select</option>
-                        <option value="Sunday">Sunday</option>
-                        <option value="Monday">Monday</option>
-                        <option value="Tuesday">Tuesday</option>
-                        <option value="Wednesday">Wednesday</option>
-                        <option value="Thursday">Thursday</option>
-                        <option value="Friday">Friday</option>
-                        <option value="Saturday">Saturday</option>
-                    </select>
+        <div  id="containers">
+            <?php if(!empty($e_time)){$a = 0;
+                foreach($e_time as $k => $val){
+                    $r_val = 'style="display:none;"';$req = 'required';
+                    if($a > 0){
+                        $r_val = 'style="display:display;"';$req = '';
+                    }
+                    ?>
+                     <div class="row">
+                        <div class="col-sm-4 mb-3">
+                            <div class="form-group">
+                                <label for="name">*<?=translate_phrase('Meeting Day'); ?></label>
+                                <select class="form-control" name="days[]"  <?=$req; ?>>
+                                    <option value="">Select</option>
+                                    <option value="Sunday" <?php if($k == 'Sunday'){echo 'selected';} ?>>Sunday</option>
+                                    <option value="Monday" <?php if($k == 'Monday'){echo 'selected';} ?>>Monday</option>
+                                    <option value="Tuesday" <?php if($k == 'Tuesday'){echo 'selected';} ?>>Tuesday</option>
+                                    <option value="Wednesday" <?php if($k == 'Wednesday'){echo 'selected';} ?>>Wednesday</option>
+                                    <option value="Thursday" <?php if($k == 'Thursday'){echo 'selected';} ?>>Thursday</option>
+                                    <option value="Friday" <?php if($k == 'Friday'){echo 'selected';} ?>>Friday</option>
+                                    <option value="Saturday" <?php if($k == 'Saturday'){echo 'selected';} ?>>Saturday</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-8 mb-3">
+                                <label for="name">*<?=translate_phrase('Meeting Time'); ?></label>
+                            <div class="form-group input-group">
+                                <input class="form-control" type="time" id="location" value="<?php if(!empty($val)){echo $val;} ?>" name="times[]"  <?=$req; ?>>
+                                <button <?=$r_val; ?>  class="btn btn-icon btn-outline-danger deleteBtns" type="button"><i class="icon ni ni-trash"></i> </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <?php $a++; }} else {?>
+            <div class="row">
+                <div class="col-sm-4 mb-3">
+                    <div class="form-group">
+                        <label for="name">*<?=translate_phrase('Meeting Day'); ?></label>
+                        <select class="form-control" name="days[]" required>
+                            <option value="">Select</option>
+                            <option value="Sunday">Sunday</option>
+                            <option value="Monday">Monday</option>
+                            <option value="Tuesday">Tuesday</option>
+                            <option value="Wednesday">Wednesday</option>
+                            <option value="Thursday">Thursday</option>
+                            <option value="Friday">Friday</option>
+                            <option value="Saturday">Saturday</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-sm-8 mb-3">
+                        <label for="name">*<?=translate_phrase('Meeting Time'); ?></label>
+                    <div class="form-group input-group">
+                        <input class="form-control" type="time" id="location" name="times[]" required>
+                        <button style="display:none;"  class="btn btn-icon btn-outline-danger deleteBtns" type="button"><i class="icon ni ni-trash"></i> </button>
+                    </div>
                 </div>
             </div>
-            <div class="col-sm-6 mb-3">
-                <div class="form-group">
-                    <label for="name">*<?=translate_phrase('Meeting Time'); ?></label>
-                    <input class="form-control" type="time" id="location" name="time[]" value="<?php if(!empty($e_location)) {echo $e_location;} ?>" required>
-                    <button style="display:none;"  class="btn btn-icon btn-outline-danger deleteBtns" type="button"><i class="icon ni ni-trash"></i> </button>
-                </div>
-            </div>
+            <?php } ?>
         </div>
         <div class="col-sm-12 mb-3 text-center">
-            <button id="addMore_days" class="btn btn-ico btn-outline-info" type="button"><i class="icon ni ni-plus-c"></i>  <?=translate_phrase('Add More Days');?></button>
+            <button id="addMores" class="btn btn-ico btn-outline-info" type="button"><i class="icon ni ni-plus-c"></i>  <?=translate_phrase('Add More Days');?></button>
         </div>
 
         <label for="name">*<?=translate_phrase('Cell Role');?></label>
@@ -125,6 +161,9 @@ $this->Crud = new Crud();
         div.querySelector('input').removeAttribute('required');
         
         
+            // Initialize Select2 for the cloned select element
+        clonedRow.find('.js-select2').select2();
+
         // Show delete button in the cloned div
         div.querySelector('.deleteBtn').style.display = 'inline-block';
         
@@ -136,25 +175,36 @@ $this->Crud = new Crud();
         container.appendChild(div);
     });
 
-    document.getElementById('addMore_days').addEventListener('click', function() {
-        var container = document.getElementById('containers');
-        var div = container.children[0].cloneNode(true);
+    $('#addMores').on('click', function() {
+        var container = $('#containers');
+        var clonedRow = container.children('.row').first().clone();
+
+        // Clear values of cloned inputs
+        clonedRow.find('input').val('');
+        clonedRow.find('select, input').removeAttr('required');
         
-        // Clear input value of the cloned div
-        div.querySelector('input').value = '';
-        div.querySelector('input').removeAttribute('required');
-        
-        
-        // Show delete button in the cloned div
-        div.querySelector('.deleteBtns').style.display = 'inline-block';
-        
-        // Add event listener to delete button
-        div.querySelector('.deleteBtns').addEventListener('click', function() {
-            div.parentNode.removeChild(div);
-        });
-        
-        container.appendChild(div);
+        // Hide delete button in the cloned row
+        clonedRow.find('.deleteBtns').show();
+
+        clonedRow.find('.js-select2').select2();
+        // Append cloned row to container
+        container.append(clonedRow);
     });
+
+    // Event delegation to handle dynamically added delete buttons
+    $('#containers').on('click', '.deleteBtns', function() {
+        $(this).closest('.row').remove();
+    });
+
+    $('#containers').on('change', 'select[name="day[]"]', function() {
+        var timeInput = $(this).closest('.row').find('input[name="time[]"]');
+        if ($(this).val()) {
+            timeInput.attr('required', 'required');
+        } else {
+            timeInput.removeAttr('required');
+        }
+    });
+
 </script>
 
 <script src="<?php echo site_url(); ?>assets/js/jsform.js"></script

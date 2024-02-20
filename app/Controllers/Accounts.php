@@ -731,16 +731,16 @@ class Accounts extends BaseController {
 					}
 
 					if($this->request->getMethod() == 'post'){
-						$del_id = $this->request->getVar('d_dept_id');
+						$del_id = $this->request->getVar('d_cell_id');
 						///// store activities
 						$by = $this->Crud->read_field('id', $log_id, 'user', 'firstname');
-						$code = $this->Crud->read_field('id', $del_id, 'dept', 'name');
-						$action = $by.' deleted Department ('.$code.') Record';
+						$code = $this->Crud->read_field('id', $del_id, 'cell', 'name');
+						$action = $by.' deleted Cell ('.$code.') Record';
 
 						if($this->Crud->deletes('id', $del_id, $table) > 0) {
 							
 							$this->Crud->activity('user', $del_id, $action);
-							echo $this->Crud->msg('success', 'Department Deleted');
+							echo $this->Crud->msg('success', 'Cell Deleted');
 							echo '<script>location.reload(false);</script>';
 						} else {
 							echo $this->Crud->msg('danger', 'Please try later');
@@ -756,31 +756,46 @@ class Accounts extends BaseController {
 						if(!empty($edit)) {
 							foreach($edit as $e) {
 								$data['e_id'] = $e->id;
+								$data['e_location'] = $e->location;
 								$data['e_name'] = $e->name;
 								$data['e_roles'] = json_decode($e->roles);
+								$data['e_time'] = json_decode($e->time);
 							}
 						}
 					}
 				} 
 
 				if($this->request->getMethod() == 'post'){
-					$dept_id = $this->request->getVar('dept_id');
+					$cell_id = $this->request->getVar('cell_id');
 					$name = $this->request->getVar('name');
 					$roles = $this->request->getVar('roles');
-
+					$location = $this->request->getVar('location');
+					$times = $this->request->getVar('times');
+					$days = $this->request->getVar('days');
+					
+					$time = [];
+					for($i=0;$i < count($days);$i++ ){
+						$day = $days[$i];
+						// echo $day;
+						$time[$day] = $times[$i];
+					}
+					// print_r($time);
+					// print_r($days);
+					// die;
 					$ins_data['name'] = $name;
 					$ins_data['roles'] = json_encode($roles);
-					// print_r($roles);
-					// die;
+					$ins_data['location'] = $location;
+					$ins_data['time'] = json_encode($time);
+					
 					// do create or update
-					if($dept_id) {
-						$upd_rec = $this->Crud->updates('id', $dept_id, $table, $ins_data);
+					if($cell_id) {
+						$upd_rec = $this->Crud->updates('id', $cell_id, $table, $ins_data);
 						if($upd_rec > 0) {
 							///// store activities
 							$by = $this->Crud->read_field('id', $log_id, 'user', 'firstname');
-							$code = $this->Crud->read_field('id', $dept_id, 'dept', 'name');
+							$code = $this->Crud->read_field('id', $cell_id, 'dept', 'name');
 							$action = $by.' updated Department ('.$code.') Record';
-							$this->Crud->activity('user', $dept_id, $action);
+							$this->Crud->activity('user', $cell_id, $action);
 
 							echo $this->Crud->msg('success', 'Record Updated');
 							echo '<script>location.reload(false);</script>';
