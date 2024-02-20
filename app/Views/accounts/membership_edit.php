@@ -212,7 +212,7 @@
                                 </div>
                                 <div class="col-md-6 col-lg-4 col-xxl-3">
                                     <div class="form-group">
-                                        <label for="password"><?php if(!empty($e_id)) { echo translate_phrase('Reset Password'); } else { echo translate_phrase('*Password'); } ?></label>
+                                        <label class="form-label" for="password"><?php if(!empty($e_id)) { echo translate_phrase('Reset Password'); } else { echo translate_phrase('*Password'); } ?></label>
                                         <input class="form-control" type="text" id="password" name="password" <?php if(empty($e_id)) { echo 'required'; } ?>>
                                     </div>
                                 </div>
