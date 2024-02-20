@@ -13,7 +13,7 @@ $this->Crud = new Crud();
         <div class="row">
             <div class="col-sm-12 text-center">
                 <h3><b><?=translate_phrase('Are you sure?');?></b></h3>
-                <input type="hidden" name="d_dept_id" value="<?php if(!empty($d_id)){echo $d_id;} ?>" />
+                <input type="hidden" name="d_cell_id" value="<?php if(!empty($d_id)){echo $d_id;} ?>" />
             </div>
             
             <div class="col-sm-12 text-center">
@@ -26,7 +26,10 @@ $this->Crud = new Crud();
 
     <!-- insert/edit view -->
     <?php if($param2 == 'edit' || $param2 == '') { ?>
-        
+        <div class="row">
+            <div class="col-sm-12"><div id="bb_ajax_msg"></div></div>
+        </div>
+
         
         <div class="row">
             <input type="hidden" name="dept_id" value="<?php if(!empty($e_id)){echo $e_id;} ?>" />
@@ -37,7 +40,7 @@ $this->Crud = new Crud();
                 </div>
             </div>
         </div>
-        <label for="name">*<?=translate_phrase('Role');?></label>
+                    <label for="name">*<?=translate_phrase('Role');?></label>
         <div class="row" id="container">
             <?php if(!empty($e_roles)){$a = 0;
                 foreach($e_roles as $k => $val){
@@ -74,10 +77,6 @@ $this->Crud = new Crud();
                 </button>
             </div>
         </div>
-        <div class="row">
-            <div class="col-sm-12"><div id="bb_ajax_msg"></div></div>
-        </div>
-
     <?php } ?>
 <?php echo form_close(); ?>
 <script>

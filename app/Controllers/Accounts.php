@@ -679,8 +679,8 @@ class Accounts extends BaseController {
 		}
     }
 
-	//Vendor
-	public function business($param1='', $param2='', $param3='') {
+	//Customer
+	public function cell($param1='', $param2='', $param3='') {
 		// check session login
 		if($this->session->get('td_id') == ''){
 			$request_uri = uri_string();
@@ -688,7 +688,7 @@ class Accounts extends BaseController {
 			return redirect()->to(site_url('auth'));
 		} 
 
-        $mod = 'accounts/business';
+        $mod = 'accounts/cell';
 
         $log_id = $this->session->get('td_id');
         $role_id = $this->Crud->read_field('id', $log_id, 'user', 'role_id');
@@ -701,13 +701,11 @@ class Accounts extends BaseController {
             return redirect()->to(site_url('dashboard'));	
         }
         $data['log_id'] = $log_id;
-        $data['current_language'] = $this->session->get('current_language');
         $data['role'] = $role;
         $data['role_c'] = $role_c;
-		if($this->Crud->check2('id', $log_id, 'setup', 0, 'user')> 0)return redirect()->to(site_url('auth/security'));
-		if($this->Crud->check2('id', $log_id, 'trade', 0, 'user')> 0)return redirect()->to(site_url('auth/security'));
        
-		$table = 'user';
+		
+		$table = 'cell';
 		$form_link = site_url($mod);
 		if($param1){$form_link .= '/'.$param1;}
 		if($param2){$form_link .= '/'.$param2.'/';}
@@ -718,715 +716,101 @@ class Accounts extends BaseController {
 		$data['param2'] = $param2;
 		$data['param3'] = $param3;
 		$data['form_link'] = $form_link;
+        $data['current_language'] = $this->session->get('current_language');
 		
 		// manage record
 		if($param1 == 'manage') {
-						
 			// prepare for delete
 			if($param2 == 'delete') {
 				if($param3) {
 					$edit = $this->Crud->read_single('id', $param3, $table);
-                    //echo var_dump($edit);
 					if(!empty($edit)) {
 						foreach($edit as $e) {
 							$data['d_id'] = $e->id;
 						}
 					}
-					
+
 					if($this->request->getMethod() == 'post'){
-                        $del_id =  $this->request->getVar('d_vendor_id');
-                        $role_id =  $this->Crud->read_field('name', 'Business', 'access_role', 'id');
-						$datas['role_id'] = $role_id;
-                        $datas['log_id'] = $log_id;
-                        
-						// print_r($datas);
-						// //$role_id . ' ' . $log_id;
-						// die;
-						
-                        $del = $this->Crud->api('delete', 'users/delete/'.$del_id, $datas);
+						$del_id = $this->request->getVar('d_dept_id');
+						///// store activities
+						$by = $this->Crud->read_field('id', $log_id, 'user', 'firstname');
+						$code = $this->Crud->read_field('id', $del_id, 'dept', 'name');
+						$action = $by.' deleted Department ('.$code.') Record';
 
-						$del = json_decode($del);
-                        if($del->status == true){	
-                        
-							echo $this->Crud->msg($del->code, translate_phrase($del->msg));
-							echo '<script>location.reload(false);</script>';
-						} else {
-							echo $this->Crud->msg('danger', translate_phrase('Please try later'));
-						}
-						die;	
-					}
-				}
-			} else {
-				// prepare for edit
-				if($param2 == 'edit') {
-					if($param3) {
-						
-						$edit = $this->Crud->read_single('id', $param3, $table);
-						if(!empty($edit)) {
-							foreach($edit as $e) {
-								$data['e_id'] = $e->id;
-								$data['e_activate'] = $e->activate;
-								$data['e_role_id'] = $e->role_id;
-								$data['e_trade'] = $e->trade;
-							}
-						}
-						
-					}
-				}
-				
-				if($this->request->getMethod() == 'post'){
-					$user_i = $this->request->getPost('user_id');
-					$role = $this->request->getPost('role');
-					$password = $this->request->getPost('password');
-					$trade = $this->request->getPost('trade');
-					
-					$role_ids =  $this->Crud->read_field('name', 'Business', 'access_role', 'id');
-			
-					if($this->request->getPost('ban')) { $set_activate = 1; } else { $set_activate = 0; }
-					
-					$data['password'] = md5($password);
-					$data['activate'] = $set_activate;
-					$data['trade'] = $trade;
-					$data['role'] = $role;
-					$data['role_id'] = $role_ids;
-					
-					
-					// do create or update
-					if($user_i) {
-						$trade_id = $this->Crud->read_field('id', $user_i, 'user', 'trade');
-                        $update = $this->Crud->api('post', 'users/update/' . $user_i, $data);
-                        $update = json_decode($update);
-						
-						if($update->status == true){
-							if($trade != $trade_id){
-								if($this->Crud->check2('id', $user_i, 'duration', '', 'user') > 0){
-									$this->Crud->updates('id', $user_i, 'user', array('setup'=> 0));
-								} else {
-									$trans = $this->Crud->read2('user_id', $user_i, 'status', 'pending', 'transaction');
-									$duration = $this->Crud->read_field('id', $user_i, 'user', 'duration');
-									$trades = $this->Crud->read_field('id', $trade, 'trade', 'medium');
-
-									$amount = $this->Crud->trade_duration($trades, $duration);
-									if(!empty($trans)){
-										foreach($trans as $t){
-											if($t->amount != $t->balance){
-												$paid = (float)$t->amount - (float)$t->balance;
-												$tran_data['balance'] = (float)$amount - (float)$paid;
-											}else {
-												$tran_data['balance'] = $amount;
-											}
-											$tran_data['amount'] = $amount;
-
-											$this->Crud->updates('id', $t->id, 'transaction', $tran_data);
-										}
-									} else {
-										$this->Crud->updates('id', $user_i, 'user', array('setup'=> 0));
-									}
-								}
-							}
-							echo $this->Crud->msg('success', translate_phrase($update->msg));
-							echo '<script>location.reload(false);</script>';
-						} else {
-							echo $this->Crud->msg($update->code, translate_phrase($update->msg));	
-						}
-                        die;
-					} 
-						
-				}
-			}
-		}
-
-
-        // record listing
-		if($param1 == 'load') {
-			$limit = $param2;
-			$offset = $param3;
-
-			$rec_limit = 25;
-			$item = '';
-            if(empty($limit)) {$limit = $rec_limit;}
-			if(empty($offset)) {$offset = 0;}
-			
-			if(!empty($this->request->getPost('state_id'))) { $state_id = $this->request->getPost('state_id'); } else { $state_id = ''; }
-			if(!empty($this->request->getPost('status'))) { $status = $this->request->getPost('status'); } else { $status = ''; }
-			if(!empty($this->request->getPost('ref_status'))) { $ref_status = $this->request->getPost('ref_status'); } else { $ref_status = ''; }
-			if(!empty($this->request->getPost('verify'))) { $verify = $this->request->getPost('verify'); } else { $verify = ''; }
-			$search = $this->request->getPost('search');
-			if(!empty($this->request->getVar('start_date'))){$start_date = $this->request->getVar('start_date');}else{$start_date = '';}
-			if(!empty($this->request->getVar('end_date'))){$end_date = $this->request->getVar('end_date');}else{$end_date = '';}
-
-
-			$items = '
-				<div class="nk-tb-item nk-tb-head">
-					<div class="nk-tb-col"><span class="sub-text">'.translate_phrase('Accounts').'</span></div>
-					<div class="nk-tb-col"><span class="sub-text">'.translate_phrase('Tax ID').'</span></div>
-					<div class="nk-tb-col tb-col-mb"><span class="sub-text">'.translate_phrase('Territory').'</span></div>
-					<div class="nk-tb-col tb-col-md"><span class="sub-text">'.translate_phrase('Trade Line').'</span></div>
-					<div class="nk-tb-col tb-col-md"><span class="sub-text">'.translate_phrase('Status').'</span></div>
-					<div class="nk-tb-col nk-tb-col-tools">
-						<ul class="nk-tb-actions gx-1 my-n1">
+						if($this->Crud->deletes('id', $del_id, $table) > 0) {
 							
-						</ul>
-					</div>
-				</div><!-- .nk-tb-item -->
-		
-				
-			';
-			$a = 1;
-
-            //echo $status;
-			$log_id = $this->session->get('td_id');
-			if(!$log_id) {
-				$item = '<div class="text-center text-muted">'.translate_phrase('Session Timeout! - Please login again').'</div>';
-			} else {
-				$role_id = $this->Crud->read_field('name', 'Business', 'access_role', 'id');
-
-
-				$all_rec = $this->Crud->filter_users('', '', '', $log_id, $role_id, $state_id, $status, $search, '', '', $start_date, $end_date);
-                // $all_rec = json_decode($all_rec);
-				if(!empty($all_rec)) { $counts = count($all_rec); } else { $counts = 0; }
-
-				$query = $this->Crud->filter_users($limit, $offset, '', $log_id, $role_id, $state_id, $status, $search, '', '', $start_date, $end_date);
-				$data['count'] = $counts;
-
-				if(!empty($query)) {
-					foreach ($query as $q) {
-						$id = $q->id;
-						$fullname = $q->fullname;
-						$email = $q->email;
-						$phone = $q->phone;
-						$territory = strtoupper(str_replace('_', ' ', $this->Crud->read_field('id', $q->territory, 'territory', 'name')));
-						$tax_id = $this->Crud->read_field('user_id', $q->id, 'virtual_account', 'acc_no');
-						$address = $q->address;
-						$city = $this->Crud->read_field('id', $q->lga_id, 'city', 'name');
-						$trade = $this->Crud->read_field('id', $q->trade, 'trade', 'name');
-						$img = $this->Crud->image($q->img_id, 'big');
-						$activate = $q->activate;
-						$u_role = $this->Crud->read_field('id', $q->role_id, 'access_role', 'name');
-						$reg_date = date('M d, Y h:ia', strtotime($q->reg_date));
-
-						$status = '<span class="text-danger">Owing</span>';
-
-						$referral = '';
-						$next_pay = $this->Crud->read_fields2('user_id', $id, 'payment_type', 'tax', 'transaction', 'payment_date');
-						if(date(fdate) <= $next_pay){
-							$status = '<span class="text-success">Paid</span>';
-
-						}
-						$approved = '';
-						if ($activate == 1) {
-							$a_color = 'success';
-							$approve_text = 'Account Activated';
-							$approved = '<span class="text-primary"><i class="ri-check-circle-line"></i></span> ';
-						} else {
-							$a_color = 'danger';
-							$approve_text = 'Account Deactivated';
-							$approved = '<span class="text-danger"><i class="ri-check-circle-line"></i></span> ';
-						}
-
-						// add manage buttons
-						if ($role_u != 1) {
-							$all_btn = '';
-						} else {
-							$all_btn = '
-								<li><a href="' . site_url($mod . '/view/' . $id) . '" class="text-success" pageTitle="View ' . $fullname . '" pageName=""><em class="icon ni ni-eye"></em><span>'.translate_phrase('View Details').'</span></a></li>
-								<li><a href="javascript:;" class="text-primary pop" pageTitle="Edit ' . $fullname . '" pageName="' . site_url($mod . '/manage/edit/' . $id) . '"><em class="icon ni ni-edit-alt"></em><span>'.translate_phrase('Edit').'</span></a></li>
-								<li><a href="javascript:;" class="text-danger pop" pageTitle="Delete ' . $fullname . '" pageName="' . site_url($mod . '/manage/delete/' . $id) . '"><em class="icon ni ni-trash-alt"></em><span>'.translate_phrase('Delete').'</span></a></li>
-								
-								
-							';
-						}
-
-						$item .= '
-							<div class="nk-tb-item">
-								<div class="nk-tb-col">
-									<div class="user-card">
-										<div class="user-avatar ">
-											<img alt="" src="' . site_url($img) . '" height="40px"/>
-										</div>
-										<div class="user-info">
-											<span class="tb-lead">' . ucwords($fullname) . ' <span class="dot dot-' . $a_color . ' ms-1"></span></span>
-											<span>' . $email . '</span><br>
-											<span>' . $u_role . '</span>
-										</div>
-									</div>
-								</div>
-								<div class="nk-tb-col tb-col">
-									<span class="text-dark"><b>' . $tax_id . '</b></span>
-								</div>
-								<div class="nk-tb-col tb-col-mb">
-								'.$address.'<br>
-									<span>' . ucwords($city) . ', '.$territory.'</span>
-								</div>
-								<div class="nk-tb-col tb-col-md">
-									<span class="tb-amount">' . $trade . ' </span>
-								</div>
-								<div class="nk-tb-col tb-col-md">
-									<span class="tb-amount">' . $status . ' </span>
-								</div>
-								<div class="nk-tb-col nk-tb-col-tools">
-									<ul class="nk-tb-actions gx-1">
-										<li>
-											<div class="drodown">
-												<a href="#" class="dropdown-toggle btn btn-icon btn-trigger" data-bs-toggle="dropdown"><em class="icon ni ni-more-h"></em></a>
-												<div class="dropdown-menu dropdown-menu-end">
-													<ul class="link-list-opt no-bdr">
-														' . $all_btn . '
-													</ul>
-												</div>
-											</div>
-										</li>
-									</ul>
-								</div>
-							</div><!-- .nk-tb-item -->
-						';
-						$a++;
-					}
-				}
-				
-				
-			}
-			
-			if(empty($item)) {
-				$resp['item'] = $items.'
-					<div class="text-center text-muted">
-						<br/><br/><br/><br/>
-						<i class="ni ni-users" style="font-size:150px;"></i><br/><br/>'.translate_phrase('No Business Account Returned').'
-					</div>
-				';
-			} else {
-				$resp['item'] = $items . $item;
-				if($offset >= 25){
-					$resp['item'] = $item;
-				}
-				
-			}
-
-			$resp['count'] = $counts;
-
-			$more_record = $counts - ($offset + $rec_limit);
-			$resp['left'] = $more_record;
-
-			if($counts > ($offset + $rec_limit)) { // for load more records
-				$resp['limit'] = $rec_limit;
-				$resp['offset'] = $offset + $limit;
-			} else {
-				$resp['limit'] = 0;
-				$resp['offset'] = 0;
-			}
-
-			echo json_encode($resp);
-			die;
-		}
-
-		if($param1 == 'view'){
-			if($param2) {
-				$user_id = $param2;
-				$data['id'] = $user_id;
-				$last_log = date('F, d Y h:ia',strtotime($this->Crud->read_field('id', $user_id, 'user', 'last_log')));
-				if(empty($this->Crud->read_field('id', $user_id, 'user', 'last_log'))){
-					$last_log = 'Not Logged In';
-				}
-				$data['last_log'] = $last_log;
-				$data['fullname'] = $this->Crud->read_field('id', $user_id, 'user', 'fullname');
-				$role_id = $this->Crud->read_field('id', $user_id, 'user', 'role_id');
-				$data['role'] = $this->Crud->read_field('id', $role_id, 'access_role', 'name');
-				$data['v_phone'] = $this->Crud->read_field('id', $user_id, 'user', 'phone');
-				$data['reg_date'] = date('F, d Y h:ia',strtotime($this->Crud->read_field('id', $user_id, 'user', 'reg_date')));
-				$data['v_email'] = $this->Crud->read_field('id', $user_id, 'user', 'email');
-				$data['tax_id'] = $this->Crud->read_field('user_id', $user_id, 'virtual_account', 'acc_no');
-				$data['bank'] = $this->Crud->read_field('user_id', $user_id, 'account', 'bank').' '.$this->Crud->read_field('user_id', $user_id, 'account', 'account').' '.$this->Crud->read_field('user_id', $user_id, 'account', 'name');
-
-				
-				$data['email'] = $this->Crud->read_field('id', $user_id, 'user', 'email');
-				$data['tax_id'] = $this->Crud->read_field('user_id', $user_id, 'virtual_account', 'acc_no');
-				$data['fullname'] = $this->Crud->read_field('id', $user_id, 'user', 'fullname');
-				$data['sms'] = $this->Crud->read_field('id', $user_id, 'user', 'receive_message');
-				$data['address'] = $this->Crud->read_field('id', $user_id, 'user', 'address');
-				$data['territory'] = str_replace('_', ' ',$this->Crud->read_field('id', $user_id, 'user', 'territory'));
-				$utilitys = $this->Crud->read_field('id', $user_id, 'user', 'utility');
-				$id_cards = $this->Crud->read_field('id', $user_id, 'user', 'id_card');
-				$trade_id = $this->Crud->read_field('id', $user_id, 'user', 'trade');
-				$data['trade'] = $this->Crud->read_field('id', $user_id, 'trade', 'name');
-				$passports = $this->Crud->read_field('id', $user_id, 'user', 'passport');
-				$data['phone'] = $this->Crud->read_field('id', $user_id, 'user', 'phone');
-				$data['duration'] = $this->Crud->read_field('id', $user_id, 'user', 'duration');
-				$data['lga_id'] = $this->Crud->read_field('id', $user_id, 'user', 'lga_id');
-				$data['state_id'] = $this->Crud->read_field('id', $user_id, 'user', 'state_id');
-				$data['country_id'] = $this->Crud->read_field('id', $user_id, 'user', 'country_id');
-				$qrcodes = $this->Crud->read_field('id', $user_id, 'user', 'qrcode');
-				$img_id = $this->Crud->read_field('id', $user_id, 'user', 'img_id');
-
-
-				$qrcode = '--';
-				// echo $qrcodes;
-				if(!empty($qrcodes) && file_exists($qrcodes)){
-					$qrcode = '<img height="150" src="'.site_url($qrcodes).'"> ';
-				}
-
-				$utility = 'No Utility Document Uploaded';
-				if(!empty($utilitys) && file_exists($utilitys)){
-					$utility = '<img height="150" src="'.site_url($utilitys).'"> ';
-				}
-
-				$id_card = 'No Valid ID Card Document Uploaded';
-				if(!empty($id_cards) && file_exists($id_cards)){
-					$id_card = '<img height="150" src="'.site_url($id_cards).'"> ';
-				}
-				
-				$passport = 'No Passport Uploaded';
-				if(!empty($passports) && file_exists($passports)){
-					$passport = '<img height="150" src="'.site_url($passports).'"> ';
-				}
-
-				$data['utility'] = $utility;
-				$data['id_card'] = $id_card;
-				$data['passport'] = $passport;
-				$data['qrcode'] = $qrcode;
-				
-
-				$data['img_id'] = $passports;
-				// $data['img'] = $this->Crud->image($img_id, 'big');
-        
-				$v_img_id = $this->Crud->read_field('id', $user_id, 'user', 'passport');
-				if(!empty($v_img_id)){
-					if(!file_exists($v_img_id)){
-						$v_img_id = 'assets/images/avatar.png';
-					}
-					$img = '<img src="'.site_url($v_img_id).'">';
-				} else {
-					$img = $this->Crud->image_name($this->Crud->read_field('id', $user_id, 'user', 'fullname'));
-				}
-				$data['v_img'] = $img;
-
-				$v_status = $this->Crud->read_field('id', $user_id, 'user', 'activate');
-				if(!empty($v_status)) { $v_status = '<span class="text-success">VERIFIED</span>'; } else { $v_status = '<span class="text-danger">UNVERIFIED</span>'; }
-				$data['v_status'] = $v_status;
-
-				$data['v_address'] = $this->Crud->read_field('id', $user_id, 'user', 'address');
-
-				$v_state_id = $this->Crud->read_field('id', $user_id, 'user', 'state_id');
-				$data['v_state'] = $this->Crud->read_field('id', $v_state_id, 'state', 'name');
-				$v_trade_id = $this->Crud->read_field('id', $user_id, 'user', 'trade');
-				$data['v_trade'] = $this->Crud->read_field('id', $v_trade_id, 'trade', 'name');
-
-				$v_country_id = $this->Crud->read_field('id', $user_id, 'user', 'country_id');
-				$data['v_country'] = $this->Crud->read_field('id', $v_country_id, 'country', 'name');
-				$v_city_id = $this->Crud->read_field('id', $user_id, 'user', 'lga_id');
-				$data['v_city'] = $this->Crud->read_field('id', $v_city_id, 'city', 'name');
-				$data['v_territory'] = $this->Crud->read_field('id', $this->Crud->read_field('id', $user_id, 'user', 'territory'), 'territory', 'name');
-				$data['v_duration'] = $this->Crud->read_field('id', $user_id, 'user', 'duration');
-				$data['v_master_id'] = $this->Crud->read_field('id', $user_id, 'user', 'master_id');
-				
-				
-				$data['v_id_card'] = $this->Crud->read_field('id', $user_id, 'user', 'id_card');
-				
-				$data['v_passport'] = $this->Crud->read_field('id', $user_id, 'user', 'passport');
-				
-				$data['v_utility'] = $this->Crud->read_field('id', $user_id, 'user', 'utility');
-				$data['v_qrcode'] = $this->Crud->read_field('id', $user_id, 'user', 'qrcode');
-				$data['v_business_name'] = $this->Crud->read_field('id', $user_id, 'user', 'business_name');
-				$data['v_business_address'] = $this->Crud->read_field('id', $user_id, 'user', 'business_address');
-			}
-			$data['title'] = translate_phrase('Account View').' - '.app_name;
-			$data['page_active'] = $mod;
-			return view($mod.'_view', $data);
-		}
-		if($param1 == 'manage') { // view for form data posting
-			return view($mod.'_form', $data);
-		} else { // view for main page
-			
-			$data['title'] = translate_phrase('Business Account').' - '.app_name;
-			$data['page_active'] = $mod;
-			return view($mod, $data);
-		}
-    }
-
-	public function master($param1='', $param2='', $param3='') {
-		// check session login
-		if($this->session->get('td_id') == ''){
-			$request_uri = uri_string();
-			$this->session->set('td_redirect', $request_uri);
-			return redirect()->to(site_url('auth'));
-		} 
-
-        $mod = 'accounts/master';
-
-        $log_id = $this->session->get('td_id');
-        $role_id = $this->Crud->read_field('id', $log_id, 'user', 'role_id');
-        $role = strtolower($this->Crud->read_field('id', $role_id, 'access_role', 'name'));
-        $role_c = $this->Crud->module($role_id, $mod, 'create');
-        $role_r = $this->Crud->module($role_id, $mod, 'read');
-        $role_u = $this->Crud->module($role_id, $mod, 'update');
-        $role_d = $this->Crud->module($role_id, $mod, 'delete');
-		if($this->Crud->check2('id', $log_id, 'setup', 0, 'user')> 0)return redirect()->to(site_url('auth/security'));
-		if($this->Crud->check2('id', $log_id, 'trade', 0, 'user')> 0)return redirect()->to(site_url('auth/security'));
-        if($role_r == 0){
-            return redirect()->to(site_url('dashboard'));	
-        }
-        $data['log_id'] = $log_id;
-        $data['current_language'] = $this->session->get('current_language');
-        $data['role'] = $role;
-        $data['role_c'] = $role_c;
-       
-		$table = 'user';
-		$form_link = site_url($mod);
-		if($param1){$form_link .= '/'.$param1;}
-		if($param2){$form_link .= '/'.$param2.'/';}
-		if($param3){$form_link .= $param3;}
-		
-		// pass parameters to view
-		$data['param1'] = $param1;
-		$data['param2'] = $param2;
-		$data['param3'] = $param3;
-		$data['form_link'] = $form_link;
-		
-		// manage record
-		if($param1 == 'manage') {
-						
-			// prepare for delete
-			if($param2 == 'delete') {
-				if($param3) {
-					$edit = $this->Crud->read_single('id', $param3, $table);
-                    //echo var_dump($edit);
-					if(!empty($edit)) {
-						foreach($edit as $e) {
-							$data['d_id'] = $e->id;
-						}
-					}
-					
-					if($this->request->getMethod() == 'post'){
-                        $del_id =  $this->request->getVar('d_master_id');
-                        $role_id =  $this->Crud->read_field('name', 'Tax Master', 'access_role', 'id');
-						$datas['role_id'] = $role_id;
-                        $datas['log_id'] = $log_id;
-                        
-						// print_r($datas);
-						// //$role_id . ' ' . $log_id;
-						// die;
-						
-                        $del = $this->Crud->api('delete', 'users/delete/'.$del_id, $datas);
-
-						$del = json_decode($del);
-                        if($del->status == true){	
-                        
-							echo $this->Crud->msg($del->code, translate_phrase($del->msg));
+							$this->Crud->activity('user', $del_id, $action);
+							echo $this->Crud->msg('success', 'Department Deleted');
 							echo '<script>location.reload(false);</script>';
 						} else {
-							echo $this->Crud->msg('danger', translate_phrase('Please try later'));
+							echo $this->Crud->msg('danger', 'Please try later');
 						}
-						die;	
+						exit;	
 					}
 				}
 			} else {
 				// prepare for edit
 				if($param2 == 'edit') {
 					if($param3) {
-						
 						$edit = $this->Crud->read_single('id', $param3, $table);
 						if(!empty($edit)) {
 							foreach($edit as $e) {
 								$data['e_id'] = $e->id;
-								$data['e_fullname'] = $e->fullname;
-								$data['e_phone'] = $e->phone;
-								$data['e_state_id'] = $e->state_id;
-								$data['e_lga_id'] = $e->lga_id;
-								$data['e_email'] = $e->email;
-								$data['e_activate'] = $e->activate;
-								$data['e_territory'] = $e->territory;
-								$data['e_passport'] = $e->passport;
-								$data['e_id_card'] = $e->id_card;
-								$data['e_utility'] = $e->utility;
-								$data['e_bank_code'] = $this->Crud->read_field('user_id', $e->id, 'account', 'code');
-								$data['e_account_name'] = $this->Crud->read_field('user_id', $e->id, 'account', 'name');
-								$data['e_account'] = $this->Crud->read_field('user_id', $e->id, 'account', 'account');
+								$data['e_name'] = $e->name;
+								$data['e_roles'] = json_decode($e->roles);
 							}
 						}
-						
 					}
-				}
-				
+				} 
+
 				if($this->request->getMethod() == 'post'){
-					$master_id = $this->request->getPost('master_id');
-					$fullname = $this->request->getPost('name');
-					$phone = $this->request->getPost('phone');
-					$email = $this->request->getPost('email');
-					$state_id = $this->request->getPost('state_id');
-					$lga_id = $this->request->getPost('lga_id');
-					$territory = $this->request->getPost('territory');
-					$passport = $this->request->getPost('passport');
-					$id_card = $this->request->getPost('id_card');
-					$utility = $this->request->getPost('utility');
-					$account_name = $this->request->getPost('account_name');
-					$bank = $this->request->getPost('bank');
-					$account = $this->request->getPost('account');
-					$password = $this->request->getPost('password');
-					
+					$dept_id = $this->request->getVar('dept_id');
+					$name = $this->request->getVar('name');
+					$roles = $this->request->getVar('roles');
 
-					$ins_data['fullname'] = $fullname;
-					$ins_data['email'] = $email;
-					$ins_data['phone'] = $phone;
-					$ins_data['territory'] = json_encode($territory);
-					$ins_data['country_id'] = 161;
-					$ins_data['state_id'] = 316;
-					$ins_data['lga_id'] = $lga_id;
-					$ins_data['role_id'] = $this->Crud->read_field('name', 'Tax Master', 'access_role', 'id');
-
-					if($password) { $ins_data['password'] = md5($password); }
-					// $lga_territ
-
-					// if($this->Crud->check2('id', $lga_id, 'territory', $territory, 'city') == 0){
-					// 	echo $this->Crud->msg('warning', 'LGA selected is not under the Territory Selected');
-					// 	die;
-					// }
-					//// Passport upload
-					if(file_exists($this->request->getFile('passports'))) {
-						$path = 'assets/images/users/tax_master/';
-						$file = $this->request->getFile('passports');
-						$getImg = $this->Crud->img_upload($path, $file);
-						
-						$passport = $getImg->path;
-					}
-
-					//// ID Card upload
-					if(file_exists($this->request->getFile('id_cards'))) {
-						$path = 'assets/images/users/tax_master/';
-						$file = $this->request->getFile('id_cards');
-						$getImg = $this->Crud->img_upload($path, $file);
-						
-						$id_card = $getImg->path;
-					}
-
-					//// Utility upload
-					if(file_exists($this->request->getFile('utilitys'))) {
-						$path = 'assets/images/users/tax_master/';
-						$file = $this->request->getFile('utilitys');
-						$getImg = $this->Crud->img_upload($path, $file);
-						
-						$utility = $getImg->path;
-					}
-
-					// if(empty($passport) || empty($id_card) || empty($utility)){
-					// 	echo $this->Crud->msg('danger', 'All Documents are Required to be Uploaded');
-					// 	die;
-					// }
-
-					
-					$ins_data['passport'] = $passport;
-					$ins_data['utility'] = $utility;
-					$ins_data['id_card'] = $id_card;
-		
+					$ins_data['name'] = $name;
+					$ins_data['roles'] = json_encode($roles);
+					// print_r($roles);
+					// die;
 					// do create or update
-					if($master_id) {
-						$upd_rec = $this->Crud->updates('id', $master_id, $table, $ins_data);
+					if($dept_id) {
+						$upd_rec = $this->Crud->updates('id', $dept_id, $table, $ins_data);
 						if($upd_rec > 0) {
-							echo $this->Crud->msg('success', translate_phrase('Record Updated'));
-
-							$b_data['code'] = $bank;
-							$b_data['account'] = $account;
-							$b_data['name'] = $account_name;
-							$b_data['bank'] = $this->Crud->read_field('code' , $bank, 'bank', 'name');
-							if($this->Crud->check('user_id', $master_id, 'account') > 0){
-								$this->Crud->updates('user_id', $master_id, 'account', $b_data);
-							} else {
-								
-								$b_data['user_id'] = $master_id;
-								$this->Crud->create('account', $b_data);
-							}
 							///// store activities
-							$by = $this->Crud->read_field('id', $log_id, 'user', 'fullname');
-							$code = $this->Crud->read_field('id', $master_id, 'user', 'fullname');
-							$action = $by.' updated Tax Master ('.$code.') Record';
-							$this->Crud->activity('user', $master_id, $action);
+							$by = $this->Crud->read_field('id', $log_id, 'user', 'firstname');
+							$code = $this->Crud->read_field('id', $dept_id, 'dept', 'name');
+							$action = $by.' updated Department ('.$code.') Record';
+							$this->Crud->activity('user', $dept_id, $action);
 
+							echo $this->Crud->msg('success', 'Record Updated');
 							echo '<script>location.reload(false);</script>';
 						} else {
-							echo $this->Crud->msg('info', translate_phrase('No Changes'));	
+							echo $this->Crud->msg('info', 'No Changes');	
 						}
 					} else {
-						if($this->Crud->check('email', $email, $table) > 0 || $this->Crud->check('phone', $phone, $table) > 0) {
-							echo $this->Crud->msg('warning', translate_phrase('Email and/or Phone Already Exist'));
+						if($this->Crud->check('name', $name, $table) > 0) {
+							echo $this->Crud->msg('warning', 'Record Already Exist');
 						} else {
-							$ins_data['activate'] = 1;
-							$ins_data['reg_date'] = date(fdate);
-
 							$ins_rec = $this->Crud->create($table, $ins_data);
 							if($ins_rec > 0) {
-								echo $this->Crud->msg('success', translate_phrase('Record Created'));
-
-								$b_data['code'] = $bank;
-								$b_data['account'] = $account;
-								$b_data['name'] = $account_name;
-								$b_data['bank'] = $this->Crud->read_field('code' , $bank, 'bank', 'name');
-								if($this->Crud->check('user_id', $ins_rec, 'account') > 0){
-									$this->Crud->updates('user_id', $ins_rec, 'account', $b_data);
-								} else {
-									
-									$b_data['user_id'] = $ins_rec;
-									$this->Crud->create('account', $b_data);
-								}
-
-								$user_id = $ins_rec;
-								if(!empty($user_id)){
-									$link = site_url('auth/profile_view/') .$user_id;
-									$qr = $this->qrcode($link);
-									$path = $qr['file'];
-									$this->Crud->updates('id', $user_id, 'user', array('qrcode'=>$path));
-								}
 								///// store activities
-								$by = $this->Crud->read_field('id', $log_id, 'user', 'fullname');
-								$code = $this->Crud->read_field('id', $ins_rec, 'user', 'fullname');
-								$action = $by.' created Tax Master ('.$code.')';
+								$by = $this->Crud->read_field('id', $log_id, 'user', 'firstname');
+								$code = $this->Crud->read_field('id', $ins_rec, 'dept', 'name');
+								$action = $by.' created Department ('.$code.') Record';
 								$this->Crud->activity('user', $ins_rec, $action);
 
-								$body = '
-									Dear '.$fullname.', <br><br>
-										A Tax Master Account Has been Created with This Email;<br>
-										Below are the login Credentials:<br><br>
-
-										Email: '.$email.'<br>
-										Phone: '.$phone.'<br>
-										Password: '.$password.'
-										
-								';
-								$sms_body = '
-									Dear '.$fullname.', A Tax Master Account Has been Created with This Email. Your login Credentials are; 
-										Email: {'.$email.'}, Phone: {'.$phone.'}, Password: {'.$password.'}
-										
-								';
-
-								$api_key = $this->Crud->read_field('name', 'termil_api', 'setting', 'value'); // pick from DB
-							
-								if($phone) {
-									$phone = '234'.substr($phone,1);
-									$datass['to'] = $phone;
-									$datass['from'] = 'TIDREM';
-									$datass['sms'] = $sms_body;
-									$datass['api_key'] = $api_key;
-									$datass['type'] = 'plain';
-									$datass['channel'] = 'generic';
-									$this->Crud->termii('post', 'sms/send', $datass);
-								}
-						
-								// send email
-								if($email) {
-									$data['email_address'] = $email;
-									$this->Crud->send_email($email, 'Tax Master Account', $body);
-								}
-								$this->Crud->notify('0', $ins_rec, $body, 'authentication', $user_id);
-
-
+								echo $this->Crud->msg('success', 'Record Created');
 								echo '<script>location.reload(false);</script>';
 							} else {
-								echo $this->Crud->msg('danger', translate_phrase('Please try later'));	
+								echo $this->Crud->msg('danger', 'Please try later');	
 							}	
 						}
 					}
-					exit;	
+
+					die;	
 				}
 			}
 		}
-
 
         // record listing
 		if($param1 == 'load') {
@@ -1439,17 +823,11 @@ class Accounts extends BaseController {
 			if(empty($offset)) {$offset = 0;}
 			
 			$search = $this->request->getPost('search');
-			if(!empty($this->request->getVar('territory'))){$territory = $this->request->getVar('territory');}else{$territory = '';}
-
-
+			
 			$items = '
 				<div class="nk-tb-item nk-tb-head">
-					<div class="nk-tb-col"><span class="sub-text">'.translate_phrase('Account').'</span></div>
-					<div class="nk-tb-col"><span class="sub-text">'.translate_phrase('Contact').'</span></div>
-					<div class="nk-tb-col tb-col-mb"><span class="sub-text">'.translate_phrase('Address').'</span></div>
-					<div class="nk-tb-col tb-col-md"><span class="sub-text">'.translate_phrase('Territory').'</span></div>
-					<div class="nk-tb-col tb-col-md"><span class="sub-text">'.translate_phrase('Tax Payer').'</span></div>
-					<div class="nk-tb-col tb-col-md"><span class="sub-text">'.translate_phrase('Field Operative').'</span></div>
+					<div class="nk-tb-col"><span class="sub-text">'.translate_phrase('Name').'</span></div>
+					<div class="nk-tb-col"><span class="sub-text">'.translate_phrase('Role(s)').'</span></div>
 					<div class="nk-tb-col nk-tb-col-tools">
 						<ul class="nk-tb-actions gx-1 my-n1">
 							
@@ -1466,74 +844,34 @@ class Accounts extends BaseController {
 			if(!$log_id) {
 				$item = '<div class="text-center text-muted">'.translate_phrase('Session Timeout! - Please login again').'</div>';
 			} else {
-				$role_id = $this->Crud->read_field('name', 'Tax Master', 'access_role', 'id');
-
-
-				$all_rec = $this->Crud->filter_users('', '', $territory, $log_id, $role_id, '0', 'all', $search,);
+				
+				$all_rec = $this->Crud->filter_dept('', '', '', $log_id, $search);
                 // $all_rec = json_decode($all_rec);
 				if(!empty($all_rec)) { $counts = count($all_rec); } else { $counts = 0; }
 
-				$query = $this->Crud->filter_users($limit, $offset, $territory, $log_id, $role_id, '0', 'all', $search,);
+				$query = $this->Crud->filter_dept($limit, $offset, '', $log_id, $search);
 				$data['count'] = $counts;
+				
 
 				if(!empty($query)) {
 					foreach ($query as $q) {
 						$id = $q->id;
-						$fullname = $q->fullname;
-						$username = $q->business_name;
-						$email = $q->email;
-						$phone = $q->phone;
-						$territory = json_decode($q->territory);
-						$ters = '';
-						if(!empty($territory) && is_array($territory)){
-							foreach($territory as $ter => $val){
-								$ters .= $this->Crud->read_field('id', $val, 'territory', 'name').', ';
-						
+						$name = $q->name;
+						$roles = $q->roles;
+						$rolesa = json_decode($roles);
+						$rols = '';
+						if(!empty($rolesa)){
+							foreach($rolesa as $r => $val){
+								$rols .= $val.', ';
 							}
 						}
-						$referral_id = 0;
-						$address = $q->address;
-						$city = $this->Crud->read_field('id', $q->lga_id, 'city', 'name');
-						$state = $this->Crud->read_field('id', $q->state_id, 'state', 'name');
-						$country = $this->Crud->read_field('id', $q->country_id, 'country', 'name');
-						$img = $q->passport;
-						if(!file_exists($img)){
-							$img = 'assets/images/avatar.png';
-						}
-						$activate = $q->activate;
-						$u_role = $this->Crud->read_field('id', $q->role_id, 'access_role', 'name');
-						$reg_date = date('M d, Y h:ia', strtotime($q->reg_date));
-
-						$market = '';
-						$referral = '';
-						if($referral_id > 0){
-							$ref = $this->Crud->read_Field('id', $referral_id, 'user', 'fullname');
-							$referral = '<span class="text-primary">Referred by: '.$ref.'</span> ';
-						}
-						$act = '';
-						if ($activate == 1) {
-							$a_color = 'success';
-						} else {
-							$a_color = 'danger';
-						}
-
-						$metric = $this->Crud->check('master_id', $id, 'user').' Field Operative';
-						$p_metric = $this->Crud->check('referral', $id, 'user');
-
-						// if ($approve == 1) {
-						// 	$act = '<span class="text-success"><i class="ri-check-circle-line"></i> Verified</span> ';
-						// } else {
-						// 	$act = '<span class="text-danger"><i class="ri-check-circle-line"></i> Unverified</span> ';
-						// }
-
 						// add manage buttons
 						if ($role_u != 1) {
 							$all_btn = '';
 						} else {
 							$all_btn = '
-								<li><a href="' . site_url($mod . '/view/' . $id) . '" class="text-success" pageTitle="View ' . $fullname . '" pageName=""><em class="icon ni ni-eye"></em><span>'.translate_phrase('View Details').'</span></a></li>
-								<li><a href="javascript:;" class="text-primary pop" pageTitle="Edit ' . $fullname . '" pageName="' . site_url($mod . '/manage/edit/' . $id) . '"><em class="icon ni ni-edit-alt"></em><span>'.translate_phrase('Edit').'</span></a></li>
-								<li><a href="javascript:;" class="text-danger pop" pageTitle="Delete ' . $fullname . '" pageName="' . site_url($mod . '/manage/delete/' . $id) . '"><em class="icon ni ni-trash-alt"></em><span>'.translate_phrase('Delete').'</span></a></li>
+								<li><a href="javascript:;" class="text-primary pop" pageTitle="Edit ' . $name . '" pageName="' . site_url($mod . '/manage/edit/' . $id) . '"><em class="icon ni ni-edit-alt"></em><span>'.translate_phrase('Edit').'</span></a></li>
+								<li><a href="javascript:;" class="text-danger pop" pageTitle="Delete ' . $name . '" pageName="' . site_url($mod . '/manage/delete/' . $id) . '"><em class="icon ni ni-trash-alt"></em><span>'.translate_phrase('Delete').'</span></a></li>
 								
 								
 							';
@@ -1542,32 +880,12 @@ class Accounts extends BaseController {
 						$item .= '
 							<div class="nk-tb-item">
 								<div class="nk-tb-col">
-									<div class="user-card">
-										<div class="user-avatar ">
-											<img alt="" src="' . site_url($img) . '" height="45px" style="max-width:100%"/>
-										</div>
-										<div class="user-info">
-											<span class="tb-lead">' . ucwords($fullname) . ' <span class="dot dot-' . $a_color . ' ms-1"></span></span>
-											<span>' . $email . '</span><br>
-											<span>' . $u_role . '</span>
-										</div>
+									<div class="user-info">
+										<span class="tb-lead">' . ucwords($name) . ' </span>
 									</div>
 								</div>
 								<div class="nk-tb-col tb-col">
-									<span class="text-dark"><b>' . $phone . '</b></span>
-								</div>
-								<div class="nk-tb-col tb-col-mb">
-									<span>' . ucwords($address) . '</span><br>
-									<span class="text-info">'.$city . '</span>
-								</div>
-								<div class="nk-tb-col tb-col-md">
-									<span>' . ucwords(rtrim($ters, ',')) . '</span>
-								</div>
-								<div class="nk-tb-col tb-col-md">
-									<span class="text-info">'.$p_metric.'</span>
-								</div>
-								<div class="nk-tb-col tb-col-md">
-									<span class="tb-amount">' . $metric . ' </span>
+									<span class="text-dark"><b>' . ucwords(rtrim($rols, ', ')) . '</b></span>
 								</div>
 								<div class="nk-tb-col nk-tb-col-tools">
 									<ul class="nk-tb-actions gx-1">
@@ -1589,14 +907,13 @@ class Accounts extends BaseController {
 					}
 				}
 				
-				
 			}
 			
 			if(empty($item)) {
 				$resp['item'] = $items.'
 					<div class="text-center text-muted">
 						<br/><br/><br/><br/>
-						<i class="ni ni-users" style="font-size:150px;"></i><br/><br/>'.translate_phrase('No Tax Master Returned').'
+						<i class="ni ni-building" style="font-size:150px;"></i><br/><br/>'.translate_phrase('No Department Returned').'
 					</div>
 				';
 			} else {
@@ -1624,729 +941,16 @@ class Accounts extends BaseController {
 			die;
 		}
 
-		if($param1 == 'view'){
-			if($param2) {
-				$user_id = $param2;
-				$data['id'] = $user_id;
-				$last_log = date('F, d Y h:ia',strtotime($this->Crud->read_field('id', $user_id, 'user', 'last_log')));
-				if(empty($this->Crud->read_field('id', $user_id, 'user', 'last_log'))){
-					$last_log = 'Not Logged In';
-				}
-				$data['last_log'] = $last_log;
-				$data['fullname'] = $this->Crud->read_field('id', $user_id, 'user', 'fullname');
-				$role_id = $this->Crud->read_field('id', $user_id, 'user', 'role_id');
-				$data['role'] = $this->Crud->read_field('id', $role_id, 'access_role', 'name');
-				$data['v_phone'] = $this->Crud->read_field('id', $user_id, 'user', 'phone');
-				$data['reg_date'] = date('F, d Y h:ia',strtotime($this->Crud->read_field('id', $user_id, 'user', 'reg_date')));
-				$data['v_email'] = $this->Crud->read_field('id', $user_id, 'user', 'email');
-				$data['tax_id'] = $this->Crud->read_field('user_id', $user_id, 'virtual_account', 'acc_no');
-				$data['bank'] = $this->Crud->read_field('user_id', $user_id, 'account', 'bank').' '.$this->Crud->read_field('user_id', $user_id, 'account', 'account').' '.$this->Crud->read_field('user_id', $user_id, 'account', 'name');
-						
-				$v_img_id = $this->Crud->read_field('id', $user_id, 'user', 'passport');
-				if(!empty($v_img_id)){
-					if(!file_exists($v_img_id)){
-						$v_img_id = 'assets/images/avatar.png';
-					}
-					$img = '<img src="'.site_url($v_img_id).'">';
-				} else {
-					$img = $this->Crud->image_name($this->Crud->read_field('id', $user_id, 'user', 'fullname'));
-				}
-				$data['v_img'] = $img;
-				
-				$data['email'] = $this->Crud->read_field('id', $user_id, 'user', 'email');
-				$data['tax_id'] = $this->Crud->read_field('user_id', $user_id, 'virtual_account', 'acc_no');
-				$data['fullname'] = $this->Crud->read_field('id', $user_id, 'user', 'fullname');
-				$data['sms'] = $this->Crud->read_field('id', $user_id, 'user', 'receive_message');
-				$data['address'] = $this->Crud->read_field('id', $user_id, 'user', 'address');
-				$data['territory'] = str_replace('_', ' ',$this->Crud->read_field('id', $user_id, 'user', 'territory'));
-				$utilitys = $this->Crud->read_field('id', $user_id, 'user', 'utility');
-				$id_cards = $this->Crud->read_field('id', $user_id, 'user', 'id_card');
-				$trade_id = $this->Crud->read_field('id', $user_id, 'user', 'trade');
-				$data['trade'] = $this->Crud->read_field('id', $user_id, 'trade', 'name');
-				$passports = $this->Crud->read_field('id', $user_id, 'user', 'passport');
-				$data['phone'] = $this->Crud->read_field('id', $user_id, 'user', 'phone');
-				$data['duration'] = $this->Crud->read_field('id', $user_id, 'user', 'duration');
-				$data['lga_id'] = $this->Crud->read_field('id', $user_id, 'user', 'lga_id');
-				$data['state_id'] = $this->Crud->read_field('id', $user_id, 'user', 'state_id');
-				$data['country_id'] = $this->Crud->read_field('id', $user_id, 'user', 'country_id');
-				$qrcodes = $this->Crud->read_field('id', $user_id, 'user', 'qrcode');
-				$img_id = $this->Crud->read_field('id', $user_id, 'user', 'img_id');
-
-
-				$qrcode = '--';
-				// echo $qrcodes;
-				if(!empty($qrcodes) && file_exists($qrcodes)){
-					$qrcode = '<img height="150" src="'.site_url($qrcodes).'"> ';
-				}
-
-				$utility = 'No Utility Document Uploaded';
-				if(!empty($utilitys) && file_exists($utilitys)){
-					$utility = '<img height="150" src="'.site_url($utilitys).'"> ';
-				}
-
-				$id_card = 'No Valid ID Card Document Uploaded';
-				if(!empty($id_cards) && file_exists($id_cards)){
-					$id_card = '<img height="150" src="'.site_url($id_cards).'"> ';
-				}
-				
-				$passport = 'No Passport Uploaded';
-				if(!empty($passports) && file_exists($passports)){
-					$passport = '<img height="150" src="'.site_url($passports).'"> ';
-				}
-
-				$data['utility'] = $utility;
-				$data['id_card'] = $id_card;
-				$data['passport'] = $passport;
-				$data['qrcode'] = $qrcode;
-				
-
-				$data['img_id'] = $passports;
-				// $data['img'] = $this->Crud->image($img_id, 'big');
-        
-				$v_status = $this->Crud->read_field('id', $user_id, 'user', 'activate');
-				if(!empty($v_status)) { $v_status = '<span class="text-success">VERIFIED</span>'; } else { $v_status = '<span class="text-danger">UNVERIFIED</span>'; }
-				$data['v_status'] = $v_status;
-
-				$data['v_address'] = $this->Crud->read_field('id', $user_id, 'user', 'address');
-
-				$v_state_id = $this->Crud->read_field('id', $user_id, 'user', 'state_id');
-				$data['v_state'] = $this->Crud->read_field('id', $v_state_id, 'state', 'name');
-				$v_trade_id = $this->Crud->read_field('id', $user_id, 'user', 'trade');
-				$data['v_trade'] = $this->Crud->read_field('id', $v_trade_id, 'trade', 'name');
-
-				$v_country_id = $this->Crud->read_field('id', $user_id, 'user', 'country_id');
-				$data['v_country'] = $this->Crud->read_field('id', $v_country_id, 'country', 'name');
-				$v_city_id = $this->Crud->read_field('id', $user_id, 'user', 'lga_id');
-				$data['v_city'] = $this->Crud->read_field('id', $v_city_id, 'city', 'name');
-				$data['v_territory'] = $this->Crud->read_field('id', $this->Crud->read_field('id', $user_id, 'user', 'territory'), 'territory', 'name');
-				$data['v_duration'] = $this->Crud->read_field('id', $user_id, 'user', 'duration');
-				$data['v_master_id'] = $this->Crud->read_field('id', $user_id, 'user', 'master_id');
-				
-				
-				$data['v_id_card'] = $this->Crud->read_field('id', $user_id, 'user', 'id_card');
-				
-				$data['v_passport'] = $this->Crud->read_field('id', $user_id, 'user', 'passport');
-				
-				$data['v_utility'] = $this->Crud->read_field('id', $user_id, 'user', 'utility');
-				$data['v_qrcode'] = $this->Crud->read_field('id', $user_id, 'user', 'qrcode');
-				$data['v_business_name'] = $this->Crud->read_field('id', $user_id, 'user', 'business_name');
-				$data['v_business_address'] = $this->Crud->read_field('id', $user_id, 'user', 'business_address');
-			}
-			$data['title'] = translate_phrase('Account View').' - '.app_name;
-			$data['page_active'] = $mod;
-			return view($mod.'_view', $data);
-		}
 		if($param1 == 'manage') { // view for form data posting
 			return view($mod.'_form', $data);
 		} else { // view for main page
 			
-			$data['title'] = translate_phrase('Tax Masters').' - '.app_name;
+			$data['title'] = translate_phrase('Cells').' - '.app_name;
 			$data['page_active'] = $mod;
 			return view($mod, $data);
 		}
     }
-	
-	
-	public function field($param1='', $param2='', $param3='') {
-		// check session login
-		if($this->session->get('td_id') == ''){
-			$request_uri = uri_string();
-			$this->session->set('td_redirect', $request_uri);
-			return redirect()->to(site_url('auth'));
-		} 
 
-        $mod = 'accounts/field';
-
-        $log_id = $this->session->get('td_id');
-        $role_id = $this->Crud->read_field('id', $log_id, 'user', 'role_id');
-        $role = strtolower($this->Crud->read_field('id', $role_id, 'access_role', 'name'));
-        $role_c = $this->Crud->module($role_id, $mod, 'create');
-        $role_r = $this->Crud->module($role_id, $mod, 'read');
-        $role_u = $this->Crud->module($role_id, $mod, 'update');
-        $role_d = $this->Crud->module($role_id, $mod, 'delete');
-        if($role_r == 0){
-            return redirect()->to(site_url('dashboard'));	
-        }
-        $data['log_id'] = $log_id;
-        $data['current_language'] = $this->session->get('current_language');
-        $data['role'] = $role;
-        $data['role_c'] = $role_c;
-       
-		$table = 'user';
-		if($this->Crud->check2('id', $log_id, 'setup', 0, 'user')> 0)return redirect()->to(site_url('auth/security'));
-		if($this->Crud->check2('id', $log_id, 'trade', 0, 'user')> 0)return redirect()->to(site_url('auth/security'));
-		$form_link = site_url($mod);
-		if($param1){$form_link .= '/'.$param1;}
-		if($param2){$form_link .= '/'.$param2.'/';}
-		if($param3){$form_link .= $param3;}
-		
-		// pass parameters to view
-		$data['param1'] = $param1;
-		$data['param2'] = $param2;
-		$data['param3'] = $param3;
-		$data['form_link'] = $form_link;
-		
-		// manage record
-		if($param1 == 'manage') {
-						
-			// prepare for delete
-			if($param2 == 'delete') {
-				if($param3) {
-					$edit = $this->Crud->read_single('id', $param3, $table);
-                    //echo var_dump($edit);
-					if(!empty($edit)) {
-						foreach($edit as $e) {
-							$data['d_id'] = $e->id;
-						}
-					}
-					
-					if($this->request->getMethod() == 'post'){
-                        $del_id =  $this->request->getVar('d_field_id');
-                        $role_id =  $this->Crud->read_field('name', 'Field Operative', 'access_role', 'id');
-						$datas['role_id'] = $role_id;
-                        $datas['log_id'] = $log_id;
-                        
-						// print_r($datas);
-						// //$role_id . ' ' . $log_id;
-						// die;
-						
-                        $del = $this->Crud->api('delete', 'users/delete/'.$del_id, $datas);
-
-						$del = json_decode($del);
-                        if($del->status == true){	
-                        
-							echo $this->Crud->msg($del->code, translate_phrase($del->msg));
-							echo '<script>location.reload(false);</script>';
-						} else {
-							echo $this->Crud->msg('danger', translate_phrase('Please try later'));
-						}
-						die;	
-					}
-				}
-			} else {
-				// prepare for edit
-				if($param2 == 'edit') {
-					if($param3) {
-						
-						$edit = $this->Crud->read_single('id', $param3, $table);
-						if(!empty($edit)) {
-							foreach($edit as $e) {
-								$data['e_id'] = $e->id;
-								$data['e_fullname'] = $e->fullname;
-								$data['e_phone'] = $e->phone;
-								$data['e_state_id'] = $e->state_id;
-								$data['e_lga_id'] = $e->lga_id;
-								$data['e_email'] = $e->email;
-								$data['e_activate'] = $e->activate;
-								$data['e_territory'] = $e->territory;
-								$data['e_master_id'] = $e->master_id;
-								$data['e_trade'] = $e->trade;
-								$data['e_passport'] = $e->passport;
-								$data['e_id_card'] = $e->id_card;
-								$data['e_utility'] = $e->utility;
-								$data['e_bank_code'] = $this->Crud->read_field('user_id', $e->id, 'account', 'code');
-								$data['e_account_name'] = $this->Crud->read_field('user_id', $e->id, 'account', 'name');
-								$data['e_account'] = $this->Crud->read_field('user_id', $e->id, 'account', 'account');
-							}
-						}
-						
-					}
-				}
-				
-				if($this->request->getMethod() == 'post'){
-					$field_id = $this->request->getPost('field_id');
-					$fullname = $this->request->getPost('name');
-					$phone = $this->request->getPost('phone');
-					$email = $this->request->getPost('email');
-					$state_id = $this->request->getPost('state_id');
-					$lga_id = $this->request->getPost('lga_id');
-					$master_id = $this->request->getPost('master_id');
-					$territory = $this->request->getPost('territory');
-					$passport = $this->request->getPost('passport');
-					$id_card = $this->request->getPost('id_card');
-					$utility = $this->request->getPost('utility');
-					$account_name = $this->request->getPost('account_name');
-					$bank = $this->request->getPost('bank');
-					$account = $this->request->getPost('account');
-					$password = $this->request->getPost('password');
-
-					$ins_data['fullname'] = $fullname;
-					$ins_data['email'] = $email;
-					$ins_data['master_id'] = $master_id;
-					$ins_data['phone'] = $phone;
-					$ins_data['territory'] = $territory;
-					$ins_data['country_id'] = 161;
-					$ins_data['state_id'] = 316;
-					$ins_data['lga_id'] = $lga_id;
-					$ins_data['role_id'] = $this->Crud->read_field('name', 'Field Operative', 'access_role', 'id');
-
-					if($password) { $ins_data['password'] = md5($password); }
-					// if($this->Crud->check2('id', $lga_id, 'territory', $territory, 'city') == 0){
-					// 	echo $this->Crud->msg('warning', 'LGA selected is not under the Territory Selected');
-					// 	die;
-					// }
-					
-					//// Passport upload
-					if(file_exists($this->request->getFile('passports'))) {
-						$path = 'assets/images/users/tax_master/';
-						$file = $this->request->getFile('passports');
-						$getImg = $this->Crud->img_upload($path, $file);
-						
-						$passport = $getImg->path;
-					}
-
-					//// ID Card upload
-					if(file_exists($this->request->getFile('id_cards'))) {
-						$path = 'assets/images/users/tax_master/';
-						$file = $this->request->getFile('id_cards');
-						$getImg = $this->Crud->img_upload($path, $file);
-						
-						$id_card = $getImg->path;
-					}
-
-					//// Utility upload
-					if(file_exists($this->request->getFile('utilitys'))) {
-						$path = 'assets/images/users/tax_master/';
-						$file = $this->request->getFile('utilitys');
-						$getImg = $this->Crud->img_upload($path, $file);
-						
-						$utility = $getImg->path;
-					}
-
-					// if(empty($passport) || empty($id_card) || empty($utility)){
-					// 	echo $this->Crud->msg('danger', 'All Documents are Required to be Uploaded');
-					// 	die;
-					// }
-
-					
-					$ins_data['passport'] = $passport;
-					$ins_data['utility'] = $utility;
-					$ins_data['id_card'] = $id_card;
-		
-					// do create or update
-					if($field_id) {
-						$upd_rec = $this->Crud->updates('id', $field_id, $table, $ins_data);
-						if($upd_rec > 0) {
-							echo $this->Crud->msg('success', translate_phrase('Record Updated'));
-
-							$b_data['code'] = $bank;
-							$b_data['account'] = $account;
-							$b_data['name'] = $account_name;
-							$b_data['bank'] = $this->Crud->read_field('code' , $bank, 'bank', 'name');
-							if($this->Crud->check('user_id', $master_id, 'account') > 0){
-								$this->Crud->updates('user_id', $master_id, 'account', $b_data);
-							} else {
-								
-								$b_data['user_id'] = $master_id;
-								$this->Crud->create('account', $b_data);
-							}
-							///// store activities
-							$by = $this->Crud->read_field('id', $log_id, 'user', 'fullname');
-							$code = $this->Crud->read_field('id', $field_id, 'user', 'fullname');
-							$action = $by.' updated Field Operative ('.$code.') Record';
-							$this->Crud->activity('user', $field_id, $action);
-
-							echo '<script>location.reload(false);</script>';
-						} else {
-							echo $this->Crud->msg('info', translate_phrase('No Changes'));	
-						}
-					} else {
-						if($this->Crud->check('email', $email, $table) > 0 || $this->Crud->check('phone', $phone, $table) > 0) {
-							echo $this->Crud->msg('warning', translate_phrase('Email and/or Phone Already Exist'));
-						} else {
-							$ins_data['activate'] = 1;
-							$ins_data['reg_date'] = date(fdate);
-
-							$ins_rec = $this->Crud->create($table, $ins_data);
-							if($ins_rec > 0) {
-								echo $this->Crud->msg('success', translate_phrase('Record Created'));
-
-								$b_data['code'] = $bank;
-								$b_data['account'] = $account;
-								$b_data['name'] = $account_name;
-								$b_data['bank'] = $this->Crud->read_field('code' , $bank, 'bank', 'name');
-								if($this->Crud->check('user_id', $ins_rec, 'account') > 0){
-									$this->Crud->updates('user_id', $ins_rec, 'account', $b_data);
-								} else {
-									
-									$b_data['user_id'] = $ins_rec;
-									$this->Crud->create('account', $b_data);
-								}
-
-								$user_id = $ins_rec;
-								if(!empty($user_id)){
-									$link = site_url('auth/profile_view/') .$user_id;
-									$qr = $this->qrcode($link);
-									$path = $qr['file'];
-									$this->Crud->updates('id', $user_id, 'user', array('qrcode'=>$path));
-								}
-								///// store activities
-								$by = $this->Crud->read_field('id', $log_id, 'user', 'fullname');
-								$code = $this->Crud->read_field('id', $ins_rec, 'user', 'fullname');
-								$action = $by.' created Field Operative ('.$code.')';
-								$this->Crud->activity('user', $ins_rec, $action);
-
-								$body = '
-									Dear '.$fullname.', <br><br>
-										A Field Operative Account Has been Created with This Email;<br>
-										Below are the login Credentials:<br><br>
-
-										Email:'.$email.'<br>
-										Phone:'.$phone.'<br>
-										Password:'.$password.'<br>
-										
-								';
-								$sms_body = '
-									Dear '.$fullname.', A Field Operative Account Has been Created with This Email/Phone Number. Your login Credentials are; 
-										Email: {'.$email.'}, Phone: {'.$phone.'}, Password: {'.$password.'}
-										
-								';
-								$api_key = $this->Crud->read_field('name', 'termil_api', 'setting', 'value'); // pick from DB
-							
-								if($phone) {
-									$phone = '234'.substr($phone,1);
-									$datass['to'] = $phone;
-									$datass['from'] = 'TIDREM';
-									$datass['sms'] = $sms_body;
-									$datass['api_key'] = $api_key;
-									$datass['type'] = 'plain';
-									$datass['channel'] = 'generic';
-									$this->Crud->termii('post', 'sms/send', $datass);
-								}
-						
-								// send email
-								if($email) {
-									$data['email_address'] = $email;
-									$this->Crud->send_email($email, 'Field Operative Account', $body);
-								}
-								$this->Crud->notify('0', $ins_rec, $body, 'authentication', $user_id);
-
-
-								echo '<script>location.reload(false);</script>';
-							} else {
-								echo $this->Crud->msg('danger', translate_phrase('Please try later'));	
-							}	
-						}
-					}
-					exit;	
-				}
-			}
-		}
-
-
-        // record listing
-		if($param1 == 'load') {
-			$limit = $param2;
-			$offset = $param3;
-
-			$rec_limit = 25;
-			$item = '';
-            if(empty($limit)) {$limit = $rec_limit;}
-			if(empty($offset)) {$offset = 0;}
-			
-			$search = $this->request->getPost('search');
-			if(!empty($this->request->getVar('territory'))){$territory = $this->request->getVar('territory');}else{$territory = '';}
-
-
-			$items = '
-				<div class="nk-tb-item nk-tb-head">
-					<div class="nk-tb-col"><span class="sub-text">'.translate_phrase('Account').'</span></div>
-					<div class="nk-tb-col  tb-col-md"><span class="sub-text">'.translate_phrase('Contact').'</span></div>
-					<div class="nk-tb-col"><span class="sub-text">'.translate_phrase('Address').'</span></div>
-					<div class="nk-tb-col tb-col-md"><span class="sub-text">'.translate_phrase('Tax Payers').'</span></div>
-					<div class="nk-tb-col tb-col-md"><span class="sub-text">'.translate_phrase('Territory').'</span></div>
-					<div class="nk-tb-col nk-tb-col-tools">
-						<ul class="nk-tb-actions gx-1 my-n1">
-							
-						</ul>
-					</div>
-				</div><!-- .nk-tb-item -->
-		
-				
-			';
-			$a = 1;
-
-            //echo $status;
-			$log_id = $this->session->get('td_id');
-			if(!$log_id) {
-				$item = '<div class="text-center text-muted">'.translate_phrase('Session Timeout! - Please login again').'</div>';
-			} else {
-				$role_id = $this->Crud->read_field('name', 'Field Operative', 'access_role', 'id');
-
-
-				$all_rec = $this->Crud->filter_field('', '', $territory, $log_id, $role_id, '0', 'all', $search,);
-                // $all_rec = json_decode($all_rec);
-				if(!empty($all_rec)) { $counts = count($all_rec); } else { $counts = 0; }
-
-				$query = $this->Crud->filter_field($limit, $offset, $territory, $log_id, $role_id, '0', 'all', $search,);
-				$data['count'] = $counts;
-
-				
-				if(!empty($query)) {
-					foreach ($query as $q) {
-						$id = $q->id;
-						$fullname = $q->fullname;
-						$username = $q->business_name;
-						$email = $q->email;
-						$phone = $q->phone;
-						$territory = $this->Crud->read_field('id', $q->territory, 'territory', 'name');
-						$master = $this->Crud->read_field('id', $q->master_id, 'user', 'fullname');
-						$referral_id = 0;
-						$address = $q->address;
-						$city = $this->Crud->read_field('id', $q->lga_id, 'city', 'name');
-						$state = $this->Crud->read_field('id', $q->state_id, 'state', 'name');
-						$country = $this->Crud->read_field('id', $q->country_id, 'country', 'name');
-						$img = $q->passport;
-						if(!file_exists($img)){
-							$img = 'assets/images/avatar.png';
-						}
-						$activate = $q->activate;
-						$u_role = $this->Crud->read_field('id', $q->role_id, 'access_role', 'name');
-						$reg_date = date('M d, Y h:ia', strtotime($q->reg_date));
-
-						if(empty($master)){
-							$master = 'Not Assigned';
-						}
-						$market = '';
-						$referral = '';
-						if($referral_id > 0){
-							$ref = $this->Crud->read_Field('id', $referral_id, 'user', 'fullname');
-							$referral = '<span class="text-primary">Referred by: '.$ref.'</span> ';
-						}
-						$act = '';
-						if ($activate == 1) {
-							$a_color = 'success';
-						} else {
-							$a_color = 'danger';
-						}
-
-						$metric = $this->Crud->check('referral', $id, 'user');
-
-						// if ($approve == 1) {
-						// 	$act = '<span class="text-success"><i class="ri-check-circle-line"></i> Verified</span> ';
-						// } else {
-						// 	$act = '<span class="text-danger"><i class="ri-check-circle-line"></i> Unverified</span> ';
-						// }
-
-						// add manage buttons
-						if ($role_u != 1) {
-							$all_btn = '';
-						} else {
-							$all_btn = '
-								<li><a href="' . site_url($mod . '/view/' . $id) . '" class="text-success" pageTitle="View ' . $fullname . '" pageName=""><em class="icon ni ni-eye"></em><span>'.translate_phrase('View Details').'</span></a></li>
-								<li><a href="javascript:;" class="text-primary pop" pageTitle="Edit ' . $fullname . '" pageName="' . site_url($mod . '/manage/edit/' . $id) . '"><em class="icon ni ni-edit-alt"></em><span>'.translate_phrase('Edit').'</span></a></li>
-								<li><a href="javascript:;" class="text-danger pop" pageTitle="Delete ' . $fullname . '" pageName="' . site_url($mod . '/manage/delete/' . $id) . '"><em class="icon ni ni-trash-alt"></em><span>'.translate_phrase('Delete').'</span></a></li>
-								
-								
-							';
-						}
-
-						$item .= '
-							<div class="nk-tb-item">
-								<div class="nk-tb-col">
-									<div class="user-card">
-										<div class="user-avatar ">
-											<img alt="" src="' . site_url($img) . '" width="50px" height="40px"/>
-										</div>
-										<div class="user-info">'.$reg_date.'
-											<span class="tb-lead">' . ucwords($fullname) . ' <span class="dot dot-' . $a_color . ' ms-1"></span></span>
-											<span>' . $email . '</span><br>
-											<span>' . $u_role . '</span>
-										</div>
-									</div>
-								</div>
-								<div class="nk-tb-col tb-col-md">
-									<span class="text-dark"><b>' . $phone . '</b></span>
-								</div>
-								<div class="nk-tb-col">
-									<span>' . ucwords($address) . '</span><br>
-									<span class="text-info">'.$city . '</span>
-								</div>
-								<div class="nk-tb-col tb-col-md">
-									<span class="text-info">'.$metric.'</span>
-								</div>
-								<div class="nk-tb-col tb-col-md">
-									<span>' . ucwords(str_replace('_', ' ', $territory)) . '</span><br><span class="text-danger">Tax Master: '.$master.'</span>
-								</div>
-								<div class="nk-tb-col nk-tb-col-tools">
-									<ul class="nk-tb-actions gx-1">
-										<li>
-											<div class="drodown">
-												<a href="#" class="dropdown-toggle btn btn-icon btn-trigger" data-bs-toggle="dropdown"><em class="icon ni ni-more-h"></em></a>
-												<div class="dropdown-menu dropdown-menu-end">
-													<ul class="link-list-opt no-bdr">
-														' . $all_btn . '
-													</ul>
-												</div>
-											</div>
-										</li>
-									</ul>
-								</div>
-							</div><!-- .nk-tb-item -->
-						';
-						$a++;
-					}
-				}
-				
-				
-			}
-			
-			if(empty($item)) {
-				$resp['item'] = $items.'
-					<div class="text-center text-muted">
-						<br/><br/><br/><br/>
-						<i class="ni ni-users" style="font-size:150px;"></i><br/><br/>'.translate_phrase('No Field Operative Returned').'
-					</div>
-				';
-			} else {
-				$resp['item'] = $items . $item;
-				if($offset >= 25){
-					$resp['item'] = $item;
-				}
-				
-			}
-
-			$resp['count'] = $counts;
-
-			$more_record = $counts - ($offset + $rec_limit);
-			$resp['left'] = $more_record;
-
-			if($counts > ($offset + $rec_limit)) { // for load more records
-				$resp['limit'] = $rec_limit;
-				$resp['offset'] = $offset + $limit;
-			} else {
-				$resp['limit'] = 0;
-				$resp['offset'] = 0;
-			}
-
-			echo json_encode($resp);
-			die;
-		}
-
-		if($param1 == 'view'){
-			if($param2) {
-				$user_id = $param2;
-				$data['id'] = $user_id;
-				$last_log = date('F, d Y h:ia',strtotime($this->Crud->read_field('id', $user_id, 'user', 'last_log')));
-				if(empty($this->Crud->read_field('id', $user_id, 'user', 'last_log'))){
-					$last_log = 'Not Logged In';
-				}
-				$data['last_log'] = $last_log;
-				$data['fullname'] = $this->Crud->read_field('id', $user_id, 'user', 'fullname');
-				$role_id = $this->Crud->read_field('id', $user_id, 'user', 'role_id');
-				$data['role'] = $this->Crud->read_field('id', $role_id, 'access_role', 'name');
-				$data['v_phone'] = $this->Crud->read_field('id', $user_id, 'user', 'phone');
-				$data['reg_date'] = date('F, d Y h:ia',strtotime($this->Crud->read_field('id', $user_id, 'user', 'reg_date')));
-				$data['v_email'] = $this->Crud->read_field('id', $user_id, 'user', 'email');
-				$data['tax_id'] = $this->Crud->read_field('user_id', $user_id, 'virtual_account', 'acc_no');
-				$data['bank'] = $this->Crud->read_field('user_id', $user_id, 'account', 'bank').' '.$this->Crud->read_field('user_id', $user_id, 'account', 'account').' '.$this->Crud->read_field('user_id', $user_id, 'account', 'name');
-						
-				$v_img_id = $this->Crud->read_field('id', $user_id, 'user', 'passport');
-				if(!empty($v_img_id)){
-					if(!file_exists($v_img_id)){
-						$v_img_id = 'assets/images/avatar.png';
-					}
-					$img = '<img src="'.site_url($v_img_id).'">';
-				} else {
-					$img = $this->Crud->image_name($this->Crud->read_field('id', $user_id, 'user', 'fullname'));
-				}
-				$data['v_img'] = $img;
-
-				$v_status = $this->Crud->read_field('id', $user_id, 'user', 'activate');
-				if(!empty($v_status)) { $v_status = '<span class="text-success">VERIFIED</span>'; } else { $v_status = '<span class="text-danger">UNVERIFIED</span>'; }
-				$data['v_status'] = $v_status;
-
-				$data['v_address'] = $this->Crud->read_field('id', $user_id, 'user', 'address');
-
-				$v_state_id = $this->Crud->read_field('id', $user_id, 'user', 'state_id');
-				$data['v_state'] = $this->Crud->read_field('id', $v_state_id, 'state', 'name');
-				$v_trade_id = $this->Crud->read_field('id', $user_id, 'user', 'trade');
-				$data['v_trade'] = $this->Crud->read_field('id', $v_trade_id, 'trade', 'name');
-
-				$v_country_id = $this->Crud->read_field('id', $user_id, 'user', 'country_id');
-				$data['v_country'] = $this->Crud->read_field('id', $v_country_id, 'country', 'name');
-				$v_city_id = $this->Crud->read_field('id', $user_id, 'user', 'lga_id');
-				$data['v_city'] = $this->Crud->read_field('id', $v_city_id, 'city', 'name');
-				$data['v_territory'] = $this->Crud->read_field('id', $this->Crud->read_field('id', $user_id, 'user', 'territory'), 'territory', 'name');
-				$data['v_duration'] = $this->Crud->read_field('id', $user_id, 'user', 'duration');
-				$data['v_master_id'] = $this->Crud->read_field('id', $user_id, 'user', 'master_id');
-				$master_id = $this->Crud->read_field('id', $user_id, 'user', 'master_id');
-				$data['v_master'] = $this->Crud->read_field('id', $master_id, 'user', 'fullname');
-				
-				$data['email'] = $this->Crud->read_field('id', $user_id, 'user', 'email');
-				$data['tax_id'] = $this->Crud->read_field('user_id', $user_id, 'virtual_account', 'acc_no');
-				$data['fullname'] = $this->Crud->read_field('id', $user_id, 'user', 'fullname');
-				$data['sms'] = $this->Crud->read_field('id', $user_id, 'user', 'receive_message');
-				$data['address'] = $this->Crud->read_field('id', $user_id, 'user', 'address');
-				$data['territory'] = str_replace('_', ' ',$this->Crud->read_field('id', $user_id, 'user', 'territory'));
-				$utilitys = $this->Crud->read_field('id', $user_id, 'user', 'utility');
-				$id_cards = $this->Crud->read_field('id', $user_id, 'user', 'id_card');
-				$trade_id = $this->Crud->read_field('id', $user_id, 'user', 'trade');
-				$data['trade'] = $this->Crud->read_field('id', $user_id, 'trade', 'name');
-				$passports = $this->Crud->read_field('id', $user_id, 'user', 'passport');
-				$data['phone'] = $this->Crud->read_field('id', $user_id, 'user', 'phone');
-				$data['duration'] = $this->Crud->read_field('id', $user_id, 'user', 'duration');
-				$data['lga_id'] = $this->Crud->read_field('id', $user_id, 'user', 'lga_id');
-				$data['state_id'] = $this->Crud->read_field('id', $user_id, 'user', 'state_id');
-				$data['country_id'] = $this->Crud->read_field('id', $user_id, 'user', 'country_id');
-				$qrcodes = $this->Crud->read_field('id', $user_id, 'user', 'qrcode');
-				$img_id = $this->Crud->read_field('id', $user_id, 'user', 'img_id');
-
-
-				$qrcode = '--';
-				// echo $qrcodes;
-				if(!empty($qrcodes) && file_exists($qrcodes)){
-					$qrcode = '<img height="150" src="'.site_url($qrcodes).'"> ';
-				}
-
-				$utility = 'No Utility Document Uploaded';
-				if(!empty($utilitys) && file_exists($utilitys)){
-					$utility = '<img height="150" src="'.site_url($utilitys).'"> ';
-				}
-
-				$id_card = 'No Valid ID Card Document Uploaded';
-				if(!empty($id_cards) && file_exists($id_cards)){
-					$id_card = '<img height="150" src="'.site_url($id_cards).'"> ';
-				}
-				
-				$passport = 'No Passport Uploaded';
-				if(!empty($passports) && file_exists($passports)){
-					$passport = '<img height="150" src="'.site_url($passports).'"> ';
-				}
-
-				$data['utility'] = $utility;
-				$data['id_card'] = $id_card;
-				$data['passport'] = $passport;
-				$data['qrcode'] = $qrcode;
-				
-
-				$data['img_id'] = $passports;
-				// $data['img'] = $this->Crud->image($img_id, 'big');
-        
-				
-				$data['v_id_card'] = $this->Crud->read_field('id', $user_id, 'user', 'id_card');
-				
-				$data['v_passport'] = $this->Crud->read_field('id', $user_id, 'user', 'passport');
-				
-				$data['v_utility'] = $this->Crud->read_field('id', $user_id, 'user', 'utility');
-				$data['v_qrcode'] = $this->Crud->read_field('id', $user_id, 'user', 'qrcode');
-				$data['v_business_name'] = $this->Crud->read_field('id', $user_id, 'user', 'business_name');
-				$data['v_business_address'] = $this->Crud->read_field('id', $user_id, 'user', 'business_address');
-			}
-			$data['title'] = translate_phrase('Account View').' - '.app_name;
-			$data['page_active'] = $mod;
-			return view($mod.'_view', $data);
-		}
-
-		if($param1 == 'manage') { // view for form data posting
-			return view($mod.'_form', $data);
-		} else { // view for main page
-			
-			$data['title'] = translate_phrase('Field Operative').' - '.app_name;
-			$data['page_active'] = $mod;
-			return view($mod, $data);
-		}
-    }
 	
 	public function customer_details($param1='', $param2='', $param3='', $param4='') {
         // record listing
