@@ -33,21 +33,29 @@ $this->Crud = new Crud();
         
         <div class="row">
             <input type="hidden" name="dept_id" value="<?php if(!empty($e_id)){echo $e_id;} ?>" />
-            <div class="col-sm-12">
+            <div class="col-sm-12 mb-3">
                 <div class="form-group">
                     <label for="name">*<?=translate_phrase('Name'); ?></label>
                     <input class="form-control" type="text" id="name" name="name" value="<?php if(!empty($e_name)) {echo $e_name;} ?>" required>
                 </div>
             </div>
-
-            <div class="col-sm-6 mb-3">
-                <div class="form-group">
-                    <label for="name">*<?=translate_phrase('Email');?></label>
-                    <input class="form-control" type="text" id="email" name="email" value="<?php if(!empty($e_email)) {echo $e_email;} ?>" required>
+        </div>
+        <div class="row" id="container">
+            <div class="col-sm-12 mb-3 ">
+                <label for="name">*<?=translate_phrase('Role');?></label>
+                <div class="form-group input-group">
+                    <input class="form-control" type="text" id="role" name="role[]" value="<?php if(!empty($role)) {echo $role;} ?>" required>
+                    <button style="display:none;" class="btn btn-icon btn-outline-danger deleteBtn" type="button"><i class="icon ni ni-trash"></i> </button>
                 </div>
+                
             </div>
+           
+        </div>
 
-
+        <div class="row" >
+            <div class="col-sm-12 mb-3 text-center">
+                <button id="addMore" class="btn btn-ico btn-outline-primary" type="button"><i class="icon ni ni-plus"></i> <?=translate_phrase('Add More Roles');?></button>
+            </div>
             <div class="col-sm-12 text-center mt-3">
                 <button class="btn btn-primary bb_fo_btn" type="submit">
                     <i class="icon ni ni-save"></i> <?=translate_phrase('Save Record');?>
@@ -58,37 +66,25 @@ $this->Crud = new Crud();
 <?php echo form_close(); ?>
 <script>
     $('.js-select2').select2();
-   
-    function statea() {
-        var country = $('#country_id').val();
-        $.ajax({
-            url: '<?=site_url('accounts/get_state/');?>'+ country,
-            success: function(data) {
-                $('#state_resp').html(data);
-            }
+    document.getElementById('addMore').addEventListener('click', function() {
+        var container = document.getElementById('container');
+        var div = container.children[0].cloneNode(true);
+        
+        // Clear input value of the cloned div
+        div.querySelector('input').value = '';
+        div.querySelector('input').removeAttribute('required');
+        
+        
+        // Show delete button in the cloned div
+        div.querySelector('.deleteBtn').style.display = 'inline-block';
+        
+        // Add event listener to delete button
+        div.querySelector('.deleteBtn').addEventListener('click', function() {
+            div.parentNode.removeChild(div);
         });
         
-    }
-
-    function lgaa() {
-        var lga = $('#state').val();
-        $.ajax({
-            url: '<?=site_url('accounts/get_lga/');?>'+ lga,
-            success: function(data) {
-                $('#lga_resp').html(data);
-            }
-        });
-    }
-
-    function branc() {
-        var lgas = $('#lga').val();
-        $.ajax({
-            url: '<?=site_url('accounts/get_branch/');?>'+ lgas,
-            success: function(data) {
-                $('#branch_resp').html(data);
-            }
-        });
-    }
-
+        container.appendChild(div);
+    });
 </script>
+
 <script src="<?php echo site_url(); ?>assets/js/jsform.js"></script
