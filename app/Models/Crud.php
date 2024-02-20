@@ -1611,18 +1611,20 @@ class Crud extends Model {
 	}
 
     /// filter user
-    public function filter_user($limit='', $offset='', $log_id, $state_id='', $status='', $search='') {
+    public function filter_membership($limit='', $offset='', $log_id, $search='') {
         $db = db_connect();
         $builder = $db->table('user');
 
         // build query
 		$builder->orderBy('id', 'DESC');
-		if(!empty($state_id)) $builder->where('state_id', $state_id);
 		
+		$role_id = $this->read_field('name', 'Member', 'access_role', 'id');
+
+		$builder->where('role_id', $role_id);
         if(!empty($search)) {
             $builder->like('fullname', $search);
 			$builder->orLike('email', $search);
-			$builder->orLike('phone', $search);
+			$builder->orLike('chat_handle', $search);
         }
 
 		

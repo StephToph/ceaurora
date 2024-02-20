@@ -9,7 +9,7 @@
 <?=$this->endSection();?>
 
 <?=$this->section('content');?>
-<div class="nk-content" style="background-image: url(<?=site_url('assets/sitebk.png'); ?>);background-size: cover;">
+<div class="nk-content">
     <div class="container-fluid">
         <div class="nk-content-inner mt-5">
             <div class="nk-content-body">
@@ -35,12 +35,12 @@
                                         <div class="form-control-wrap">
                                             <select class="form-select js-select2" name="title" id="title" data-placeholder="Select Title" required>
                                                 <option value="">Select Title</option>
-                                                <option value="Brother">Brother</option>
-                                                <option value="Sister">Sister</option>
-                                                <option value="Pastor">Pastor</option>
-                                                <option value="Elder">Elder</option>
-                                                <option value="Deacon">Deacon</option>
-                                                <option value="Deaconess">Deaconess</option>
+                                                <option value="Brother" <?php if(!empty($e_title)){if($e_title ==  'Brother'){echo 'selected';}}; ?>>Brother</option>
+                                                <option value="Sister" <?php if(!empty($e_title)){if($e_title ==  'Sister'){echo 'selected';}}; ?>>Sister</option>
+                                                <option value="Pastor" <?php if(!empty($e_title)){if($e_title ==  'Pastor'){echo 'selected';}}; ?>>Pastor</option>
+                                                <option value="Elder" <?php if(!empty($e_title)){if($e_title ==  'Elder'){echo 'selected';}}; ?>>Elder</option>
+                                                <option value="Deacon" <?php if(!empty($e_title)){if($e_title ==  'Deacon'){echo 'selected';}}; ?>>Deacon</option>
+                                                <option value="Deaconess" <?php if(!empty($e_title)){if($e_title ==  'Deaconess'){echo 'selected';}}; ?>>Deaconess</option>
                                             </select>
                                         </div>
                                     </div>
@@ -48,19 +48,19 @@
                                 <div class="col-md-6 col-lg-4 col-xxl-3">
                                     <div class="form-group"><label class="form-label"
                                             for="last-name">Last Name</label><input type="text"
-                                            class="form-control" name="lastname" id="last-name" placeholder="Last Name" required>
+                                            class="form-control" name="lastname" id="last-name" value="<?php if(!empty($e_lastname)){echo $e_lastname;} ?>" placeholder="Last Name" required>
                                     </div>
                                 </div>
                                 <div class="col-md-6 col-lg-4 col-xxl-3">
                                     <div class="form-group"><label class="form-label"
                                             for="first-name">First Name</label><input type="text"
                                             class="form-control" name="firstname" id="first-name"
-                                            placeholder="First Name" required></div>
+                                            placeholder="First Name" value="<?php if(!empty($e_firstname)){echo $e_firstname;} ?>" required></div>
                                 </div>
                                 <div class="col-md-6 col-lg-4 col-xxl-3">
                                     <div class="form-group"><label class="form-label"
                                             for="last-name">Other Name</label><input type="text"
-                                            class="form-control" name="othername" id="last-name" placeholder="Last Name">
+                                            class="form-control" name="othername" id="last-name" value="<?php if(!empty($e_othername)){echo $e_othername;} ?>" placeholder="Last Name">
                                     </div>
                                 </div>
                                <div class="col-md-6 col-lg-4 col-xxl-3">
@@ -69,39 +69,38 @@
                                                 class="form-select js-select2" name="gender" required
                                                 data-placeholder="Select Gender">
                                                 <option value="">Select Gender</option>
-                                                <option value="Male">Male</option>
-                                                <option value="Female">Female</option>
+                                                <option value="Male" <?php if(!empty($e_gender)){if($e_gender == 'Male'){echo 'selected';}}?>>Male</option>
+                                                <option value="Female" <?php if(!empty($e_gender)){if($e_gender == 'Female'){echo 'selected';}}?>>Female</option>
                                             </select></div>
                                     </div>
                                 </div>
                                 <div class="col-md-6 col-lg-4 col-xxl-3">
                                     <div class="form-group"><label class="form-label"
                                             for="phone-no">Phone</label><input type="number"
-                                            class="form-control" name="phone" id="phone-no" placeholder="Phone no">
+                                            class="form-control" name="phone" id="phone-no" value="<?php if(!empty($e_phone)){echo $e_phone;} ?>" placeholder="Phone no">
                                     </div>
                                 </div>
                                 <div class="col-md-6 col-lg-4 col-xxl-3">
                                     <div class="form-group"><label class="form-label" for="email">Email
                                             Address</label><input type="email" name="email" class="form-control"
-                                            id="email" placeholder="Email Address"></div>
+                                            id="email" value="<?php if(!empty($e_email)){echo $e_email;} ?>" placeholder="Email Address"></div>
                                 </div>
                                 <div class="col-md-6 col-lg-4 col-xxl-3">
-                                    <div class="form-group"><label class="form-label" for="email">Kingchat Handle</label><input type="text" name="chat_handle" class="form-control"
-                                            id="email" placeholder="Email Address"></div>
+                                    <div class="form-group"><label class="form-label" for="email">Kingchat Handle</label><input type="text" name="chat_handle" class="form-control" value="<?php if(!empty($e_chat_handle)){echo $e_chat_handle;} ?>" id="email" placeholder="Kingchat Handle"></div>
                                 </div>
                                 <div class="col-md-6 col-lg-4 col-xxl-3">
                                     <div class="form-group"><label class="form-label">Birth Date</label>
                                         <div class="form-control-wrap">
                                             <div class="form-icon form-icon-right"><em
                                                     class="icon ni ni-calendar"></em></div><input
-                                                type="text" name="dob" class="form-control date-picker"
+                                                type="text" name="dob" value="<?php if(!empty($e_dob)){echo $e_dob;} ?>" class="form-control date-picker"
                                                 data-date-format="yyyy-mm-dd" placeholder="yyyy-mm-dd">
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-md-6 col-lg-4 col-xxl-3">
                                     <div class="form-group"><label class="form-label"
-                                            for="address">Adddress</label><input type="text"
+                                            for="address">Adddress</label><input type="text" value="<?php if(!empty($e_address)){echo $e_address;} ?>"
                                             class="form-control" name="address" id="address" placeholder="Address">
                                     </div>
                                 </div>
@@ -111,14 +110,10 @@
                                             <select class="form-select js-select2" name="family_status"
                                                 data-placeholder="Select Status">
                                                 <option value="">Select</option>
-                                                <option value="single">Single
-                                                </option>
-                                                <option value="married">Married
-                                                </option>
-                                                <option value="sepreated">Seperated
-                                                </option>
-                                                <option value="divorced">Divorced
-                                                </option>
+                                                <option value="single" <?php if(!empty($e_family_status)){if($e_family_status == 'single'){echo 'selected';}} ?>>Single </option>
+                                                <option value="married" <?php if(!empty($e_family_status)){if($e_family_status == 'married'){echo 'selected';}} ?>>Married </option>
+                                                <option value="sepreated" <?php if(!empty($e_family_status)){if($e_family_status == 'seperated'){echo 'selected';}} ?>>Seperated </option>
+                                                <option value="divorced" <?php if(!empty($e_family_status)){if($e_family_status == 'divorced'){echo 'selected';}} ?>>Divorced </option>
                                             </select>
                                         </div>
                                     </div>
@@ -129,14 +124,16 @@
                                             <select class="form-select js-select2" id="family_position" name="family_position"
                                                 data-placeholder="Select Position" onchange="posit();">
                                                 <option value="">Select</option>
-                                                <option value="Child">Child
-                                                </option>
-                                                <option value="Parent">Parent
-                                                </option>
+                                                <option value="Child" <?php if(!empty($e_family_position)){if($e_family_position == 'Child'){echo 'selected';}} ?>>Child </option>
+                                                <option value="Parent" <?php if(!empty($e_family_position)){if($e_family_position == 'Parent'){echo 'selected';}} ?>>Parent </option>
                                             </select>
                                         </div>
                                     </div>
                                 </div>
+
+                                <?php
+                                    $disp = '';
+                                ?>
                                 <div class="col-md-6 col-lg-4 col-xxl-3" id="parent_resp" style="display:none;">
                                     <div class="form-group"><label class="form-label">Parent</label>
                                         <div class="form-control-wrap">
@@ -147,6 +144,10 @@
                                                     $parent  = $this->Crud->read_single_order('family_position', 'Parent', 'user', 'surname', 'asc');
                                                     if(!empty($parent)){
                                                         foreach($parent as $p){
+                                                            $sel = '';
+                                                            if(!empty($e_parent_id)){
+                                                                if($e_parent_id == $p->id)$sel = 'selected';
+                                                            }
                                                             echo '<option value="'.$p->id.'">'.ucwords($p->surname.' '.$p->firstname).'</option>';
                                                         }
                                                     }
