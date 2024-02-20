@@ -1167,10 +1167,25 @@ class Accounts extends BaseController {
 						if(!empty($edit)) {
 							foreach($edit as $e) {
 								$data['e_id'] = $e->id;
-								$data['e_location'] = $e->location;
-								$data['e_name'] = $e->name;
-								$data['e_roles'] = json_decode($e->roles);
-								$data['e_time'] = json_decode($e->time);
+								$data['e_firstname'] = $e->firstname;
+								$data['e_surname'] = $e->surname;
+								$data['e_gender'] = $e->gender;
+								$data['e_othername'] = $e->othername;
+								$data['e_email'] = $e->email;
+								$data['e_title'] = $e->title;
+								$data['e_phone'] = $e->phone;
+								$data['e_address'] = $e->address;
+								$data['e_gender'] = $e->gender;
+								$data['e_chat_handle'] = $e->chat_handle;
+								$data['e_dob'] = $e->dob;
+								$data['e_family_status'] = $e->family_status;
+								$data['e_family_position'] = $e->family_position;
+								$data['e_cell_id'] = $e->cell_id;
+								$data['e_cell_role'] = $e->cell_role;
+								$data['e_dept_id'] = $e->dept_id;
+								$data['e_dept_role'] = $e->dept_role;
+								$data['e_parent_id'] = $e->parent_id;
+								
 							}
 						}
 					}
