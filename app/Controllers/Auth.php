@@ -647,55 +647,12 @@ class Auth extends BaseController {
 
 
 		$data['email'] = $this->Crud->read_field('id', $log_id, 'user', 'email');
-		$data['tax_id'] = $this->Crud->read_field('user_id', $log_id, 'virtual_account', 'acc_no');
-		$data['fullname'] = $this->Crud->read_field('id', $log_id, 'user', 'fullname');
-        $data['sms'] = $this->Crud->read_field('id', $log_id, 'user', 'receive_message');
-        $data['address'] = $this->Crud->read_field('id', $log_id, 'user', 'address');
-        $data['territory'] = str_replace('_', ' ',$this->Crud->read_field('id', $log_id, 'user', 'territory'));
-        $utilitys = $this->Crud->read_field('id', $log_id, 'user', 'utility');
-        $id_cards = $this->Crud->read_field('id', $log_id, 'user', 'id_card');
-		$trade_id = $this->Crud->read_field('id', $log_id, 'user', 'trade');
-		$data['trade'] = $this->Crud->read_field('id', $trade_id, 'trade', 'name');
-		$passports = $this->Crud->read_field('id', $log_id, 'user', 'passport');
-        $data['phone'] = $this->Crud->read_field('id', $log_id, 'user', 'phone');
-		$data['duration'] = $this->Crud->read_field('id', $log_id, 'user', 'duration');
-		$data['lga_id'] = $this->Crud->read_field('id', $log_id, 'user', 'lga_id');
-		$data['state_id'] = $this->Crud->read_field('id', $log_id, 'user', 'state_id');
-		$data['country_id'] = $this->Crud->read_field('id', $log_id, 'user', 'country_id');
-		$qrcodes = $this->Crud->read_field('id', $log_id, 'user', 'qrcode');
-		$img_id = $this->Crud->read_field('id', $log_id, 'user', 'img_id');
-
-
-		$qrcode = '--';
-		// echo $qrcodes;
-		if(!empty($qrcodes) && file_exists($qrcodes)){
-			$qrcode = '<img height="150" src="'.site_url($qrcodes).'"> ';
-		}
-
-		$utility = 'No Utility Document Uploaded';
-		if(!empty($utilitys) && file_exists($utilitys)){
-			$utility = '<img height="150" src="'.site_url($utilitys).'"> ';
-		}
-
-		$id_card = 'No Valid ID Card Document Uploaded';
-		if(!empty($id_cards) && file_exists($id_cards)){
-			$id_card = '<img height="150" src="'.site_url($id_cards).'"> ';
-		}
-		
-		$passport = 'No Passport Uploaded';
-		if(!empty($passports) && file_exists($passports)){
-			$passport = '<img height="150" src="'.site_url($passports).'"> ';
-		}
-
-		$data['utility'] = $utility;
-		$data['id_card'] = $id_card;
-		$data['passport'] = $passport;
-		$data['qrcode'] = $qrcode;
+		$data['address'] = $this->Crud->read_field('id', $log_id, 'user', 'address');
+		$data['chat_handle'] = $this->Crud->read_field('id', $log_id, 'user', 'chat_handle');
+		$data['fullname'] = $this->Crud->read_field('id', $log_id, 'user', 'surname').' '.$this->Crud->read_field('id', $log_id, 'user', 'firstname');
+       	$data['phone'] = $this->Crud->read_field('id', $log_id, 'user', 'phone');
 		
 
-		$data['img_id'] = $passports;
-		// $data['img'] = $this->Crud->image($img_id, 'big');
-        
         $data['current_language'] = $this->session->get('current_language');
 		if($param1 == 'manage'){
 			return view('auth/profile_form', $data);

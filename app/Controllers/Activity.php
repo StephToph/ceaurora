@@ -13,10 +13,7 @@ class Activity extends BaseController {
 			return redirect()->to(site_url('auth'));
 		} 
 		$log_id = $this->session->get('td_id');
-		if($this->Crud->check2('id', $log_id, 'setup', 0, 'user')> 0)return redirect()->to(site_url('auth/security'));
-		if($this->Crud->check2('id', $log_id, 'trade', 0, 'user')> 0)return redirect()->to(site_url('auth/security'));
-		if($this->Crud->check2('id', $log_id, 'state_id', 0, 'user')> 0)return redirect()->to(site_url('auth/profile'));
-		if($this->Crud->check2('id', $log_id, 'country_id', 0, 'user')> 0)return redirect()->to(site_url('auth/profile'));
+		
 	   
         $mod = 'activity';
 
@@ -34,12 +31,10 @@ class Activity extends BaseController {
         $data['role_c'] = $role_c;
 		
         $data['current_language'] = $this->session->get('current_language');
-        $data['fullname'] = $this->Crud->read_field('id', $log_id, 'user', 'fullname');
+        $data['fullname'] = $this->Crud->read_field('id', $log_id, 'user', 'surname').' '.$this->Crud->read_field('id', $log_id, 'user', 'firstname');
         $data['email'] = $this->Crud->read_field('id', $log_id, 'user', 'email');
        $data['phone'] = $this->Crud->read_field('id', $log_id, 'user', 'phone');
         $data['reg_date'] = $this->Crud->read_field('id', $log_id, 'user', 'reg_date');
-        $country_id = $this->Crud->read_field('id', $log_id, 'user', 'country_id');
-        $data['country_id'] = $this->Crud->read_field('id', $country_id, 'country', 'name');
 		$table = 'activity';
 
         $form_link = site_url($mod);

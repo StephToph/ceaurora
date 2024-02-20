@@ -9,7 +9,7 @@
 <?=$this->endSection();?>
 
 <?=$this->section('content');?>
-<div class="nk-content" style="background-image: url(<?=site_url('assets/sitebk.png'); ?>);background-size: cover;">
+<div class="nk-content">
     <div class="container-fluid">
         <div class="nk-content-inner">
             <div class="nk-content-body">
