@@ -13,12 +13,12 @@ $this->Crud = new Crud();
         <div class="row">
             <div class="col-sm-12 text-center">
                 <h3><b><?=translate_phrase('Are you sure?');?></b></h3>
-                <input type="hidden" name="d_vendor_id" value="<?php if(!empty($d_id)){echo $d_id;} ?>" />
+                <input type="hidden" name="d_membership_id" value="<?php if(!empty($d_id)){echo $d_id;} ?>" />
             </div>
             
             <div class="col-sm-12 text-center">
                 <button class="btn btn-danger text-uppercase" type="submit">
-                    <i class="ri-delete-bin-4-line"></i> <?=translate_phrase('Yes - Delete'); ?>
+                    <i class="icon ni ni-trash"></i> <?=translate_phrase('Yes - Delete'); ?>
                 </button>
             </div>
         </div>

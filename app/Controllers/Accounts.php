@@ -1033,16 +1033,16 @@ class Accounts extends BaseController {
 					}
 
 					if($this->request->getMethod() == 'post'){
-						$del_id = $this->request->getVar('d_cell_id');
+						$del_id = $this->request->getVar('d_membership_id');
 						///// store activities
 						$by = $this->Crud->read_field('id', $log_id, 'user', 'firstname');
-						$code = $this->Crud->read_field('id', $del_id, 'cell', 'name');
-						$action = $by.' deleted Cell ('.$code.') Record';
+						$code = $this->Crud->read_field('id', $del_id, 'user', 'surname');
+						$action = $by.' deleted Membership ('.$code.') Record';
 
 						if($this->Crud->deletes('id', $del_id, $table) > 0) {
 							
 							$this->Crud->activity('user', $del_id, $action);
-							echo $this->Crud->msg('success', 'Cell Deleted');
+							echo $this->Crud->msg('success', 'Membership Deleted');
 							echo '<script>location.reload(false);</script>';
 						} else {
 							echo $this->Crud->msg('danger', 'Please try later');
@@ -1142,16 +1142,16 @@ class Accounts extends BaseController {
 					}
 
 					if($this->request->getMethod() == 'post'){
-						$del_id = $this->request->getVar('d_cell_id');
+						$del_id = $this->request->getVar('d_membership_id');
 						///// store activities
 						$by = $this->Crud->read_field('id', $log_id, 'user', 'firstname');
-						$code = $this->Crud->read_field('id', $del_id, 'cell', 'name');
-						$action = $by.' deleted Cell ('.$code.') Record';
+						$code = $this->Crud->read_field('id', $del_id, 'user', 'surname');
+						$action = $by.' deleted Membership ('.$code.') Record';
 
 						if($this->Crud->deletes('id', $del_id, $table) > 0) {
 							
 							$this->Crud->activity('user', $del_id, $action);
-							echo $this->Crud->msg('success', 'Cell Deleted');
+							echo $this->Crud->msg('success', 'Membership Deleted');
 							echo '<script>location.reload(false);</script>';
 						} else {
 							echo $this->Crud->msg('danger', 'Please try later');
@@ -1168,7 +1168,7 @@ class Accounts extends BaseController {
 							foreach($edit as $e) {
 								$data['e_id'] = $e->id;
 								$data['e_firstname'] = $e->firstname;
-								$data['e_surname'] = $e->surname;
+								$data['e_lastname'] = $e->surname;
 								$data['e_gender'] = $e->gender;
 								$data['e_othername'] = $e->othername;
 								$data['e_email'] = $e->email;
@@ -1377,13 +1377,14 @@ class Accounts extends BaseController {
 
 						if(empty($phone))$phone = '-';
 						if(empty($email))$email = '-';
+						if(empty($title))$title = '-';
 						
 						// add manage buttons
 						if ($role_u != 1) {
 							$all_btn = '';
 						} else {
 							$all_btn = '
-								<li><a href="javascript:;" class="text-info" pageTitle="Edit ' . $name . '" pageName="' . site_url($mod . '/manages/edit/' . $id) . '"><em class="icon ni ni-edit-alt"></em><span>'.translate_phrase('Edit').'</span></a></li>
+								<li><a href="' . site_url($mod . '/manages/edit/' . $id) . '" class="text-info" pageTitle="Edit ' . $name . '" pageName="' . site_url($mod . '/manages/edit/' . $id) . '"><em class="icon ni ni-edit-alt"></em><span>'.translate_phrase('Edit').'</span></a></li>
 								<li><a href="javascript:;" class="text-danger pop" pageTitle="Delete ' . $name . '" pageName="' . site_url($mod . '/manage/delete/' . $id) . '"><em class="icon ni ni-trash-alt"></em><span>'.translate_phrase('Delete').'</span></a></li>
 								
 								
