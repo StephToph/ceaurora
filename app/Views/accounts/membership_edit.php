@@ -30,7 +30,7 @@
                                 <div class="col-md-6 col-lg-4 col-xxl-3">
                                     <div class="form-group"><label class="form-label">Title</label>
                                         <div class="form-control-wrap">
-                                            <select class="form-select js-select2" id="title" data-placeholder="Select Title" required>
+                                            <select class="form-select js-select2" name="title" id="title" data-placeholder="Select Title" required>
                                                 <option value="">Select Title</option>
                                                 <option value="Brother">Brother</option>
                                                 <option value="Sister">Sister</option>
