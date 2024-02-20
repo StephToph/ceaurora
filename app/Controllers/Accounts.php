@@ -1243,7 +1243,7 @@ class Accounts extends BaseController {
 							$this->Crud->activity('user', $membership_id, $action);
 
 							echo $this->Crud->msg('success', 'Membership Updated');
-							echo '<script>location.reload(false);</script>';
+							echo '<script>window.location.replace("'.site_url('accounts/membership').'");</script>';
 						} else {
 							echo $this->Crud->msg('info', 'No Changes');	
 						}
@@ -1264,7 +1264,7 @@ class Accounts extends BaseController {
 								$this->Crud->activity('user', $ins_rec, $action);
 
 								echo $this->Crud->msg('success', 'Membership Created');
-								echo '<script>location.reload(false);</script>';
+								echo '<script>window.location.replace("'.site_url('accounts/membership').'");</script>';
 							} else {
 								echo $this->Crud->msg('danger', 'Please try later');	
 							}	
@@ -1286,7 +1286,13 @@ class Accounts extends BaseController {
 					$li = '<option value="">Select Deparment Role</option>';
 					if(!empty($dept_role)){
 						foreach(json_decode($dept_role) as $r => $val){
-							$li .= '<option value="'.$val.'">'.ucwords($val).'</option>';
+							$sel = '';
+							if(!empty($param3)){
+								if($param3 == $val){
+									$sel = 'selected';
+								}
+							}
+							$li .= '<option value="'.$val.'" '.$sel.'>'.ucwords($val).'</option>';
 						}
 					}
 				}
@@ -1307,7 +1313,13 @@ class Accounts extends BaseController {
 				$li = '<option value="">Select Cell Role</option>';
 				if(!empty($dept_role)){
 					foreach(json_decode($dept_role) as $r => $val){
-						$li .= '<option value="'.$val.'">'.ucwords($val).'</option>';
+						$sel = '';
+						if(!empty($param3)){
+							if($param3 == $val){
+								$sel = 'selected';
+							}
+						}
+						$li .= '<option value="'.$val.'" '.$sel.'>'.ucwords($val).'</option>';
 					}
 				}
 			
@@ -1402,7 +1414,7 @@ class Accounts extends BaseController {
 									<span class="text-dark">' . ucwords($chat_handle) . '</span>
 								</div>
 								<div class="nk-tb-col tb-col">
-									<span class="text-dark"><b>Email-> </b>' . ($email) .' <br><b>Phone-> </b>'.$phone.'</span>
+									<span class="text-dark"><b>Email -> </b>' . ($email) .' <br><b>Phone -> </b>'.$phone.'</span>
 								</div>
 								<div class="nk-tb-col tb-col-md">
 									<span class="text-dark">' . ($title) . '</span>

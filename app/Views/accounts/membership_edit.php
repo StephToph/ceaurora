@@ -30,6 +30,7 @@
                             
                             <?php echo form_open_multipart($form_link, array('id'=>'bb_ajax_form', 'class'=>'')); ?>
                             <div class="row gy-4">
+                                <input type="hidden" name="membership_id" value="<?php if(!empty($e_id)){echo $e_id;}?>">
                                 <div class="col-md-6 col-lg-4 col-xxl-3">
                                     <div class="form-group"><label class="form-label">Title</label>
                                         <div class="form-control-wrap">
@@ -132,9 +133,14 @@
                                 </div>
 
                                 <?php
-                                    $disp = '';
+                                    $disp = 'none';
+                                    if(!empty($e_family_position)){
+                                        if($e_family_position == 'Child'){
+                                            $disp = 'block';
+                                        }
+                                    }
                                 ?>
-                                <div class="col-md-6 col-lg-4 col-xxl-3" id="parent_resp" style="display:none;">
+                                <div class="col-md-6 col-lg-4 col-xxl-3" id="parent_resp" style="display:<?=$disp;?>;">
                                     <div class="form-group"><label class="form-label">Parent</label>
                                         <div class="form-control-wrap">
                                             <select class="form-select js-select2" name="parent_id"
@@ -166,7 +172,13 @@
                                                     $parent  = $this->Crud->read_order('dept', 'name', 'asc');
                                                     if(!empty($parent)){
                                                         foreach($parent as $p){
-                                                            echo '<option value="'.$p->id.'">'.ucwords($p->name).'</option>';
+                                                            $sel = '';
+                                                            if(!empty($e_dept_id)){
+                                                                if($e_dept_id == $p->id){
+                                                                    $sel = 'selected';
+                                                                }
+                                                            }
+                                                            echo '<option value="'.$p->id.'" '.$sel.'>'.ucwords($p->name).'</option>';
                                                         }
                                                     }
                                                 ?>
@@ -174,7 +186,21 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-6 col-lg-4 col-xxl-3" id="dept_resp" style="display:none;">
+
+                                <?php
+                                    $dept_roles = 'none';
+                                    $depts_roles = '';
+                                    if(!empty($e_dept_id)){
+                                        $dept_roles = 'block';
+                                        
+                                    }
+                                    $cell_roles = 'none';
+                                    if(!empty($e_cell_id)){
+                                        $cell_roles = 'block';
+                                        
+                                    }
+                                ?>
+                                <div class="col-md-6 col-lg-4 col-xxl-3" id="dept_resp" style="display:<?=$dept_roles;?>;">
                                     <div class="form-group"><label class="form-label">Department Role</label>
                                         <div class="form-control-wrap">
                                             <select class="form-select js-select2" id="dept_role_id" name="dept_role_id"
@@ -195,7 +221,13 @@
                                                     $parent  = $this->Crud->read_order('cells', 'name', 'asc');
                                                     if(!empty($parent)){
                                                         foreach($parent as $p){
-                                                            echo '<option value="'.$p->id.'">'.ucwords($p->name).'</option>';
+                                                            $sel = '';
+                                                            if(!empty($e_cell_id)){
+                                                                if($e_cell_id == $p->id){
+                                                                    $sel = 'selected';
+                                                                }
+                                                            }
+                                                            echo '<option value="'.$p->id.'" '.$sel.'>'.ucwords($p->name).'</option>';
                                                         }
                                                     }
                                                 ?>
@@ -203,7 +235,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-6 col-lg-4 col-xxl-3" id="cell_resp" style="display:none;">
+                                <div class="col-md-6 col-lg-4 col-xxl-3" id="cell_resp" style="display:<?=$cell_roles; ?>;">
                                     <div class="form-group"><label class="form-label">Cell Role</label>
                                         <div class="form-control-wrap">
                                             <select class="form-select js-select2" id="cell_role_id" name="cell_role_id"
@@ -245,11 +277,22 @@
     $(function() {
         // load('', '');
     });
-
-    function dept_role(){
+    <?php 
+        if(!empty($e_dept_role)){?>
+            var dept = '<?=$e_dept_role; ?>';
+            setTimeout(dept_role(dept), 2000);
+        <?php }
+    ?>
+     <?php 
+        if(!empty($e_cell_role)){?>
+            var cell = '<?=$e_cell_role; ?>';
+            setTimeout(cell_role(cell), 2000);
+        <?php }
+    ?>
+    function dept_role(dept){
         var dept_id = $('#dept_id').val();
         $.ajax({
-            url: site_url + 'accounts/membership/get_dept_role/' + dept_id,
+            url: site_url + 'accounts/membership/get_dept_role/' + dept_id + '/'+ dept,
             type: 'get',
             success: function (data) {
                 var dt = JSON.parse(data);
@@ -260,10 +303,10 @@
         });
     }
 
-    function cell_role(){
+    function cell_role(cell){
         var cell_id = $('#cell_id').val();
         $.ajax({
-            url: site_url + 'accounts/membership/get_cell_role/' + cell_id,
+            url: site_url + 'accounts/membership/get_cell_role/' + cell_id+ '/'+ cell,
             type: 'get',
             success: function (data) {
                 var dt = JSON.parse(data);
