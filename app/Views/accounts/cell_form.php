@@ -32,15 +32,45 @@ $this->Crud = new Crud();
 
         
         <div class="row">
-            <input type="hidden" name="dept_id" value="<?php if(!empty($e_id)){echo $e_id;} ?>" />
+            <input type="hidden" name="cell_id" value="<?php if(!empty($e_id)){echo $e_id;} ?>" />
             <div class="col-sm-12 mb-3">
                 <div class="form-group">
                     <label for="name">*<?=translate_phrase('Name'); ?></label>
                     <input class="form-control" type="text" id="name" name="name" value="<?php if(!empty($e_name)) {echo $e_name;} ?>" required>
                 </div>
             </div>
+            <div class="col-sm-12 mb-3">
+                <div class="form-group">
+                    <label for="name">*<?=translate_phrase('Location'); ?></label>
+                    <input class="form-control" type="text" id="location" name="location" value="<?php if(!empty($e_location)) {echo $e_location;} ?>" required>
+                </div>
+            </div>
+            
         </div>
-                    <label for="name">*<?=translate_phrase('Role');?></label>
+        <div class="row" id="conatiners">
+            <div class="col-sm-6 mb-3">
+                <div class="form-group">
+                    <label for="name">*<?=translate_phrase('Meeting Day'); ?></label>
+                    <select class="form-select2 js-select2">
+                        <option value="">Select</option>
+                        <option value="Sunday">Sunday</option>
+                        <option value="Monday">Monday</option>
+                        <option value="Tuesday">Tuesday</option>
+                        <option value="Wednesday">Wednesday</option>
+                        <option value="Thursday">Thursday</option>
+                        <option value="Friday">Friday</option>
+                        <option value="Saturday">Saturday</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-sm-6 mb-3">
+                <div class="form-group">
+                    <label for="name">*<?=translate_phrase('Meeting Time'); ?></label>
+                    <input class="form-control" type="time" id="location" name="time[]" value="<?php if(!empty($e_location)) {echo $e_location;} ?>" required>
+                </div>
+            </div>
+        </div>
+        <label for="name">*<?=translate_phrase('Cell Role');?></label>
         <div class="row" id="container">
             <?php if(!empty($e_roles)){$a = 0;
                 foreach($e_roles as $k => $val){
@@ -51,7 +81,7 @@ $this->Crud = new Crud();
                     ?>
                 <div class="col-sm-12 mb-3 ">
                     <div class="form-group input-group">
-                        <input class="form-control" type="text" id="role" placeholder="Enter Department Roles" name="roles[]" value="<?php if(!empty($val)) {echo $val;} ?>" <?=$req; ?>>
+                        <input class="form-control" type="text" id="role" placeholder="Enter Cell Roles" name="roles[]" value="<?php if(!empty($val)) {echo $val;} ?>" <?=$req; ?>>
                         <button <?=$r_val; ?>  class="btn btn-icon btn-outline-danger deleteBtn" type="button"><i class="icon ni ni-trash"></i> </button>
                     </div>
                     
@@ -59,7 +89,7 @@ $this->Crud = new Crud();
            <?php $a++; }} else {?>
                 <div class="col-sm-12 mb-3 ">
                     <div class="form-group input-group">
-                        <input class="form-control" type="text" id="role" placeholder="Enter Department Roles" name="roles[]" value="<?php if(!empty($val)) {echo $val;} ?>" required>
+                        <input class="form-control" type="text" id="role" placeholder="Enter Cell Roles" name="roles[]" value="<?php if(!empty($val)) {echo $val;} ?>" required>
                         <button style="display:none;" class="btn btn-icon btn-outline-danger deleteBtn" type="button"><i class="icon ni ni-trash"></i> </button>
                     </div>
                     
