@@ -3,6 +3,7 @@
     $this->Crud = new Crud();
     
     $username = $this->Crud->read_field('id', $log_id, 'user', 'surname').' '.$this->Crud->read_field('id', $log_id, 'user', 'firstname');
+    $log_name = $this->Crud->read_field('id', $log_id, 'user', 'surname').' '.$this->Crud->read_field('id', $log_id, 'user', 'firstname');
     $email = $this->Crud->read_field('id', $log_id, 'user', 'email');
     $log_role_id = $this->Crud->read_field('id', $log_id, 'user', 'role_id');
 	$log_role = strtolower($this->Crud->read_field('id', $log_role_id, 'access_role', 'name'));
@@ -560,8 +561,8 @@
 </body>
 
 
-    <script src="<?=site_url(); ?>assets/js/bundle.js?ver=3.2.3"></script>
-    <script src="<?=site_url(); ?>assets/js/scripts.js?ver=3.2.3"></script>
+    <script src="<?=site_url(); ?>assets/js/bundlee5ca.js?ver=3.2.3"></script>
+    <script src="<?=site_url(); ?>assets/js/scriptse5ca.js?ver=3.2.3"></script>
    
     <script>
          var site_url = '<?=site_url(); ?>';
