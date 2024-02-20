@@ -123,8 +123,8 @@
                                 <div class="col-md-6 col-lg-4 col-xxl-3">
                                     <div class="form-group"><label class="form-label">Family Unit Position</label>
                                         <div class="form-control-wrap">
-                                            <select class="form-select js-select2" name="family_position"
-                                                data-placeholder="Select Position">
+                                            <select class="form-select js-select2" id="family_position" name="family_position"
+                                                data-placeholder="Select Position" onchange="posit();">
                                                 <option value="">Select</option>
                                                 <option value="Child">Child
                                                 </option>
@@ -134,23 +134,27 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-6 col-lg-4 col-xxl-3">
-                                    <div class="form-group"><label class="form-label">Select Room
-                                            Type</label>
-                                        <div class="form-control-wrap"><select
-                                                class="form-select js-select2">
-                                                <option value="default_option">Select Room Type</option>
-                                                <option value="option_select_room_type">Delux</option>
-                                                <option value="option_select_room_type">Super Delux
-                                                </option>
-                                                <option value="option_select_room_type">Single</option>
-                                                <option value="option_select_room_type">Double</option>
-                                            </select></div>
+                                <div class="col-md-6 col-lg-4 col-xxl-3" id="parent_resp" style="display:none;">
+                                    <div class="form-group"><label class="form-label">Parent</label>
+                                        <div class="form-control-wrap">
+                                            <select class="form-select js-select2" name="parent_id"
+                                                data-placeholder="Select Parent">
+                                                <option value="">Select</option>
+                                                <?php
+                                                    $parent  = $this->Crud->read_single_order('family_position', 'Parent', 'user', 'surname', 'asc');
+                                                    if(!empty($parent)){
+                                                        foreach($parent as $p){
+                                                            echo '<option value="'.$p->id.'">'.ucwords($p->surname.' '.$p->firstname).'</option>';
+                                                        }
+                                                    }
+                                                ?>
+                                            </select>
+                                        </div>
                                     </div>
                                 </div>
                                 
                                 <div class="col-sm-12 mb-3 text-center">
-                                    <div class="form-group"><button type="submit"
+                                    <div class="form-group  mt-4"><button type="submit"
                                             class="btn btn-primary">Save Membership</button></div>
                                 </div>
                             </div>
@@ -173,6 +177,15 @@
     $(function() {
         // load('', '');
     });
+
+    function posit(){
+        var position = $('#family_position').val();
+        if(position == 'Child'){
+            $('#parent_resp').show(500);
+        } else{
+            $('#parent_resp').hide(500);
+        }
+    }
     function loads() {
         var start_date = $('#start_date').val();
         var end_date = $('#end_date').val();
