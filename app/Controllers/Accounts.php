@@ -841,9 +841,10 @@ class Accounts extends BaseController {
 			
 			$items = '
 				<div class="nk-tb-item nk-tb-head">
-					<div class="nk-tb-col"><span class="sub-text">'.translate_phrase('Name').'</span></div>
-					<div class="nk-tb-col"><span class="sub-text">'.translate_phrase('Role(s)').'</span></div>
-					<div class="nk-tb-col"><span class="sub-text">'.translate_phrase('Day/Time').'</span></div>
+					<div class="nk-tb-col"><span class="sub-text text-dark">'.translate_phrase('Name').'</span></div>
+					<div class="nk-tb-col nk-tb-col-md"><span class="sub-text text-dark">'.translate_phrase('Location').'</span></div>
+					<div class="nk-tb-col"><span class="sub-text text-dark">'.translate_phrase('Role(s)').'</span></div>
+					<div class="nk-tb-col nk-tb-col-md"><span class="sub-text text-dark">'.('Day/Time').'</span></div>
 					<div class="nk-tb-col nk-tb-col-tools">
 						<ul class="nk-tb-actions gx-1 my-n1">
 							
@@ -861,11 +862,11 @@ class Accounts extends BaseController {
 				$item = '<div class="text-center text-muted">'.translate_phrase('Session Timeout! - Please login again').'</div>';
 			} else {
 				
-				$all_rec = $this->Crud->filter_cell('', '', '', $log_id, $search);
+				$all_rec = $this->Crud->filter_cell('', '', $search);
                 // $all_rec = json_decode($all_rec);
 				if(!empty($all_rec)) { $counts = count($all_rec); } else { $counts = 0; }
 
-				$query = $this->Crud->filter_cell($limit, $offset, '', $log_id, $search);
+				$query = $this->Crud->filter_cell($limit, $offset, $search);
 				$data['count'] = $counts;
 				
 
@@ -873,6 +874,8 @@ class Accounts extends BaseController {
 					foreach ($query as $q) {
 						$id = $q->id;
 						$name = $q->name;
+						$location = $q->location;
+						$time = $q->time;
 						$roles = $q->roles;
 						$rolesa = json_decode($roles);
 						$rols = '';
@@ -880,6 +883,11 @@ class Accounts extends BaseController {
 							foreach($rolesa as $r => $val){
 								$rols .= $val.', ';
 							}
+						}
+
+						$times = '<span class="text-danger">No Meeting Time</span>';
+						if(!empty($time)){
+							$times = '<a href="javascript:;" class="text-primary pop" pageTitle="View Time " pageName="' . site_url($mod . '/manage/view/' . $id) . '"><em class="icon ni ni-eye"></em> <span>'.translate_phrase('View Meeting Time').'</span></a>';
 						}
 						// add manage buttons
 						if ($role_u != 1) {
@@ -900,8 +908,14 @@ class Accounts extends BaseController {
 										<span class="tb-lead">' . ucwords($name) . ' </span>
 									</div>
 								</div>
+								<div class="nk-tb-col tb-col-md">
+									<span class="text-dark">' . ucwords($location) . '</span>
+								</div>
 								<div class="nk-tb-col tb-col">
 									<span class="text-dark"><b>' . ucwords(rtrim($rols, ', ')) . '</b></span>
+								</div>
+								<div class="nk-tb-col tb-col-md">
+									<span class="text-dark">' . ($times) . '</span>
 								</div>
 								<div class="nk-tb-col nk-tb-col-tools">
 									<ul class="nk-tb-actions gx-1">

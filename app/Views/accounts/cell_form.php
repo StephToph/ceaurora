@@ -24,6 +24,42 @@ $this->Crud = new Crud();
         </div>
     <?php } ?>
 
+    
+<?php if($param2 == 'view'){?>
+    <table id="dtable" class="table table-striped">
+        <thead>
+            <tr>
+                <th>Day</th>
+                <th>Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php 
+                $pays = $this->Crud->read_single('id', $param3, 'cells');
+
+                $total = 0;
+                if(!empty($pays)){
+                    foreach($pays as $p){
+                        $time = $p->time;
+                        if(!empty(json_decode($time))){
+                            foreach(json_decode($time) as $t => $val){
+                       
+                        ?>
+                            <tr>
+                                <td><?=$t ?></td>
+                                <td><?=date('h:iA', strtotime($val)); ?></td>
+                            </tr>
+                   <?php
+                            }
+                        }
+                    }
+                }
+                
+            ?>
+        </tbody>
+    </table>
+
+<?php } ?>
     <!-- insert/edit view -->
     <?php if($param2 == 'edit' || $param2 == '') { ?>
         <div class="row">
@@ -71,6 +107,7 @@ $this->Crud = new Crud();
                                 </select>
                             </div>
                         </div>
+
                         <div class="col-sm-8 mb-3">
                                 <label for="name">*<?=translate_phrase('Meeting Time'); ?></label>
                             <div class="form-group input-group">
@@ -160,10 +197,6 @@ $this->Crud = new Crud();
         div.querySelector('input').value = '';
         div.querySelector('input').removeAttribute('required');
         
-        
-            // Initialize Select2 for the cloned select element
-        clonedRow.find('.js-select2').select2();
-
         // Show delete button in the cloned div
         div.querySelector('.deleteBtn').style.display = 'inline-block';
         

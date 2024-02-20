@@ -1677,6 +1677,7 @@ class Crud extends Model {
 		
         if(!empty($search)) {
             $builder->like('name', $search);
+            $builder->orLike('location', $search, 'both');
         }
 
 		
