@@ -28,7 +28,7 @@ class Analytics extends BaseController {
         $data['current_language'] = $this->session->get('current_language');
         $data['role'] = $role;
         $data['role_c'] = $role_c;
-        $data['title'] = translate_phrase('Analytics').' | '.app_name;
+        $data['title'] = translate_phrase('Analytics').' - '.app_name;
         $data['page_active'] = $mod;
         return view('analytics', $data);
     }

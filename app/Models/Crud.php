@@ -1641,9 +1641,9 @@ class Crud extends Model {
     }
 
 	
-	public function filter_trade($limit='', $offset='', $search='') {
+	public function filter_dept($limit='', $offset='', $search='') {
         $db = db_connect();
-        $builder = $db->table('trade');
+        $builder = $db->table('dept');
 
         // build query
 		$builder->orderBy('id', 'asc');

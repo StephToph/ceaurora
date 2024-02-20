@@ -36,7 +36,7 @@ class Dashboard extends BaseController {
         $data['current_language'] = $this->session->get('current_language');
         $data['role'] = $role;
         $data['role_c'] = $role_c;
-        $data['title'] = translate_phrase('Dashboard').' | '.app_name;
+        $data['title'] = translate_phrase('Dashboard').' - '.app_name;
         $data['page_active'] = $mod;
         return view('dashboard', $data);
     }
@@ -67,7 +67,7 @@ class Dashboard extends BaseController {
         $data['current_language'] = $this->session->get('current_language');
         $data['role'] = $role;
         $data['role_c'] = $role_c;
-        $data['title'] = translate_phrase('Frequently Asked Questions').' | '.app_name;
+        $data['title'] = translate_phrase('Frequently Asked Questions').' - '.app_name;
         $data['page_active'] = $mod;
         return view('designs/faq', $data);
     }
@@ -250,7 +250,7 @@ class Dashboard extends BaseController {
 			return view($mod.'_form', $data);
 		} else { // view for main page
 			
-			$data['title'] = translate_phrase('Tax Status Check').' | '.app_name;
+			$data['title'] = translate_phrase('Tax Status Check').' - '.app_name;
 			$data['page_active'] = 'dashboard/tax_check';
 			return view($mod, $data);
 		}

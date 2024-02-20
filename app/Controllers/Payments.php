@@ -830,7 +830,7 @@ class Payments extends BaseController {
         if($param1 == 'manage'){
             return view('payments/tax_form', $data);
         } else {
-            $data['title'] = translate_phrase('Tax Invoices').' | '.app_name;
+            $data['title'] = translate_phrase('Tax Invoices').' - '.app_name;
             $data['page_active'] = $mod;
             return view('payments/tax', $data);
         }
@@ -1014,7 +1014,7 @@ class Payments extends BaseController {
         if($param1 == 'scan'){
             return view('payments/form', $data);
         } else {
-            $data['title'] = translate_phrase('Transaction History').' | '.app_name;
+            $data['title'] = translate_phrase('Transaction History').' - '.app_name;
             $data['page_active'] = $mod;
             return view('payments/transaction', $data);
         }
@@ -1279,7 +1279,7 @@ class Payments extends BaseController {
         
         $data['current_language'] = $this->session->get('current_language');
         $data['page_active'] = $mod;
-        $data['title'] = translate_phrase('Payment Success').' | '.app_name;
+        $data['title'] = translate_phrase('Payment Success').' - '.app_name;
         return view('payments/success', $data);
     }
 
@@ -1309,7 +1309,7 @@ class Payments extends BaseController {
         
         $data['current_language'] = $this->session->get('current_language');
         $data['page_active'] = $mod;
-        $data['title'] = translate_phrase('Payment Receipt').' | '.app_name;
+        $data['title'] = translate_phrase('Payment Receipt').' - '.app_name;
         return view('payments/receipt', $data);
     }
 
@@ -1336,7 +1336,7 @@ class Payments extends BaseController {
         
         
         $data['current_language'] = $this->session->get('current_language');
-        $data['title'] = translate_phrase('Confirm Payment').' | '.app_name;
+        $data['title'] = translate_phrase('Confirm Payment').' - '.app_name;
         return view('payments/confirm', $data);
     }
 

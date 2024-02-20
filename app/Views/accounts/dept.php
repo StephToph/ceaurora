@@ -16,9 +16,9 @@
                 <div class="nk-block-head nk-block-head-sm">
                     <div class="nk-block-between">
                         <div class="nk-block-head-content">
-                            <h3 class="nk-block-title page-title"><?=translate_phrase('Personal Account Lists');?></h3>
+                            <h3 class="nk-block-title page-title"><?=translate_phrase('Department');?></h3>
                             <div class="nk-block-des text-soft">
-                                <p><?=translate_phrase('You have total');?> <span id="counta"></span> <?=translate_phrase('personal account(s).');?></p>
+                                <p><?=translate_phrase('You have total');?> <span id="counta"></span> <?=translate_phrase('department(s).');?></p>
                             </div>
                         </div><!-- .nk-block-head-content -->
                     </div><!-- .nk-block-between -->
@@ -29,73 +29,18 @@
                             <div class="card-inner position-relative card-tools-toggle">
                                 <div class="card-title-group">
                                     <div class="card-tools">
-                                        <ul class="btn-toolbar gx-1">
-                                            <li>
-                                                <div class="col-sm-12 mb-1">
-                                                    <div class="row">
-                                                        <div class="col-6 col-sm-6"> <label for="name" class="small text-muted"><?=translate_phrase('START DATE');?></label>
-                                                            <input type="date" class="form-control" name="start_date" id="start_date" oninput="loads()" style="border:1px solid #ddd;">
-                                                        </div>
-                                                        <div class="col-6 col-sm-6"> <label for="name" class="small text-muted"><?=translate_phrase('END DATE');?></label>
-                                                            <input type="date" class="form-control" name="end_date" id="end_date" oninput="loads()" style="border:1px solid #ddd;">
-                                                        </div>
-                                                        <div class="col-md-12" style="color: transparent;"><span id="date_resul"></span></div>
-                                                    </div>
-                                                </div>
-                
-                                            </li>
-                                        </ul>
+                                        
                                     </div><!-- .card-tools -->
                                     <div class="card-tools me-n1">
                                         <ul class="btn-toolbar gx-1">
                                             <li>
-                                                <a href="#" class="btn btn-icon search-toggle toggle-search" data-target="search"><em class="icon ni ni-search"></em></a>
-                                            </li><!-- li -->
+                                                <a href="javascript:;" class="btn btn-icon search-toggle toggle-search" data-target="search"><em class="icon ni ni-search"></em></a>
+                                            </li>
                                             <li class="btn-toolbar-sep"></li><!-- li -->
                                             <li>
-                                                <div class="toggle-wrap">
-                                                    <a href="#" class="btn btn-icon btn-trigger toggle" data-target="cardTools"><em class="icon ni ni-menu-right"></em></a>
-                                                    <div class="toggle-content" data-content="cardTools">
-                                                        <ul class="btn-toolbar gx-1">
-                                                            <li class="toggle-close">
-                                                                <a href="#" class="btn btn-icon btn-trigger toggle" data-target="cardTools"><em class="icon ni ni-arrow-left"></em></a>
-                                                            </li>
-                                                            <li>
-                                                                <div class="dropdown">
-                                                                    <a href="#" class="btn btn-trigger btn-icon dropdown-toggle" data-bs-toggle="dropdown">
-                                                                        <div class="dot dot-primary"></div>
-                                                                        <em class="icon ni ni-filter-alt"></em>
-                                                                    </a>
-                                                                    <div class="filter-wg dropdown-menu dropdown-menu-xl dropdown-menu-end">
-                                                                        <div class="dropdown-head">
-                                                                            <span class="sub-title dropdown-title"><?=translate_phrase('Filter Customers');?></span>
-                                                                            <div class="dropdown">
-                                                                                <a href="#" class="btn btn-sm btn-icon">
-                                                                                    <em class="icon ni ni-more-h"></em>
-                                                                                </a>
-                                                                            </div>
-                                                                        </div>
-                                                                        <div class="dropdown-body dropdown-body-rg">
-                                                                            <div class="row gx-6 gy-3">
-                                                                                <div class="col-12">
-                                                                                    <div class="form-group">
-                                                                                        <label class="overline-title overline-title-alt"><?=translate_phrase('Active Status');?></label>
-                                                                                        <select class="form-select js-select2" data-search="on" id="status" onchange="load('', '')">
-                                                                                            <option value="all"><?=translate_phrase('All Status');?></option>
-                                                                                            <option value="1"><?=translate_phrase('Activated');?></option>
-                                                                                            <option value="0"><?=translate_phrase('Banned');?></option>
-                                                                                        </select>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div><!-- .filter-wg -->
-                                                                </div><!-- .dropdown -->
-                                                            </li><!-- li -->
-                                                        </ul><!-- .btn-toolbar -->
-                                                    </div><!-- .toggle-content -->
-                                                </div><!-- .toggle-wrap -->
+                                                <a href="javascript:;" pageTitle="Add Department" class="btn btn-outline-primary btn-icon pop" pageName="<?=site_url('accounts/dept/manage'); ?>"><em class="icon ni ni-plus-c"></em></a>
                                             </li><!-- li -->
+                                           
                                         </ul><!-- .btn-toolbar -->
                                     </div><!-- .card-tools -->
                                 </div><!-- .card-title-group -->
@@ -103,7 +48,7 @@
                                     <div class="card-body">
                                         <div class="search-content">
                                             <a href="#" class="search-back btn btn-icon toggle-search" data-target="search"><em class="icon ni ni-arrow-left"></em></a>
-                                            <input type="text" class="form-control border-transparent form-focus-none" placeholder="Search by user or email" oninput="load('', '')" id="search">
+                                            <input type="text" class="form-control border-transparent form-focus-none" placeholder="Search by name" oninput="load('', '')" id="search">
                                         </div>
                                     </div>
                                 </div><!-- .card-search -->
@@ -130,33 +75,8 @@
     $(function() {
         load('', '');
     });
-    function virtual_create(id){
-        $('#virtual_resp_'+id).html('<div class="col-sm-12 text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>');
-        $.ajax({
-            url: site_url + 'dashboard/create_virtuals/'+id,
-            type: 'post',
-            success: function (data) {
-                $('#virtual_resp_'+id).html(data);
-               
-            }
-        });
-    }
-
-    function loads() {
-        var start_date = $('#start_date').val();
-        var end_date = $('#end_date').val();
-
-        if(!start_date || !end_date){
-            $('#date_resul').css('color', 'Red');
-            $('#date_resul').html('<?=translate_phrase('Enter Start and End Date');?>!!');
-        } else if(start_date > end_date){
-            $('#date_resul').css('color', 'Red');
-            $('#date_resul').html('<?=translate_phrase('Start Date cannot be greater');?>!');
-        } else {
-            $('#date_resul').html('');
-            load('', '');
-        }
-    }
+   
+   
     function load(x, y) {
         var more = 'no';
         var methods = '';
@@ -171,19 +91,14 @@
             $('#loadmore').html('<div class="col-sm-12 text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>');
         }
 
-        var start_date = $('#start_date').val();
-        var end_date = $('#end_date').val();
-
-        var state_id = $('#state_id').val();
-        var status = $('#status').val();
-        var ref_status = $('#ref_status').val();
+       
         var search = $('#search').val();
         //alert(status);
 
         $.ajax({
-            url: site_url + 'accounts/personal/load' + methods,
+            url: site_url + 'accounts/dept/load' + methods,
             type: 'post',
-            data: { state_id: state_id, search: search ,start_date: start_date,end_date: end_date, status: status  , ref_status: ref_status },
+            data: { search: search },
             success: function (data) {
                 var dt = JSON.parse(data);
                 if (more == 'no') {

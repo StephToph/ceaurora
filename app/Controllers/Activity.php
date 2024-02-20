@@ -158,7 +158,7 @@ class Activity extends BaseController {
 			//$data['order_sort'] = '0, "asc"'; // default ordering (0, 'asc')
 			//$data['no_sort'] = '5,6'; // sort disable columns (1,3,5)
 		
-			$data['title'] = translate_phrase('Activity').' | '.app_name;
+			$data['title'] = translate_phrase('Activity').' - '.app_name;
 			$data['page_active'] = $mod;
 
 			return view($mod.'/list', $data);

@@ -45,7 +45,7 @@ class Auth extends BaseController {
         }
         
         $data['current_language'] = $this->session->get('current_language');
-        $data['title'] =  $multilingual->_ph('Sign In').' | '.app_name;
+        $data['title'] =  $multilingual->_ph('Sign In').' - '.app_name;
         $data['msg'] = $msg;
         return view('auth/login', $data);
     }
@@ -109,7 +109,7 @@ class Auth extends BaseController {
         }
         
         $data['current_language'] = $this->session->get('current_language');
-        $data['title'] =  $multilingual->_ph('Sign In').' | '.app_name;
+        $data['title'] =  $multilingual->_ph('Sign In').' - '.app_name;
         $data['msg'] = $msg;
         return view('auth/login', $data);
     }
@@ -198,7 +198,7 @@ class Auth extends BaseController {
 		}
         
         $data['current_language'] = $this->session->get('current_language');
-        $data['title'] = translate_phrase('Reset Password').' | '.app_name;
+        $data['title'] = translate_phrase('Reset Password').' - '.app_name;
         return view('auth/forgot', $data);
     }
 	
@@ -309,7 +309,7 @@ class Auth extends BaseController {
 		
         $data['current_language'] = $this->session->get('current_language');
 		$data['user_id'] = $log_id;
-        $data['title'] = translate_phrase('One Time Password').' | '.app_name;
+        $data['title'] = translate_phrase('One Time Password').' - '.app_name;
         return view('auth/otp', $data);
     }
 
@@ -498,7 +498,7 @@ class Auth extends BaseController {
         }
         
         $data['current_language'] = $this->session->get('current_language');
-        $data['title'] = translate_phrase('Register').' | '.app_name;
+        $data['title'] = translate_phrase('Register').' - '.app_name;
         return view('auth/register', $data);
     }
 
@@ -700,7 +700,7 @@ class Auth extends BaseController {
 		if($param1 == 'manage'){
 			return view('auth/profile_form', $data);
 		} else {
-			$data['title'] = translate_phrase('Profile').' | '.app_name;
+			$data['title'] = translate_phrase('Profile').' - '.app_name;
 			$data['page_active'] = 'profile';
 			return view('auth/profile', $data);
 
@@ -787,7 +787,7 @@ class Auth extends BaseController {
 		$data['qrcode'] = $qrcode;
 		
 
-		$data['title'] = translate_phrase('Profile View').' | '.app_name;
+		$data['title'] = translate_phrase('Profile View').' - '.app_name;
 		$data['page_active'] = 'auth/profile_view';
 		return view('auth/profile_view', $data);
 
@@ -900,7 +900,7 @@ class Auth extends BaseController {
 		if($param1 == 'manage'){
 			return view('auth/profile_form', $data);
 		} else {
-			$data['title'] = translate_phrase('Payment Setup').' | '.app_name;
+			$data['title'] = translate_phrase('Payment Setup').' - '.app_name;
 			$data['page_active'] = 'auth/security';
 			return view('auth/security', $data);
 
@@ -962,7 +962,7 @@ class Auth extends BaseController {
 		if($param1 == 'manage'){
 			return view('auth/profile_form', $data);
 		} else {
-			$data['title'] = translate_phrase('Bank Account Setup').' | '.app_name;
+			$data['title'] = translate_phrase('Bank Account Setup').' - '.app_name;
 			$data['page_active'] = 'auth/bank';
 			return view('auth/bank', $data);
 
@@ -1003,7 +1003,7 @@ class Auth extends BaseController {
 		
         $data['current_language'] = $this->session->get('current_language');
 
-		$data['title'] =  translate_phrase('Change Password').' | '.app_name;
+		$data['title'] =  translate_phrase('Change Password').' - '.app_name;
 		$data['page_active'] = 'profile';
 
 		return view('profile/password', $data);

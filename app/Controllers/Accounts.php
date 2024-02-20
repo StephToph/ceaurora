@@ -401,7 +401,7 @@ class Accounts extends BaseController {
 			$data['order_sort'] = '0, "asc"'; // default ordering (0, 'asc')
 			$data['no_sort'] = '1,6'; // sort disable columns (1,3,5)
 		
-			$data['title'] = translate_phrase('Administrators').' | '.app_name;
+			$data['title'] = translate_phrase('Administrators').' - '.app_name;
 			$data['page_active'] = $mod;
 			return view($mod, $data);
 		}
@@ -596,22 +596,12 @@ class Accounts extends BaseController {
             if(empty($limit)) {$limit = $rec_limit;}
 			if(empty($offset)) {$offset = 0;}
 			
-			if(!empty($this->request->getVar('start_date'))){$start_date = $this->request->getVar('start_date');}else{$start_date = '';}
-			if(!empty($this->request->getVar('end_date'))){$end_date = $this->request->getVar('end_date');}else{$end_date = '';}
-
-			if(!empty($this->request->getPost('state_id'))) { $state_id = $this->request->getPost('state_id'); } else { $state_id = ''; }
-			if(!empty($this->request->getPost('status'))) { $status = $this->request->getPost('status'); } else { $status = ''; }
-			if(!empty($this->request->getPost('ref_status'))) { $ref_status = $this->request->getPost('ref_status'); } else { $ref_status = ''; }
 			$search = $this->request->getPost('search');
-
-			if(empty($ref_status))$ref_status = 0;
+			
 			$items = '
 				<div class="nk-tb-item nk-tb-head">
-					<div class="nk-tb-col"><span class="sub-text">'.translate_phrase('Accounts').'</span></div>
-					<div class="nk-tb-col"><span class="sub-text">'.translate_phrase('Tax ID').'</span></div>
-					<div class="nk-tb-col tb-col-mb"><span class="sub-text">'.translate_phrase('Territory').'</span></div>
-					<div class="nk-tb-col tb-col-md"><span class="sub-text">'.translate_phrase('Trade Line').'</span></div>
-					<div class="nk-tb-col tb-col-md"><span class="sub-text">'.translate_phrase('Status').'</span></div>
+					<div class="nk-tb-col"><span class="sub-text">'.translate_phrase('Name').'</span></div>
+					<div class="nk-tb-col"><span class="sub-text">'.translate_phrase('Role(s)').'</span></div>
 					<div class="nk-tb-col nk-tb-col-tools">
 						<ul class="nk-tb-actions gx-1 my-n1">
 							
@@ -628,66 +618,29 @@ class Accounts extends BaseController {
 			if(!$log_id) {
 				$item = '<div class="text-center text-muted">'.translate_phrase('Session Timeout! - Please login again').'</div>';
 			} else {
-				$role_id = $this->Crud->read_field('name', 'Personal', 'access_role', 'id');
-
-				$all_rec = $this->Crud->filter_users('', '', '', $log_id, $role_id, $state_id, $status, $search, '', '', $start_date, $end_date);
+				
+				$all_rec = $this->Crud->filter_dept('', '', '', $log_id, $search);
                 // $all_rec = json_decode($all_rec);
 				if(!empty($all_rec)) { $counts = count($all_rec); } else { $counts = 0; }
 
-				$query = $this->Crud->filter_users($limit, $offset, '', $log_id, $role_id, $state_id, $status, $search, '', '', $start_date, $end_date);
+				$query = $this->Crud->filter_dept($limit, $offset, '', $log_id, $search);
 				$data['count'] = $counts;
 				
 
 				if(!empty($query)) {
 					foreach ($query as $q) {
 						$id = $q->id;
-						$fullname = $q->fullname;
-						$email = $q->email;
-						$phone = $q->phone;
-						$territory = strtoupper(str_replace('_', ' ', $this->Crud->read_field('id', $q->territory, 'territory', 'name')));
-						$tax_id = $this->Crud->read_field('user_id', $q->id, 'virtual_account', 'acc_no');
-						$address = $q->address;
-						$city = $this->Crud->read_field('id', $q->lga_id, 'city', 'name');
-						$trade = $this->Crud->read_field('id', $q->trade, 'trade', 'name');
-						$img = $this->Crud->image($q->img_id, 'big');
-						$activate = $q->activate;
-						$u_role = $this->Crud->read_field('id', $q->role_id, 'access_role', 'name');
-						$reg_date = date('M d, Y h:ia', strtotime($q->reg_date));
-
-						$status = '<span class="text-danger">Owing</span>';
+						$name = $q->name;
+						$roles = $q->roles;
 						
-						$next_pay = $this->Crud->read_field2('user_id', $id, 'payment_type', 'tax', 'transaction', 'payment_date');
-						if(date(fdate) > $next_pay){
-							$status = '<span class="text-success">Paid</span>';
-
-						}
-
-						if(empty($tax_id)){
-							$tax_id = '
-							<div id="virtual_resp_"'.$id.'>
-								<button class="btn btn-info  m-2" onclick="virtual_create('.$id.');" type="button">Generate Virtual Account/Tax ID</button>
-							</div>
-							';
-						}
-						$approved = '';
-						if ($activate == 1) {
-							$a_color = 'success';
-							$approve_text = 'Account Activated';
-							$approved = '<span class="text-primary"><i class="ri-check-circle-line"></i></span> ';
-						} else {
-							$a_color = 'danger';
-							$approve_text = 'Account Deactivated';
-							$approved = '<span class="text-danger"><i class="ri-check-circle-line"></i></span> ';
-						}
-
 						// add manage buttons
 						if ($role_u != 1) {
 							$all_btn = '';
 						} else {
 							$all_btn = '
-								<li><a href="' . site_url($mod . '/view/' . $id) . '" class="text-success" pageTitle="View ' . $fullname . '" pageName=""><em class="icon ni ni-eye"></em><span>'.translate_phrase('View Details').'</span></a></li>
-								<li><a href="javascript:;" class="text-primary pop" pageTitle="Edit ' . $fullname . '" pageName="' . site_url($mod . '/manage/edit/' . $id) . '"><em class="icon ni ni-edit-alt"></em><span>'.translate_phrase('Edit').'</span></a></li>
-								<li><a href="javascript:;" class="text-danger pop" pageTitle="Delete ' . $fullname . '" pageName="' . site_url($mod . '/manage/delete/' . $id) . '"><em class="icon ni ni-trash-alt"></em><span>'.translate_phrase('Delete').'</span></a></li>
+								<li><a href="' . site_url($mod . '/view/' . $id) . '" class="text-success" pageTitle="View ' . $name . '" pageName=""><em class="icon ni ni-eye"></em><span>'.translate_phrase('View Details').'</span></a></li>
+								<li><a href="javascript:;" class="text-primary pop" pageTitle="Edit ' . $name . '" pageName="' . site_url($mod . '/manage/edit/' . $id) . '"><em class="icon ni ni-edit-alt"></em><span>'.translate_phrase('Edit').'</span></a></li>
+								<li><a href="javascript:;" class="text-danger pop" pageTitle="Delete ' . $name . '" pageName="' . site_url($mod . '/manage/delete/' . $id) . '"><em class="icon ni ni-trash-alt"></em><span>'.translate_phrase('Delete').'</span></a></li>
 								
 								
 							';
@@ -696,29 +649,12 @@ class Accounts extends BaseController {
 						$item .= '
 							<div class="nk-tb-item">
 								<div class="nk-tb-col">
-									<div class="user-card">
-										<div class="user-avatar ">
-											<img alt="" src="' . site_url($img) . '" height="40px"/>
-										</div>
-										<div class="user-info">
-											<span class="tb-lead">' . ucwords($fullname) . ' <span class="dot dot-' . $a_color . ' ms-1"></span></span>
-											<span>' . $email . '</span><br>
-											<span>' . $u_role . '</span>
-										</div>
+									<div class="user-info">
+										<span class="tb-lead">' . ucwords($name) . ' </span>
 									</div>
 								</div>
 								<div class="nk-tb-col tb-col">
-									<span class="text-dark"><b>' . $tax_id . '</b></span>
-								</div>
-								<div class="nk-tb-col tb-col-mb">
-									'.$address.'<br>
-									<span>' . ucwords($city) . ', '.$territory.'</span>
-								</div>
-								<div class="nk-tb-col tb-col-md">
-									<span class="tb-amount">' . $trade . ' </span>
-								</div>
-								<div class="nk-tb-col tb-col-md">
-									<span class="tb-amount">' . $status . ' </span>
+									<span class="text-dark"><b>' . $roles . '</b></span>
 								</div>
 								<div class="nk-tb-col nk-tb-col-tools">
 									<ul class="nk-tb-actions gx-1">
@@ -746,7 +682,7 @@ class Accounts extends BaseController {
 				$resp['item'] = $items.'
 					<div class="text-center text-muted">
 						<br/><br/><br/><br/>
-						<i class="ni ni-users" style="font-size:150px;"></i><br/><br/>'.translate_phrase('No Personal Account Returned').'
+						<i class="ni ni-building" style="font-size:150px;"></i><br/><br/>'.translate_phrase('No Department Returned').'
 					</div>
 				';
 			} else {
@@ -881,7 +817,7 @@ class Accounts extends BaseController {
 				$data['v_business_name'] = $this->Crud->read_field('id', $user_id, 'user', 'business_name');
 				$data['v_business_address'] = $this->Crud->read_field('id', $user_id, 'user', 'business_address');
 			}
-			$data['title'] = translate_phrase('Account View').' | '.app_name;
+			$data['title'] = translate_phrase('Account View').' - '.app_name;
 			$data['page_active'] = $mod;
 			return view($mod.'_view', $data);
 		}
@@ -889,7 +825,7 @@ class Accounts extends BaseController {
 			return view($mod.'_form', $data);
 		} else { // view for main page
 			
-			$data['title'] = translate_phrase('Personal Account').' | '.app_name;
+			$data['title'] = translate_phrase('Departments').' - '.app_name;
 			$data['page_active'] = $mod;
 			return view($mod, $data);
 		}
@@ -1344,7 +1280,7 @@ class Accounts extends BaseController {
 				$data['v_business_name'] = $this->Crud->read_field('id', $user_id, 'user', 'business_name');
 				$data['v_business_address'] = $this->Crud->read_field('id', $user_id, 'user', 'business_address');
 			}
-			$data['title'] = translate_phrase('Account View').' | '.app_name;
+			$data['title'] = translate_phrase('Account View').' - '.app_name;
 			$data['page_active'] = $mod;
 			return view($mod.'_view', $data);
 		}
@@ -1352,7 +1288,7 @@ class Accounts extends BaseController {
 			return view($mod.'_form', $data);
 		} else { // view for main page
 			
-			$data['title'] = translate_phrase('Business Account').' | '.app_name;
+			$data['title'] = translate_phrase('Business Account').' - '.app_name;
 			$data['page_active'] = $mod;
 			return view($mod, $data);
 		}
@@ -1948,7 +1884,7 @@ class Accounts extends BaseController {
 				$data['v_business_name'] = $this->Crud->read_field('id', $user_id, 'user', 'business_name');
 				$data['v_business_address'] = $this->Crud->read_field('id', $user_id, 'user', 'business_address');
 			}
-			$data['title'] = translate_phrase('Account View').' | '.app_name;
+			$data['title'] = translate_phrase('Account View').' - '.app_name;
 			$data['page_active'] = $mod;
 			return view($mod.'_view', $data);
 		}
@@ -1956,7 +1892,7 @@ class Accounts extends BaseController {
 			return view($mod.'_form', $data);
 		} else { // view for main page
 			
-			$data['title'] = translate_phrase('Tax Masters').' | '.app_name;
+			$data['title'] = translate_phrase('Tax Masters').' - '.app_name;
 			$data['page_active'] = $mod;
 			return view($mod, $data);
 		}
@@ -2549,7 +2485,7 @@ class Accounts extends BaseController {
 				$data['v_business_name'] = $this->Crud->read_field('id', $user_id, 'user', 'business_name');
 				$data['v_business_address'] = $this->Crud->read_field('id', $user_id, 'user', 'business_address');
 			}
-			$data['title'] = translate_phrase('Account View').' | '.app_name;
+			$data['title'] = translate_phrase('Account View').' - '.app_name;
 			$data['page_active'] = $mod;
 			return view($mod.'_view', $data);
 		}
@@ -2558,7 +2494,7 @@ class Accounts extends BaseController {
 			return view($mod.'_form', $data);
 		} else { // view for main page
 			
-			$data['title'] = translate_phrase('Field Operative').' | '.app_name;
+			$data['title'] = translate_phrase('Field Operative').' - '.app_name;
 			$data['page_active'] = $mod;
 			return view($mod, $data);
 		}
@@ -3248,7 +3184,7 @@ class Accounts extends BaseController {
 			return view($mod.'_form', $data);
 		} else { // view for main page
 			
-			$data['title'] = translate_phrase('OTP Check').' | '.app_name;
+			$data['title'] = translate_phrase('OTP Check').' - '.app_name;
 			$data['page_active'] = 'dashboard/otp_check';
 			return view($mod, $data);
 		}
@@ -3550,7 +3486,7 @@ class Accounts extends BaseController {
 			return view('accounts/'.$mod.'_form', $data);
 		} else { // view for main page
 			
-			$data['title'] = translate_phrase('Virtual Assign').' | '.app_name;
+			$data['title'] = translate_phrase('Virtual Assign').' - '.app_name;
 			$data['page_active'] = 'accounts/virtual_assign';
 			return view('accounts/'.$mod, $data);
 		}

@@ -198,7 +198,7 @@
                 </div>
             </div>
             <div class="nk-wrap ">
-                <div class="nk-header nk-header-fixed">
+                <div class="nk-header nk-header-fixed bg-white">
                     <div class="container-fluid">
                     <div class="nk-header-wrap">
                             <div class="nk-menu-trigger d-xl-none ms-n1">
