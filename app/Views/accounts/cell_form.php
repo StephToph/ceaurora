@@ -47,7 +47,7 @@ $this->Crud = new Crud();
             </div>
             
         </div>
-        <div class="row" id="conatiners">
+        <div class="row" id="containers">
             <div class="col-sm-6 mb-3">
                 <div class="form-group">
                     <label for="name">*<?=translate_phrase('Meeting Day'); ?></label>
@@ -67,9 +67,14 @@ $this->Crud = new Crud();
                 <div class="form-group">
                     <label for="name">*<?=translate_phrase('Meeting Time'); ?></label>
                     <input class="form-control" type="time" id="location" name="time[]" value="<?php if(!empty($e_location)) {echo $e_location;} ?>" required>
+                    <button style="display:none;"  class="btn btn-icon btn-outline-danger deleteBtns" type="button"><i class="icon ni ni-trash"></i> </button>
                 </div>
             </div>
         </div>
+        <div class="col-sm-12 mb-3 text-center">
+            <button id="addMore_days" class="btn btn-ico btn-outline-info" type="button"><i class="icon ni ni-plus-c"></i>  <?=translate_phrase('Add More Days');?></button>
+        </div>
+
         <label for="name">*<?=translate_phrase('Cell Role');?></label>
         <div class="row" id="container">
             <?php if(!empty($e_roles)){$a = 0;
@@ -125,6 +130,26 @@ $this->Crud = new Crud();
         
         // Add event listener to delete button
         div.querySelector('.deleteBtn').addEventListener('click', function() {
+            div.parentNode.removeChild(div);
+        });
+        
+        container.appendChild(div);
+    });
+
+    document.getElementById('addMore_days').addEventListener('click', function() {
+        var container = document.getElementById('containers');
+        var div = container.children[0].cloneNode(true);
+        
+        // Clear input value of the cloned div
+        div.querySelector('input').value = '';
+        div.querySelector('input').removeAttribute('required');
+        
+        
+        // Show delete button in the cloned div
+        div.querySelector('.deleteBtns').style.display = 'inline-block';
+        
+        // Add event listener to delete button
+        div.querySelector('.deleteBtns').addEventListener('click', function() {
             div.parentNode.removeChild(div);
         });
         
