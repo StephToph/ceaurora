@@ -40,16 +40,31 @@ $this->Crud = new Crud();
                 </div>
             </div>
         </div>
+                    <label for="name">*<?=translate_phrase('Role');?></label>
         <div class="row" id="container">
-            <div class="col-sm-12 mb-3 ">
-                <label for="name">*<?=translate_phrase('Role');?></label>
-                <div class="form-group input-group">
-                    <input class="form-control" type="text" id="role" name="roles[]" value="<?php if(!empty($role)) {echo $role;} ?>" required>
-                    <button style="display:none;" class="btn btn-icon btn-outline-danger deleteBtn" type="button"><i class="icon ni ni-trash"></i> </button>
+            <?php if(!empty($e_roles)){$a = 0;
+                foreach($e_roles as $k => $val){
+                    $r_val = 'style="display:none;"';$req = 'required';
+                    if($a > 0){
+                        $r_val = 'style="display:display;"';$req = '';
+                    }
+                    ?>
+                <div class="col-sm-12 mb-3 ">
+                    <div class="form-group input-group">
+                        <input class="form-control" type="text" id="role" placeholder="Enter Department Roles" name="roles[]" value="<?php if(!empty($val)) {echo $val;} ?>" <?=$req; ?>>
+                        <button <?=$r_val; ?>  class="btn btn-icon btn-outline-danger deleteBtn" type="button"><i class="icon ni ni-trash"></i> </button>
+                    </div>
+                    
                 </div>
-                
-            </div>
-           
+           <?php $a++; }} else {?>
+                <div class="col-sm-12 mb-3 ">
+                    <div class="form-group input-group">
+                        <input class="form-control" type="text" id="role" placeholder="Enter Department Roles" name="roles[]" value="<?php if(!empty($val)) {echo $val;} ?>" required>
+                        <button style="display:none;" class="btn btn-icon btn-outline-danger deleteBtn" type="button"><i class="icon ni ni-trash"></i> </button>
+                    </div>
+                    
+                </div>
+           <?php }?>
         </div>
 
         <div class="row" >

@@ -485,7 +485,7 @@ class Accounts extends BaseController {
 							foreach($edit as $e) {
 								$data['e_id'] = $e->id;
 								$data['e_name'] = $e->name;
-								$data['roles'] = $e->roles;
+								$data['e_roles'] = json_decode($e->roles);
 							}
 						}
 					}
