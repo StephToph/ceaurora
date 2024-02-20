@@ -44,7 +44,7 @@ $this->Crud = new Crud();
             <div class="col-sm-12 mb-3 ">
                 <label for="name">*<?=translate_phrase('Role');?></label>
                 <div class="form-group input-group">
-                    <input class="form-control" type="text" id="role" name="role[]" value="<?php if(!empty($role)) {echo $role;} ?>" required>
+                    <input class="form-control" type="text" id="role" name="roles[]" value="<?php if(!empty($role)) {echo $role;} ?>" required>
                     <button style="display:none;" class="btn btn-icon btn-outline-danger deleteBtn" type="button"><i class="icon ni ni-trash"></i> </button>
                 </div>
                 

@@ -448,40 +448,32 @@ class Accounts extends BaseController {
 		
 		// manage record
 		if($param1 == 'manage') {
-			$role_ids =  $this->Crud->read_field('name', 'Personal', 'access_role', 'id');
-						
 			// prepare for delete
 			if($param2 == 'delete') {
 				if($param3) {
 					$edit = $this->Crud->read_single('id', $param3, $table);
-                    //echo var_dump($edit);
 					if(!empty($edit)) {
 						foreach($edit as $e) {
 							$data['d_id'] = $e->id;
 						}
 					}
-					
-					if($this->request->getMethod() == 'post'){
-                        $del_id =  $this->request->getVar('d_customer_id');
-                        $role_id =  $this->Crud->read_field('name', 'Personal', 'access_role', 'id');
-						$datas['role_id'] = $role_id;
-                        $datas['log_id'] = $log_id;
-                        
-						// print_r($datas);
-						// //$role_id . ' ' . $log_id;
-						// die;
-						
-                        $del = $this->Crud->api('delete', 'users/delete/'.$del_id, $datas);
 
-						$del = json_decode($del);
-                        if($del->status == true){	
-                        
-							echo $this->Crud->msg($del->code, translate_phrase($del->msg));
+					if($this->request->getMethod() == 'post'){
+						$del_id = $this->request->getVar('d_dept_id');
+						///// store activities
+						$by = $this->Crud->read_field('id', $log_id, 'user', 'firstname');
+						$code = $this->Crud->read_field('id', $del_id, 'dept', 'name');
+						$action = $by.' deleted Department ('.$code.') Record';
+
+						if($this->Crud->deletes('id', $del_id, $table) > 0) {
+							
+							$this->Crud->activity('user', $del_id, $action);
+							echo $this->Crud->msg('success', 'Department Deleted');
 							echo '<script>location.reload(false);</script>';
 						} else {
-							echo $this->Crud->msg('danger', translate_phrase('Please try later'));
+							echo $this->Crud->msg('danger', 'Please try later');
 						}
-						die;	
+						exit;	
 					}
 				}
 			} else {
@@ -492,96 +484,58 @@ class Accounts extends BaseController {
 						if(!empty($edit)) {
 							foreach($edit as $e) {
 								$data['e_id'] = $e->id;
-								$data['e_fullname'] = $e->fullname;
-								$data['e_email'] = $e->email;
-								$data['e_phone'] = $e->phone;
-								$data['e_country_id'] = $e->country_id;
-								$data['e_state_id'] = $e->state_id;
-								$data['e_role_id'] = $e->role_id;
-								$data['e_trade'] = $e->trade;
-								$data['e_address'] = $e->address;
-								$data['e_activate'] = $e->activate;
-								$data['e_img'] = $e->img_id;
-								
+								$data['e_name'] = $e->name;
+								$data['roles'] = $e->roles;
 							}
 						}
 					}
-				}
-				
+				} 
+
 				if($this->request->getMethod() == 'post'){
-					$user_i =  $this->request->getVar('user_id');
-					$fullname = $this->request->getPost('name');
-					$phone = $this->request->getPost('phone');
-					$email = $this->request->getPost('email');
-					$password =  $this->request->getVar('password');
-					$role =  $this->request->getVar('role');
-					$ban =  $this->request->getVar('ban');
-					$trade =  $this->request->getVar('trade');
+					$dept_id = $this->request->getVar('dept_id');
+					$name = $this->request->getVar('name');
+					$roles = $this->request->getVar('roles');
 
-					$data['trade'] = $trade;
-					$data['role'] = $role;
-					$data['password'] = $password;
-					$data['fullname'] = $fullname;
-					$data['email'] = $email;
-					$data['phone'] = $phone;
-					$data['ban'] = $ban;
-                    $data['log_id'] = $log_id;
-					$data['role_id'] = $role_ids;
-
-					
+					$ins_data['name'] = $name;
+					$ins_data['roles'] = json_encode($roles);
+					// print_r($roles);
+					// die;
 					// do create or update
-					if($user_i) {
-						$trade_id = $this->Crud->read_field('id', $user_i, 'user', 'trade');
-                        $update = $this->Crud->api('post', 'users/update/' . $user_i, $data);
-                        $update = json_decode($update);
-						//print_r($update);
-						if($update->status == true){
+					if($dept_id) {
+						$upd_rec = $this->Crud->updates('id', $dept_id, $table, $ins_data);
+						if($upd_rec > 0) {
+							///// store activities
+							$by = $this->Crud->read_field('id', $log_id, 'user', 'firstname');
+							$code = $this->Crud->read_field('id', $dept_id, 'dept', 'name');
+							$action = $by.' updated Department ('.$code.') Record';
+							$this->Crud->activity('user', $dept_id, $action);
 
-							if($trade != $trade_id){
-								if($this->Crud->check2('id', $user_i, 'duration', '', 'user') > 0){
-									$this->Crud->updates('id', $user_i, 'user', array('setup'=> 0));
-								} else {
-									$trans = $this->Crud->read2('user_id', $user_i, 'status', 'pending', 'transaction');
-									$duration = $this->Crud->read_field('id', $user_i, 'user', 'duration');
-									$trades = $this->Crud->read_field('id', $trade, 'trade', 'medium');
-
-									$amount = $this->Crud->trade_duration($trades, $duration);
-									if(!empty($trans)){
-										foreach($trans as $t){
-											if($t->amount != $t->balance){
-												$paid = (float)$t->amount - (float)$t->balance;
-												$tran_data['balance'] = (float)$amount - (float)$paid;
-											}else {
-												$tran_data['balance'] = $amount;
-											}
-											$tran_data['amount'] = $amount;
-
-											$this->Crud->updates('id', $t->id, 'transaction', $tran_data);
-										}
-									} else {
-										$this->Crud->updates('id', $user_i, 'user', array('setup'=> 0));
-									}
-								}
-							}
-							
-							echo $this->Crud->msg('success', translate_phrase($update->msg));
+							echo $this->Crud->msg('success', 'Record Updated');
 							echo '<script>location.reload(false);</script>';
 						} else {
-							echo $this->Crud->msg($update->code, translate_phrase($update->msg));	
+							echo $this->Crud->msg('info', 'No Changes');	
 						}
-                        die;
-					} else{
-                        $add = $this->Crud->api('post', 'users/post', $data);
-                        $add = json_decode($add);
-						if($add->status == true){
-							echo $this->Crud->msg('success', translate_phrase($add->msg));
-							echo '<script>location.reload(false);</script>';
+					} else {
+						if($this->Crud->check('name', $name, $table) > 0) {
+							echo $this->Crud->msg('warning', 'Record Already Exist');
 						} else {
-							echo $this->Crud->msg($add->code, translate_phrase($add->msg));	
+							$ins_rec = $this->Crud->create($table, $ins_data);
+							if($ins_rec > 0) {
+								///// store activities
+								$by = $this->Crud->read_field('id', $log_id, 'user', 'firstname');
+								$code = $this->Crud->read_field('id', $ins_rec, 'dept', 'name');
+								$action = $by.' created Department ('.$code.') Record';
+								$this->Crud->activity('user', $ins_rec, $action);
+
+								echo $this->Crud->msg('success', 'Record Created');
+								echo '<script>location.reload(false);</script>';
+							} else {
+								echo $this->Crud->msg('danger', 'Please try later');	
+							}	
 						}
-                        die;
-                    }
-						
+					}
+
+					die;	
 				}
 			}
 		}
@@ -632,13 +586,18 @@ class Accounts extends BaseController {
 						$id = $q->id;
 						$name = $q->name;
 						$roles = $q->roles;
-						
+						$rolesa = json_decode($roles);
+						$rols = '';
+						if(!empty($rolesa)){
+							foreach($rolesa as $r => $val){
+								$rols .= $val.', ';
+							}
+						}
 						// add manage buttons
 						if ($role_u != 1) {
 							$all_btn = '';
 						} else {
 							$all_btn = '
-								<li><a href="' . site_url($mod . '/view/' . $id) . '" class="text-success" pageTitle="View ' . $name . '" pageName=""><em class="icon ni ni-eye"></em><span>'.translate_phrase('View Details').'</span></a></li>
 								<li><a href="javascript:;" class="text-primary pop" pageTitle="Edit ' . $name . '" pageName="' . site_url($mod . '/manage/edit/' . $id) . '"><em class="icon ni ni-edit-alt"></em><span>'.translate_phrase('Edit').'</span></a></li>
 								<li><a href="javascript:;" class="text-danger pop" pageTitle="Delete ' . $name . '" pageName="' . site_url($mod . '/manage/delete/' . $id) . '"><em class="icon ni ni-trash-alt"></em><span>'.translate_phrase('Delete').'</span></a></li>
 								
@@ -654,7 +613,7 @@ class Accounts extends BaseController {
 									</div>
 								</div>
 								<div class="nk-tb-col tb-col">
-									<span class="text-dark"><b>' . $roles . '</b></span>
+									<span class="text-dark"><b>' . ucwords(rtrim($rols, ', ')) . '</b></span>
 								</div>
 								<div class="nk-tb-col nk-tb-col-tools">
 									<ul class="nk-tb-actions gx-1">
