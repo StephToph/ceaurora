@@ -1129,6 +1129,136 @@ class Accounts extends BaseController {
 			}
 		}
 
+		// manage record
+		if($param1 == 'manages') {
+			// prepare for delete
+			if($param2 == 'delete') {
+				if($param3) {
+					$edit = $this->Crud->read_single('id', $param3, $table);
+					if(!empty($edit)) {
+						foreach($edit as $e) {
+							$data['d_id'] = $e->id;
+						}
+					}
+
+					if($this->request->getMethod() == 'post'){
+						$del_id = $this->request->getVar('d_cell_id');
+						///// store activities
+						$by = $this->Crud->read_field('id', $log_id, 'user', 'firstname');
+						$code = $this->Crud->read_field('id', $del_id, 'cell', 'name');
+						$action = $by.' deleted Cell ('.$code.') Record';
+
+						if($this->Crud->deletes('id', $del_id, $table) > 0) {
+							
+							$this->Crud->activity('user', $del_id, $action);
+							echo $this->Crud->msg('success', 'Cell Deleted');
+							echo '<script>location.reload(false);</script>';
+						} else {
+							echo $this->Crud->msg('danger', 'Please try later');
+						}
+						exit;	
+					}
+				}
+			} else {
+				// prepare for edit
+				if($param2 == 'edit') {
+					if($param3) {
+						$edit = $this->Crud->read_single('id', $param3, $table);
+						if(!empty($edit)) {
+							foreach($edit as $e) {
+								$data['e_id'] = $e->id;
+								$data['e_location'] = $e->location;
+								$data['e_name'] = $e->name;
+								$data['e_roles'] = json_decode($e->roles);
+								$data['e_time'] = json_decode($e->time);
+							}
+						}
+					}
+				} 
+
+				if($this->request->getMethod() == 'post'){
+					$membership_id = $this->request->getVar('membership_id');
+					$firstname = $this->request->getVar('firstname');
+					$lastname = $this->request->getVar('lastname');
+					$othername = $this->request->getVar('othername');
+					$gender = $this->request->getVar('gender');
+					$email = $this->request->getVar('email');
+					$phone = $this->request->getVar('phone');
+					$dob = $this->request->getVar('dob');
+					$chat_handle = $this->request->getVar('chat_handle');
+					$address = $this->request->getVar('address');
+					$family_status = $this->request->getVar('family_status');
+					$family_position = $this->request->getVar('family_position');
+					$parent_id = $this->request->getVar('parent_id');
+					$dept_id = $this->request->getVar('dept_id');
+					$dept_role_id = $this->request->getVar('dept_role_id');
+					$cell_id = $this->request->getVar('cell_id');
+					$cell_role_id = $this->request->getVar('cell_role_id');
+					$title = $this->request->getVar('title');
+					
+					
+					$ins_data['title'] = $title;
+					$ins_data['firstname'] = $firstname;
+					$ins_data['othername'] = $othername;
+					$ins_data['lastname'] = $lastname;
+					$ins_data['email'] = $email;
+					$ins_data['phone'] = $phone;
+					$ins_data['gender'] = $gender;
+					$ins_data['address'] = $address;
+					$ins_data['chat_handle'] = $chat_handle;
+					$ins_data['dob'] = $dob;
+					$ins_data['family_status'] = $family_status;
+					$ins_data['family_position'] = $family_position;
+					$ins_data['parent_id'] = $parent_id;
+					$ins_data['dept_id'] = $dept_id;
+					$ins_data['dept_role'] = $dept_role_id;
+					$ins_data['cell_id'] = $cell_id;
+					$ins_data['cell_role'] = $cell_role_id;
+					
+					// do create or update
+					if($membership_id) {
+						$upd_rec = $this->Crud->updates('id', $membership_id, $table, $ins_data);
+						if($upd_rec > 0) {
+							///// store activities
+							$by = $this->Crud->read_field('id', $log_id, 'user', 'firstname');
+							$code = $this->Crud->read_field('id', $membership_id, 'dept', 'name');
+							$action = $by.' updated Department ('.$code.') Record';
+							$this->Crud->activity('user', $membership_id, $action);
+
+							echo $this->Crud->msg('success', 'Record Updated');
+							echo '<script>location.reload(false);</script>';
+						} else {
+							echo $this->Crud->msg('info', 'No Changes');	
+						}
+					} else {
+						if($this->Crud->check('name', $name, $table) > 0) {
+							echo $this->Crud->msg('warning', 'Record Already Exist');
+						} else {
+							$ins_data['role_id'] = $role_id;
+							$ins_data['activate'] = 1;
+							$ins_data['reg_date'] = date(fdate);
+							$ins_data['cell_id'] = $cell_id;
+							$ins_rec = $this->Crud->create($table, $ins_data);
+							if($ins_rec > 0) {
+								///// store activities
+								$by = $this->Crud->read_field('id', $log_id, 'user', 'firstname');
+								$code = $this->Crud->read_field('id', $ins_rec, 'dept', 'name');
+								$action = $by.' created Department ('.$code.') Record';
+								$this->Crud->activity('user', $ins_rec, $action);
+
+								echo $this->Crud->msg('success', 'Record Created');
+								echo '<script>location.reload(false);</script>';
+							} else {
+								echo $this->Crud->msg('danger', 'Please try later');	
+							}	
+						}
+					}
+
+					die;	
+				}
+			}
+		}
+
 		if($param1 == 'get_dept_role'){
 			if(!empty($param2)){
 				
@@ -1318,6 +1448,12 @@ class Accounts extends BaseController {
 
 		if($param1 == 'manage') { // view for form data posting
 			return view($mod.'_form', $data);
+		}elseif($param1 == 'manages'){
+			
+			$data['page_active'] = $mod;
+			$data['title'] = translate_phrase('New Membership').' - '.app_name;
+			if($param2 == 'edit')$data['title'] = translate_phrase('Edit Membership').' - '.app_name;
+			return view($mod.'_edit', $data);
 		} else { // view for main page
 			
 			$data['title'] = translate_phrase('Membership').' - '.app_name;
