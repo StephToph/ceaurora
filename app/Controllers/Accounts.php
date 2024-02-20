@@ -1347,8 +1347,8 @@ class Accounts extends BaseController {
 				<div class="nk-tb-item nk-tb-head">
 					<div class="nk-tb-col"><span class="sub-text text-dark">'.translate_phrase('Full Name').'</span></div>
 					<div class="nk-tb-col nk-tb-col-md"><span class="sub-text text-dark">'.translate_phrase('Kingschat Handle').'</span></div>
-					<div class="nk-tb-col"><span class="sub-text text-dark">'.translate_phrase('Contact').'</span></div>
-					<div class="nk-tb-col nk-tb-col-md"><span class="sub-text text-dark">'.('Title').'</span></div>
+					<div class="nk-tb-col"><span class="sub-text text-dark">'.translate_phrase('Email').'</span></div>
+					<div class="nk-tb-col nk-tb-col-md"><span class="sub-text text-dark">'.('Phone').'</span></div>
 					<div class="nk-tb-col nk-tb-col-tools">
 						<ul class="nk-tb-actions gx-1 my-n1">
 							
@@ -1398,6 +1398,7 @@ class Accounts extends BaseController {
 							$all_btn = '
 								<li><a href="' . site_url($mod . '/manages/edit/' . $id) . '" class="text-info" pageTitle="Edit ' . $name . '" pageName="' . site_url($mod . '/manages/edit/' . $id) . '"><em class="icon ni ni-edit-alt"></em><span>'.translate_phrase('Edit').'</span></a></li>
 								<li><a href="javascript:;" class="text-danger pop" pageTitle="Delete ' . $name . '" pageName="' . site_url($mod . '/manage/delete/' . $id) . '"><em class="icon ni ni-trash-alt"></em><span>'.translate_phrase('Delete').'</span></a></li>
+								<li><a href="javascript:;" class="text-success pop" pageTitle="View ' . $name . '" pageSize="modal-lg" pageName="' . site_url($mod . '/manage/view/' . $id) . '"><em class="icon ni ni-trash-alt"></em><span>'.translate_phrase('Delete').'</span></a></li>
 								
 								
 							';
@@ -1414,10 +1415,10 @@ class Accounts extends BaseController {
 									<span class="text-dark">' . ucwords($chat_handle) . '</span>
 								</div>
 								<div class="nk-tb-col tb-col">
-									<span class="text-dark"><b>Email -> </b>' . ($email) .' <br><b>Phone -> </b>'.$phone.'</span>
+									<span class="text-dark">' . ($email) .'</span>
 								</div>
 								<div class="nk-tb-col tb-col-md">
-									<span class="text-dark">' . ($title) . '</span>
+									<span class="text-dark">' . ($phone) . '</span>
 								</div>
 								<div class="nk-tb-col nk-tb-col-tools">
 									<ul class="nk-tb-actions gx-1">
