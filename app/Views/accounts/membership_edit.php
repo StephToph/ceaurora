@@ -210,7 +210,12 @@
                                         </div>
                                     </div>
                                 </div>
-                                
+                                <div class="col-md-6 col-lg-4 col-xxl-3">
+                                    <div class="form-group">
+                                        <label for="password"><?php if(!empty($e_id)) { echo translate_phrase('Reset Password'); } else { echo translate_phrase('*Password'); } ?></label>
+                                        <input class="form-control" type="text" id="password" name="password" <?php if(empty($e_id)) { echo 'required'; } ?>>
+                                    </div>
+                                </div>
                                 <div class="col-sm-12 mb-3 text-center">
                                     <div class="form-group  mt-4"><button type="submit"
                                             class="btn btn-primary">Save Membership</button></div>
