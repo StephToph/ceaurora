@@ -5,22 +5,41 @@ $this->Crud = new Crud();
 ?>
 <?php echo form_open_multipart($form_link, array('id'=>'bb_ajax_form', 'class'=>'')); ?>
     <!-- delete view -->
-    <?php if($param2 == 'delete') { ?>
+    <?php if($param3 == 'add' || $param3 == 'edit') { ?>
+        <input type="hidden" name="part_id" value="">
         <div class="row">
-            <div class="col-sm-12"><div id="bb_ajax_msg"></div></div>
-        </div>
+            <?php 
+                $partner = $this->Crud->read_order('partnership', 'name', 'asc');
+                if(!empty($partner)){
+                    foreach($partner as $p){
+            ?>
+                <div class="col-sm-6 mb-2">
+                    <div class="form-group" id="">
+                        <label for="activate"><?=translate_phrase('Partnership');?></label>
+                        <input class="form-control" type="text" value="<?=ucwords($p->name); ?>" id="partnership" name="partnership[]" readonly>
+                    </div>
+                </div>
+                <div class="col-sm-6 mb-2">
+                    <div class="form-group">
+                        <label for="password"><?=translate_phrase('Yearly Goal');?></label>
+                        <input class="form-control" type="text" id="goal" name="goal[]">
+                    </div>
+                </div>
+            <?php 
+                }
+            }
+            ?>
 
-        <div class="row">
-            <div class="col-sm-12 text-center">
-                <h3><b><?=translate_phrase('Are you sure?');?></b></h3>
-                <input type="hidden" name="d_membership_id" value="<?php if(!empty($d_id)){echo $d_id;} ?>" />
-            </div>
-            
-            <div class="col-sm-12 text-center">
-                <button class="btn btn-danger text-uppercase" type="submit">
-                    <i class="icon ni ni-trash"></i> <?=translate_phrase('Yes - Delete'); ?>
+            <div class="col-sm-12 mt-3 mb-3 text-center">
+                <button class="btn btn-primary bb_fo_btn" type="submit">
+                    <i class="icon ni ni-save"></i> <?=translate_phrase('Save Record');?>
                 </button>
             </div>
+
+            <div class="row">
+                <div class="col-sm-12"><div id="bb_ajax_msg"></div></div>
+            </div>
+        
         </div>
     <?php } ?>
 
