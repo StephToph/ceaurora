@@ -1275,7 +1275,7 @@ class Accounts extends BaseController {
 							if($ins_rec > 0) {
 								///// store activities
 								$by = $this->Crud->read_field('id', $log_id, 'user', 'firstname');
-								$code = $this->Crud->read_field('id', $ins_rec, 'dept', 'name');
+								$code = $this->Crud->read_field('id', $ins_rec, 'user', 'surname');
 								$action = $by.' created Membership ('.$code.') Record';
 								$this->Crud->activity('user', $ins_rec, $action);
 
@@ -1423,7 +1423,7 @@ class Accounts extends BaseController {
 							$all_btn = '
 								<li><a href="' . site_url($mod . '/manages/edit/' . $id) . '" class="text-info" pageTitle="Edit ' . $name . '" pageName="' . site_url($mod . '/manages/edit/' . $id) . '"><em class="icon ni ni-edit-alt"></em><span>'.translate_phrase('Edit').'</span></a></li>
 								<li><a href="javascript:;" class="text-danger pop" pageTitle="Delete ' . $name . '" pageName="' . site_url($mod . '/manage/delete/' . $id) . '"><em class="icon ni ni-trash-alt"></em><span>'.translate_phrase('Delete').'</span></a></li>
-								<li><a href="javascript:;" class="text-success pop" pageTitle="View ' . $name . '" pageSize="modal-lg" pageName="' . site_url($mod . '/manage/view/' . $id) . '"><em class="icon ni ni-trash-alt"></em><span>'.translate_phrase('Delete').'</span></a></li>
+								<li><a href="' . site_url($mod . '/view/' . $id) . '" class="text-success" pageTitle="View ' . $name . '" pageSize="modal-lg" pageName=""><em class="icon ni ni-eye"></em><span>'.translate_phrase('View Records').'</span></a></li>
 								
 								
 							';
@@ -1508,6 +1508,58 @@ class Accounts extends BaseController {
 			die;
 		}
 
+		if($param1 == 'view'){
+			if($param2) {
+				$user_id = $param2;
+				$data['id'] = $user_id;
+				$data['last_log'] = date('F, d Y h:ia',strtotime($this->Crud->read_field('id', $user_id, 'user', 'last_log')));
+				if(empty($this->Crud->read_field('id', $user_id, 'user', 'last_log'))){
+					$data['last_log'] = 'Not Logged In';
+				}
+				$data['fullname'] = $this->Crud->read_field('id', $user_id, 'user', 'surname').' '.$this->Crud->read_field('id', $user_id, 'user', 'firstname').' '.$this->Crud->read_field('id', $user_id, 'user', 'othername');
+				$role_id = $this->Crud->read_field('id', $user_id, 'user', 'role_id');
+				$role = $this->Crud->read_field('id', $role_id, 'access_role', 'name');
+				$data['role'] = $this->Crud->read_field('id', $role_id, 'access_role', 'name');
+				$data['v_phone'] = $this->Crud->read_field('id', $user_id, 'user', 'phone');
+				$data['v_dob'] = $this->Crud->read_field('id', $user_id, 'user', 'dob');
+				$data['v_gender'] = $this->Crud->read_field('id', $user_id, 'user', 'gender');
+				$data['v_title'] = $this->Crud->read_field('id', $user_id, 'user', 'title');
+				$data['v_chat_handle'] = $this->Crud->read_field('id', $user_id, 'user', 'chat_handle');
+				$data['v_family_status'] = $this->Crud->read_field('id', $user_id, 'user', 'family_status');
+				$data['v_marriage_anniversary'] = $this->Crud->read_field('id', $user_id, 'user', 'marriage_anniversary');
+				$data['v_family_position'] = $this->Crud->read_field('id', $user_id, 'user', 'family_position');
+				$data['v_cell_id'] = $this->Crud->read_field('id', $user_id, 'user', 'cell_id');
+				$data['v_cell_role'] = $this->Crud->read_field('id', $user_id, 'user', 'cell_role');
+				$data['v_dept_id'] = $this->Crud->read_field('id', $user_id, 'user', 'dept_id');
+				$data['v_dept_role'] = $this->Crud->read_field('id', $user_id, 'user', 'dept_role');
+				$data['v_job_type'] = $this->Crud->read_field('id', $user_id, 'user', 'job_type');
+				$data['v_employer_address'] = $this->Crud->read_field('id', $user_id, 'user', 'employer_address');
+				$data['v_foundation_school'] = $this->Crud->read_field('id', $user_id, 'user', 'foundation_school');
+				$data['v_baptism'] = $this->Crud->read_field('id', $user_id, 'user', 'baptism');
+				$data['reg_date'] = date('F, d Y h:ia',strtotime($this->Crud->read_field('id', $user_id, 'user', 'reg_date')));
+				$data['v_email'] = $this->Crud->read_field('id', $user_id, 'user', 'email');
+
+				$v_img_id = $this->Crud->read_field('id', $user_id, 'user', 'img_id');
+				if(!empty($v_img_id)){
+					$img = '<img src="'.site_url($this->Crud->image($v_img_id, "big")).'">';
+				} else {
+					$img = $this->Crud->image_name($this->Crud->read_field('id', $user_id, 'user', 'surname').' '.$this->Crud->read_field('id', $user_id, 'user', 'firstname').' '.$this->Crud->read_field('id', $user_id, 'user', 'othername'));
+				}
+				$data['v_img'] = $img;
+
+				$v_status = $this->Crud->read_field('id', $user_id, 'user', 'activate');
+				if(!empty($v_status)) { $v_status = '<span class="text-success">VERIFIED</span>'; } else { $v_status = '<span class="text-danger">UNVERIFIED</span>'; }
+				$data['v_status'] = $v_status;
+
+				$data['v_address'] = $this->Crud->read_field('id', $user_id, 'user', 'address');
+
+
+			}
+			$data['page_active'] = $mod;
+			$data['title'] = translate_phrase('Membership View').' - '.app_name;
+			return view($mod.'_view', $data);
+		}
+
 		if($param1 == 'manage') { // view for form data posting
 			return view($mod.'_form', $data);
 		}elseif($param1 == 'manages'){
@@ -1516,7 +1568,7 @@ class Accounts extends BaseController {
 			$data['title'] = translate_phrase('New Membership').' - '.app_name;
 			if($param2 == 'edit')$data['title'] = translate_phrase('Edit Membership').' - '.app_name;
 			return view($mod.'_edit', $data);
-		} else { // view for main page
+		}else { // view for main page
 			
 			$data['title'] = translate_phrase('Membership').' - '.app_name;
 			$data['page_active'] = $mod;
