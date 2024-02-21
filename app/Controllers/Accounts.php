@@ -1176,6 +1176,11 @@ class Accounts extends BaseController {
 								$data['e_phone'] = $e->phone;
 								$data['e_address'] = $e->address;
 								$data['e_gender'] = $e->gender;
+								$data['e_marriage_anniversary'] = $e->marriage_anniversary;
+								$data['e_job_type'] = $e->job_type;
+								$data['e_employer_address'] = $e->employer_address;
+								$data['e_baptism'] = $e->baptism;
+								$data['e_foundation_school'] = $e->foundation_school;
 								$data['e_chat_handle'] = $e->chat_handle;
 								$data['e_dob'] = $e->dob;
 								$data['e_family_status'] = $e->family_status;
@@ -1211,8 +1216,14 @@ class Accounts extends BaseController {
 					$cell_role_id = $this->request->getVar('cell_role_id');
 					$title = $this->request->getVar('title');
 					$password = $this->request->getVar('password');
+					$marriage_anniversary = $this->request->getVar('marriage_anniversary');
+					$job_type = $this->request->getVar('job_type');
+					$employer_address = $this->request->getVar('employer_address');
+					$baptism = $this->request->getVar('baptism');
+					$foundation_school = $this->request->getVar('foundation_school');
 					
-					
+					// echo $baptism;
+					// die;
 					$ins_data['title'] = $title;
 					$ins_data['firstname'] = $firstname;
 					$ins_data['othername'] = $othername;
@@ -1221,6 +1232,11 @@ class Accounts extends BaseController {
 					$ins_data['phone'] = $phone;
 					$ins_data['gender'] = $gender;
 					$ins_data['address'] = $address;
+					$ins_data['marriage_anniversary'] = $marriage_anniversary;
+					$ins_data['job_type'] = $job_type;
+					$ins_data['employer_address'] = $employer_address;
+					$ins_data['baptism'] = $baptism;
+					$ins_data['foundation_school'] = $foundation_school;
 					$ins_data['chat_handle'] = $chat_handle;
 					$ins_data['dob'] = $dob;
 					$ins_data['family_status'] = $family_status;
