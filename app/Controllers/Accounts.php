@@ -1345,10 +1345,13 @@ class Accounts extends BaseController {
 			
 			$items = '
 				<div class="nk-tb-item nk-tb-head">
-					<div class="nk-tb-col"><span class="sub-text text-dark">'.translate_phrase('Full Name').'</span></div>
-					<div class="nk-tb-col nk-tb-col-md"><span class="sub-text text-dark">'.translate_phrase('Kingschat Handle').'</span></div>
-					<div class="nk-tb-col"><span class="sub-text text-dark">'.translate_phrase('Email').'</span></div>
+					<div class="nk-tb-col nk-tb-col-md"><span class="sub-text text-dark">'.translate_phrase('Title').'</span></div>
+					<div class="nk-tb-col"><span class="sub-text text-dark">'.translate_phrase('Name').'</span></div>
 					<div class="nk-tb-col nk-tb-col-md"><span class="sub-text text-dark">'.('Phone').'</span></div>
+					<div class="nk-tb-col"><span class="sub-text text-dark">'.translate_phrase('Email').'</span></div>
+					<div class="nk-tb-col nk-tb-col-md"><span class="sub-text text-dark">'.translate_phrase('Kingschat Handle').'</span></div>
+					<div class="nk-tb-col"><span class="sub-text text-dark">'.translate_phrase('Cell').'</span></div>
+					<div class="nk-tb-col"><span class="sub-text text-dark">'.translate_phrase('DOB').'</span></div>
 					<div class="nk-tb-col nk-tb-col-tools">
 						<ul class="nk-tb-actions gx-1 my-n1">
 							
@@ -1382,9 +1385,15 @@ class Accounts extends BaseController {
 						$phone = $q->phone;
 						$email = $q->email;
 						$chat_handle = $q->chat_handle;
+						$dob = date('d M Y', strtotime($q->dob));
+						$cell_id = $q->cell_id;
 						$title = $q->title;
 						$activate = $q->activate;
 						
+						$cell = '-';
+						if(!empty($q->cell_id)){
+							$cell = $this->Crud->read_field('id', $q->cell_id, 'cells', 'name');
+						}
 						$name = $surname.' '.$firstname.' '.$othername;
 
 						if(empty($phone))$phone = '-';
@@ -1406,19 +1415,28 @@ class Accounts extends BaseController {
 
 						$item .= '
 							<div class="nk-tb-item">
+								<div class="nk-tb-col tb-col-md">
+									<span class="text-dark">' . ucwords($title) . '</span>
+								</div>
 								<div class="nk-tb-col">
 									<div class="user-info">
 										<span class="tb-lead"><b>' . ucwords($name) . '</b> </span>
 									</div>
 								</div>
 								<div class="nk-tb-col tb-col-md">
-									<span class="text-dark">' . ucwords($chat_handle) . '</span>
+									<span class="text-dark">' . ($phone) . '</span>
 								</div>
 								<div class="nk-tb-col tb-col">
 									<span class="text-dark">' . ($email) .'</span>
 								</div>
 								<div class="nk-tb-col tb-col-md">
-									<span class="text-dark">' . ($phone) . '</span>
+									<span class="text-dark">' . ucwords($chat_handle) . '</span>
+								</div>
+								<div class="nk-tb-col tb-col-md">
+									<span class="text-dark">' . ($cell) . '</span>
+								</div>
+								<div class="nk-tb-col tb-col-md">
+									<span class="text-dark">' . ($dob) . '</span>
 								</div>
 								<div class="nk-tb-col nk-tb-col-tools">
 									<ul class="nk-tb-actions gx-1">
