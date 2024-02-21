@@ -5,11 +5,8 @@ $this->Crud = new Crud();
 ?>
 <?php echo form_open_multipart($form_link, array('id'=>'bb_ajax_form', 'class'=>'')); ?>
     <!-- delete view -->
-    <?php if($param3 == 'add') { ?>
-        <div class="row">
-            <div class="col-sm-12"><div id="bb_ajax_msg"></div></div>
-        </div>
-
+    <?php if($param3 == 'add' || $param3 == 'edit') { ?>
+        <input type="hidden" name="part_id" value="">
         <div class="row">
             <?php 
                 $partner = $this->Crud->read_order('partnership', 'name', 'asc');
@@ -33,11 +30,16 @@ $this->Crud = new Crud();
             }
             ?>
 
-            <div class="col-sm-12 mt-3 text-center">
+            <div class="col-sm-12 mt-3 mb-3 text-center">
                 <button class="btn btn-primary bb_fo_btn" type="submit">
                     <i class="icon ni ni-save"></i> <?=translate_phrase('Save Record');?>
                 </button>
             </div>
+
+            <div class="row">
+                <div class="col-sm-12"><div id="bb_ajax_msg"></div></div>
+            </div>
+        
         </div>
     <?php } ?>
 
@@ -153,4 +155,3 @@ $this->Crud = new Crud();
 
 </script>
 <script src="<?php echo site_url(); ?>assets/js/jsform.js"></script>
-<script src="<?php echo site_url(); ?>assets/js/scripts.js"></script>

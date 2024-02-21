@@ -23,6 +23,9 @@
                 <div class="nk-block">
                     <div class="card card-bordered card-stretch">
                         <div class="card-inner-group">
+                            <?php 
+                                if(empty($this->Crud->read_field('id', $param2, 'user', 'partnership'))){
+                            ?>
                             <div class="card-inner position-relative card-tools-toggle">
                                 <div class="card-title-group">
                                     <div class="card-tools">
@@ -37,15 +40,9 @@
                                         </ul><!-- .btn-toolbar -->
                                     </div><!-- .card-tools -->
                                 </div><!-- .card-title-group -->
-                                <div class="card-search search-wrap" data-search="search">
-                                    <div class="card-body">
-                                        <div class="search-content">
-                                            <a href="#" class="search-back btn btn-icon toggle-search" data-target="search"><em class="icon ni ni-arrow-left"></em></a>
-                                            <input type="text" class="form-control border-transparent form-focus-none" placeholder="Search by name" oninput="load('', '')" id="search">
-                                        </div>
-                                    </div>
-                                </div><!-- .card-search -->
+                               
                             </div><!-- .card-inner -->
+                            <?php } ?>
                             <div class="card-inner p-0">
                                 <div class="nk-tb-list nk-tb-ulist" id="load_data">
                                 </div><!-- .nk-tb-list -->
@@ -61,6 +58,7 @@
         </div>
     </div>
 </div>
+<input type="hidden" id="member_id", value="<?php if(!empty($param2)){echo $param2;}?>">
 
 <script>var site_url = '<?php echo site_url(); ?>';</script>
 <script src="<?php echo base_url(); ?>/assets/js/jquery.min.js"></script>
@@ -86,12 +84,13 @@
 
        
         var search = $('#search').val();
+        var member_id = $('#member_id').val();
         //alert(status);
 
         $.ajax({
-            url: site_url + 'accounts/membership/load' + methods,
+            url: site_url + 'accounts/membership/partnership/load' + methods,
             type: 'post',
-            data: { search: search },
+            data: { search: search, member_id:member_id },
             success: function (data) {
                 var dt = JSON.parse(data);
                 if (more == 'no') {

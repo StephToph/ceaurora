@@ -136,4 +136,3 @@ $this->Crud = new Crud();
 
 </script>
 <script src="<?php echo site_url(); ?>assets/js/jsform.js"></script>
-<script src="<?php echo site_url(); ?>assets/js/scripts.js"></script>

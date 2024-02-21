@@ -1569,46 +1569,189 @@ class Accounts extends BaseController {
 				if(empty($this->Crud->read_field('id', $user_id, 'user', 'last_log'))){
 					$data['last_log'] = 'Not Logged In';
 				}
-				$data['fullname'] = $this->Crud->read_field('id', $user_id, 'user', 'surname').' '.$this->Crud->read_field('id', $user_id, 'user', 'firstname').' '.$this->Crud->read_field('id', $user_id, 'user', 'othername');
-				$role_id = $this->Crud->read_field('id', $user_id, 'user', 'role_id');
-				$role = $this->Crud->read_field('id', $role_id, 'access_role', 'name');
-				$data['role'] = $this->Crud->read_field('id', $role_id, 'access_role', 'name');
-				$data['v_phone'] = $this->Crud->read_field('id', $user_id, 'user', 'phone');
-				$data['v_dob'] = $this->Crud->read_field('id', $user_id, 'user', 'dob');
-				$data['v_gender'] = $this->Crud->read_field('id', $user_id, 'user', 'gender');
-				$data['v_title'] = $this->Crud->read_field('id', $user_id, 'user', 'title');
-				$data['v_chat_handle'] = $this->Crud->read_field('id', $user_id, 'user', 'chat_handle');
-				$data['v_family_status'] = $this->Crud->read_field('id', $user_id, 'user', 'family_status');
-				$data['v_marriage_anniversary'] = $this->Crud->read_field('id', $user_id, 'user', 'marriage_anniversary');
-				$data['v_family_position'] = $this->Crud->read_field('id', $user_id, 'user', 'family_position');
-				$data['v_cell_id'] = $this->Crud->read_field('id', $user_id, 'user', 'cell_id');
-				$data['v_cell_role'] = $this->Crud->read_field('id', $user_id, 'user', 'cell_role');
-				$data['v_dept_id'] = $this->Crud->read_field('id', $user_id, 'user', 'dept_id');
-				$data['v_dept_role'] = $this->Crud->read_field('id', $user_id, 'user', 'dept_role');
-				$data['v_job_type'] = $this->Crud->read_field('id', $user_id, 'user', 'job_type');
-				$data['v_employer_address'] = $this->Crud->read_field('id', $user_id, 'user', 'employer_address');
-				$data['v_foundation_school'] = $this->Crud->read_field('id', $user_id, 'user', 'foundation_school');
-				$data['v_baptism'] = $this->Crud->read_field('id', $user_id, 'user', 'baptism');
-				$data['reg_date'] = date('F, d Y h:ia',strtotime($this->Crud->read_field('id', $user_id, 'user', 'reg_date')));
-				$data['v_email'] = $this->Crud->read_field('id', $user_id, 'user', 'email');
-
-				$v_img_id = $this->Crud->read_field('id', $user_id, 'user', 'img_id');
-				if(!empty($v_img_id)){
-					$img = '<img src="'.site_url($this->Crud->image($v_img_id, "big")).'">';
-				} else {
-					$img = $this->Crud->image_name($this->Crud->read_field('id', $user_id, 'user', 'surname').' '.$this->Crud->read_field('id', $user_id, 'user', 'firstname').' '.$this->Crud->read_field('id', $user_id, 'user', 'othername'));
-				}
-				$data['v_img'] = $img;
-
-				$v_status = $this->Crud->read_field('id', $user_id, 'user', 'activate');
-				if(!empty($v_status)) { $v_status = '<span class="text-success">VERIFIED</span>'; } else { $v_status = '<span class="text-danger">UNVERIFIED</span>'; }
-				$data['v_status'] = $v_status;
-
-				$data['v_address'] = $this->Crud->read_field('id', $user_id, 'user', 'address');
-
+				
 				if($param3){
+					if($this->request->getMethod() == 'post'){
+						$part_id = $this->request->getPost('part_id');
+						$partnership = $this->request->getPost('partnership');
+						$goal = $this->request->getPost('goal');
+						
+						$parts = [];
+						for($i=0;$i<count($partnership);$i++){
+							$part_id = $this->Crud->read_field('name', $partnership[$i], 'partnership', 'id');
+							$parts[$part_id] = $goal[$i];
+						}
+						
+						$upd_rec = $this->Crud->updates('id', $user_id, 'user', array('partnership'=>json_encode($parts)));
+
+						if($upd_rec > 0) {
+							///// store activities
+							$by = $this->Crud->read_field('id', $log_id, 'user', 'firstname');
+							$code = $this->Crud->read_field('id', $user_id, 'user', 'surname');
+							$action = $by.' updated Partnership for Membership ('.$code.') Record';
+							$this->Crud->activity('user', $user_id, $action);
+
+							echo $this->Crud->msg('success', 'Partnership Updated');
+							echo '<script>location.reload(false);</script>';
+
+						} else {
+							echo $this->Crud->msg('info', 'No Changes');	
+						}
+						die;
+					}
 					return view($mod.'_partnership_form', $data);
 				}
+			}
+			 // record listing
+			if($param2 == 'load') {
+				$limit = $param2;
+				$offset = $param3;
+
+				$rec_limit = 25;
+				$item = '';
+				if(empty($limit)) {$limit = $rec_limit;}
+				if(empty($offset)) {$offset = 0;}
+				
+				$search = $this->request->getPost('search');
+				$member_id = $this->request->getPost('member_id');
+				
+				$items = '
+					<div class="nk-tb-item nk-tb-head">
+						<div class="nk-tb-col"><span class="sub-text text-dark"><b>'.translate_phrase('Partnership').'</b></span></div>
+						<div class="nk-tb-col"><span class="sub-text text-dark"><b>'.translate_phrase('Pledge').'</b></span></div>
+						<div class="nk-tb-col"><span class="sub-text text-dark"><b>'.translate_phrase('Given').'</b></span></div>
+						<div class="nk-tb-col"><span class="sub-text text-dark"><b>'.translate_phrase('Balance').'</b></span></div>
+						<div class="nk-tb-col nk-tb-col-tools">
+							<ul class="nk-tb-actions gx-1 my-n1">
+								
+							</ul>
+						</div>
+					</div><!-- .nk-tb-item -->
+			
+					
+				';
+				$a = 1;
+
+				//echo $status;
+				$log_id = $this->session->get('td_id');
+				if(!$log_id) {
+					$item = '<div class="text-center text-muted">'.translate_phrase('Session Timeout! - Please login again').'</div>';
+				} else {
+					
+					$all_rec = $this->Crud->read_order('partnership', 'name', 'asc');
+					// $all_rec = json_decode($all_rec);
+					if(!empty($all_rec)) { $counts = count($all_rec); } else { $counts = 0; }
+					$query = $this->Crud->read_order('partnership', 'name', 'asc');
+					$data['count'] = $counts;
+					
+
+					if(!empty($query)) {
+						foreach ($query as $q) {
+							$id = $q->id;
+							$name = $q->name;
+							$goal = 0;
+							$given = 0;
+							$balance = 0;
+							if(!empty($member_id)){
+								$parts = $this->Crud->read_field('id', $member_id, 'user', 'partnership');
+								if(!empty($parts)){
+									$partss = json_decode($parts);
+									foreach($partss as $pa => $val){
+										if($id == $pa){
+											$goal = (float)$val;
+										}
+									}
+								}
+							}
+							
+							// add manage buttons
+							if ($role_u != 1) {
+								$all_btn = '';
+							} else {
+								$all_btn = '
+									<li><a href="' . site_url($mod . '/manages/edit/' . $id) . '" class="text-info" pageTitle="Edit ' . $name . '" pageName="' . site_url($mod . '/manages/edit/' . $id) . '"><em class="icon ni ni-edit-alt"></em><span>'.translate_phrase('Edit').'</span></a></li>
+									<li><a href="javascript:;" class="text-danger pop" pageTitle="Delete ' . $name . '" pageName="' . site_url($mod . '/manage/delete/' . $id) . '"><em class="icon ni ni-trash-alt"></em><span>'.translate_phrase('Delete').'</span></a></li>
+									<li><a href="' . site_url($mod . '/view/' . $id) . '" class="text-success" pageTitle="View ' . $name . '" pageSize="modal-lg" pageName=""><em class="icon ni ni-eye"></em><span>'.translate_phrase('View Records').'</span></a></li>
+									<li><a href="' . site_url($mod . '/partnership/' . $id) . '" class="text-primary" pageTitle="View ' . $name . '" pageSize="modal-lg" pageName=""><em class="icon ni ni-link"></em><span>'.translate_phrase('Partnership Records').'</span></a></li>
+									
+									
+								';
+							}
+
+							$item .= '
+								<div class="nk-tb-item">
+									<div class="nk-tb-col">
+										<div class="user-info">
+											<span class="tb-lead text-primary">' . ucwords($name) . '</span>
+										</div>
+									</div>
+									<div class="nk-tb-col">
+										<div class="user-info">
+											<span class="tb-lead">$' . number_format($goal,2) . ' </span>
+										</div>
+									</div>
+									<div class="nk-tb-col">
+										<div class="user-info">
+											<span class="tb-lead">$' . number_format($given,2) . '</span>
+										</div>
+									</div>
+									<div class="nk-tb-col">
+										<div class="user-info">
+											<span class="tb-lead">$' .number_format($balance,2) . '</span>
+										</div>
+									</div>
+									<div class="nk-tb-col nk-tb-col-tools">
+										<ul class="nk-tb-actions gx-1">
+											<li>
+												<div class="drodown">
+													<a href="#" class="dropdown-toggle btn btn-icon btn-trigger" data-bs-toggle="dropdown"><em class="icon ni ni-more-h"></em></a>
+													<div class="dropdown-menu dropdown-menu-end">
+														<ul class="link-list-opt no-bdr">
+															' . $all_btn . '
+														</ul>
+													</div>
+												</div>
+											</li>
+										</ul>
+									</div>
+								</div><!-- .nk-tb-item -->
+							';
+							$a++;
+						}
+					}
+					
+				}
+				
+				if(empty($item)) {
+					$resp['item'] = $items.'
+						<div class="text-center text-muted">
+							<br/><br/><br/><br/>
+							<i class="ni ni-user" style="font-size:150px;"></i><br/><br/>'.translate_phrase('No Membership Returned').'
+						</div>
+					';
+				} else {
+					$resp['item'] = $items . $item;
+					if($offset >= 25){
+						$resp['item'] = $item;
+					}
+					
+				}
+
+				$resp['count'] = $counts;
+
+				$more_record = $counts - ($offset + $rec_limit);
+				$resp['left'] = $more_record;
+
+				if($counts > ($offset + $rec_limit)) { // for load more records
+					$resp['limit'] = $rec_limit;
+					$resp['offset'] = $offset + $limit;
+				} else {
+					$resp['limit'] = 0;
+					$resp['offset'] = 0;
+				}
+
+				echo json_encode($resp);
+				die;
 			}
 			$data['page_active'] = $mod;
 			$data['title'] = translate_phrase('Partnership').' - '.app_name;
