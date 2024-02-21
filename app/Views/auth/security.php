@@ -11,7 +11,7 @@
 
 <?=$this->section('content');?>
     <!-- content @s -->
-    <div class="nk-content" style="background-image: url(<?=site_url('assets/sitebk.png'); ?>);background-size: cover;">
+    <div class="nk-content" >
         <div class="container wide-xl  mt-5">
             <div class="nk-content-inner">
                 <div class="nk-content-body">
