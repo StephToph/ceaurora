@@ -108,14 +108,24 @@
                                 <div class="col-md-6 col-lg-4 col-xxl-3">
                                     <div class="form-group"><label class="form-label">Family Status</label>
                                         <div class="form-control-wrap">
-                                            <select class="form-select js-select2" name="family_status"
-                                                data-placeholder="Select Status">
+                                            <select class="form-select js-select2" id="family_status" name="family_status"
+                                                data-placeholder="Select Status" onchange="">
                                                 <option value="">Select</option>
                                                 <option value="single" <?php if(!empty($e_family_status)){if($e_family_status == 'single'){echo 'selected';}} ?>>Single </option>
                                                 <option value="married" <?php if(!empty($e_family_status)){if($e_family_status == 'married'){echo 'selected';}} ?>>Married </option>
                                                 <option value="sepreated" <?php if(!empty($e_family_status)){if($e_family_status == 'seperated'){echo 'selected';}} ?>>Seperated </option>
                                                 <option value="divorced" <?php if(!empty($e_family_status)){if($e_family_status == 'divorced'){echo 'selected';}} ?>>Divorced </option>
                                             </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-lg-4 col-xxl-3" id="marriedDiv" style="display: <?php echo (!empty($e_family_status) && $e_family_status == 'married') ? 'block' : 'none'; ?>">
+                                    <div class="form-group"><label class="form-label">Marriage Anniverary</label>
+                                        <div class="form-control-wrap">
+                                            <div class="form-icon form-icon-right"><em
+                                                    class="icon ni ni-calendar"></em></div><input
+                                                type="text" name="marriage_anniversary" value="<?php if(!empty($e_marriage_anniversary)){echo $e_marriage_anniversary;} ?>" class="form-control date-picker"
+                                                data-date-format="yyyy-mm-dd" placeholder="yyyy-mm-dd">
                                         </div>
                                     </div>
                                 </div>
@@ -246,6 +256,49 @@
                                         </div>
                                     </div>
                                 </div>
+                                
+                                <div class="col-md-6 col-lg-4 col-xxl-3">
+                                    <div class="form-group">
+                                        <label class="form-label" for="password">Job type</label>
+                                        <input class="form-control" type="text" id="job_type" name="job_type" value="<?php if(!empty($e_job_type)){echo $e_job_type;}?>" >
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-lg-4 col-xxl-3">
+                                    <div class="form-group">
+                                        <label class="form-label" for="password">Employer Address</label>
+                                        <input class="form-control" type="text" id="employer_address" name="employer_address" value="<?php if(!empty($e_employer_address)){echo $e_employer_address;}?>">
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-lg-4 col-xxl-3">
+                                    <div class="form-group">
+                                        <div class="col-sm-12 mb-2">
+                                            <label>Foundation School?</label><br>
+                                            <div class="custom-control custom-radio">    
+                                                <input type="radio" id="customRadio1" name="foundation_school" class="custom-control-input" <?php if(!empty($e_foundation_school)){if($e_foundation_school == 'yes'){echo 'checked';}} ?>  value="yes">    
+                                                <label class="custom-control-label" for="customRadio1">Yes</label>
+                                            </div>
+                                            <div class="custom-control custom-radio">     
+                                                <input type="radio" id="customRadio2" name="foundation_school" class="custom-control-input" <?php if(!empty($e_foundation_school)){if($e_foundation_school == 'no'){echo 'checked';}} ?> value="no">    
+                                                <label class="custom-control-label" for="customRadio2">No</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-lg-4 col-xxl-3">
+                                    <div class="form-group">
+                                        <div class="col-sm-12 mb-2">
+                                            <label>Are you Baptised?</label><br>
+                                            <div class="custom-control custom-radio">    
+                                                <input type="radio" id="customRadio12" value="yes" name="baptism"  <?php if(!empty($e_baptism)){if($e_baptism == 'yes'){echo 'checked';}} ?> class="custom-control-input">    
+                                                <label class="custom-control-label" for="customRadio12">Yes</label>
+                                            </div>
+                                            <div class="custom-control custom-radio">     
+                                                <input type="radio" id="customRadio22" value="no" name="baptism"  <?php if(!empty($e_baptism)){if($e_baptism == 'no'){echo 'checked';}} ?> class="custom-control-input">    
+                                                <label class="custom-control-label" for="customRadio22">No</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="col-md-6 col-lg-4 col-xxl-3">
                                     <div class="form-group">
                                         <label class="form-label" for="password"><?php if(!empty($e_id)) { echo translate_phrase('Reset Password'); } else { echo translate_phrase('*Password'); } ?></label>
@@ -275,7 +328,14 @@
 <script src="<?php echo site_url(); ?>assets/js/jsform.js"></script>
 <script>
     $(function() {
-        // load('', '');
+        $('#family_status').on('change', function(){
+            var selectedValue = $(this).val();
+            if(selectedValue === 'married') {
+                $('#marriedDiv').show(500);
+            } else {
+                $('#marriedDiv').hide(500);
+            }
+        });
     });
     <?php 
         if(!empty($e_dept_role)){?>
