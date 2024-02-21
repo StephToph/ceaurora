@@ -154,7 +154,7 @@
                                                     </div>
                                                     <div class="profile-ud-item">
                                                         <div class="profile-ud wider">
-                                                            <span class="profile-ud-label"><?=translate_phrase('Employer Address');?></span>
+                                                            <span class="profile-ud-label"><?=translate_phrase('Employer Name');?></span>
                                                             <span class="profile-ud-value"><?=ucwords($v_employer_address); ?></span>
                                                         </div>
                                                     </div>
