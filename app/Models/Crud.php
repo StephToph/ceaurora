@@ -1754,6 +1754,37 @@ class Crud extends Model {
         $db->close();
     }
 
+	public function filter_analytics($limit='', $offset='', $search='', $log_id) {
+        $db = db_connect();
+        $builder = $db->table('partners_history');
+
+		$role_id = $this->read_field('id', $log_id, 'user', 'role_id');
+		$role = strtolower($this->read_field('id', $role_id, 'access_role', 'name'));
+		if($role != 'developer' && $role != 'administrator'){
+			$builder->where('member_id', $log_id);
+		} 
+        // build query
+		$builder->orderBy('id', 'asc');
+		
+        if(!empty($search)) {
+            $builder->like('name', $search);
+        }
+
+		
+        // limit query
+        if($limit && $offset) {
+			$query = $builder->get($limit, $offset);
+		} else if($limit) {
+			$query = $builder->get($limit);
+		} else {
+            $query = $builder->get();
+        }
+
+        // return query
+        return $query->getResult();
+        $db->close();
+    }
+
 	public function filter_territory($limit='', $offset='', $territory='',$search='') {
         $db = db_connect();
         $builder = $db->table('territory');

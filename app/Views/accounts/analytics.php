@@ -16,36 +16,32 @@
                 <div class="nk-block-head nk-block-head-sm">
                     <div class="nk-block-between">
                         <div class="nk-block-head-content">
-                            <h3 class="nk-block-title page-title"><?php if(!empty($param2)){echo ucwords($this->Crud->read_field('id', $param2, 'user', 'surname')).'`s '; } ?><?=translate_phrase('Partnership');?></h3>
+                            <h3 class="nk-block-title page-title"><?=translate_phrase('Partnership Analytics');?></h3>
                         </div>
                         <div class="nk-block-head-content">
-                            <a class="btn btn-info" href="<?=site_url('accounts/membership'); ?>"><em class="icon ni ni-arrow-long-left"></em>Back to Membership</a>
-                        </div><!-- .nk-block-head-content -->
+                            <button type="button" onclick="$('#filter_resp').toggle(500);" class="btn btn-primary">Filter</button>
+                        </div>
+                        
                     </div><!-- .nk-block-between -->
+                </div><!-- .nk-block-head -->
+                <div class="nk-block-head nk-block-head-sm row" style="display:none" id="filter_resp">
+                    <div class="col-sm-6 row">
+                        <div class="col-sm-6">
+                            <input type="date" class="form-control" name="start_date" id="start_date" oninput="loads()" style="border:1px solid #ddd;" placeholder="<?=translate_phrase('START DATE');?>">
+                            <span class="text-danger">Start Date</span>
+                        </div>
+                        <div class="col-sm-6">
+                            <input type="date" class="form-control" name="end_date" id="end_date" oninput="loads()" style="border:1px solid #ddd;" placeholder="<?=translate_phrase('END DATE');?>">
+                            <span class="text-danger">End Date</span>
+                            
+                        </div>
+                        <div class="col-md-12" style="color:transparent;  text-white align:right;"><span id="date_resul"></span></div>
+                    </div>
                 </div><!-- .nk-block-head -->
                 <div class="nk-block">
                     <div class="card card-bordered card-stretch">
                         <div class="card-inner-group">
-                            <?php 
-                                if(empty($this->Crud->read_field('id', $param2, 'user', 'partnership'))){
-                            ?>
-                            <div class="card-inner position-relative card-tools-toggle">
-                                <div class="card-title-group">
-                                    <div class="card-tools">
-                                        
-                                    </div><!-- .card-tools -->
-                                    <div class="card-tools me-n1">
-                                        <ul class="btn-toolbar gx-1">
-                                            <li>
-                                                <a href="javascript:;" pageTitle="Add Partnership" class="btn btn-outline-primary btn-icon pop" pageName="<?=site_url('accounts/membership/partnership/'.$param2.'/add'); ?>"><em class="icon ni ni-plus-c"></em></a>
-                                            </li><!-- li -->
-                                           
-                                        </ul><!-- .btn-toolbar -->
-                                    </div><!-- .card-tools -->
-                                </div><!-- .card-title-group -->
-                               
-                            </div><!-- .card-inner -->
-                            <?php } ?>
+                            
                             <div class="card-inner p-0">
                                 <div class="nk-tb-list nk-tb-ulist" id="load_data">
                                 </div><!-- .nk-tb-list -->
@@ -70,6 +66,21 @@
         load('', '');
     });
    
+    function loads() {
+        var start_date = $('#start_date').val();
+        var end_date = $('#end_date').val();
+
+        if(!start_date || !end_date){
+            $('#date_resul').css('color', 'Red');
+            $('#date_resul').html('<?=translate_phrase('Enter Start and End Date');?>!!');
+        } else if(start_date > end_date){
+            $('#date_resul').css('color', 'Red');
+            $('#date_resul').html('<?=translate_phrase('Start Date cannot be greater');?>!');
+        } else {
+            $('#date_resul').html('');
+            load('', '');
+        }
+    }
    
     function load(x, y) {
         var more = 'no';
@@ -88,12 +99,15 @@
        
         var search = $('#search').val();
         var member_id = $('#member_id').val();
+        var start_date = $('#start_date').val();
+        var end_date = $('#end_date').val();
+
         //alert(status);
 
         $.ajax({
-            url: site_url + 'accounts/membership/partnership/load' + methods,
+            url: site_url + 'accounts/analytics/load' + methods,
             type: 'post',
-            data: { search: search, member_id:member_id },
+            data: { search: search, start_date:start_date,end_date:end_date },
             success: function (data) {
                 var dt = JSON.parse(data);
                 if (more == 'no') {
