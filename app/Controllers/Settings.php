@@ -374,17 +374,15 @@ class Settings extends BaseController {
 	
 	}
 
-	public function trade($param1='', $param2='', $param3='') {
-		// check login
-        $log_id = $this->session->get('td_id');
-        if(empty($log_id)) return redirect()->to(site_url('auth'));
+	public function partnership($param1='', $param2='', $param3='') {
+		// check session login
+		if($this->session->get('td_id') == ''){
+			$request_uri = uri_string();
+			$this->session->set('td_redirect', $request_uri);
+			return redirect()->to(site_url('auth'));
+		} 
 
-		$role_id = $this->Crud->read_field('id', $log_id, 'user', 'role_id');
-		$role = strtolower($this->Crud->read_field('id', $role_id, 'access_role', 'name'));
-		
-        $data['log_id'] = $log_id;
-		
-        $mod = 'settings/trade';
+        $mod = 'settings/partnership';
 
         $log_id = $this->session->get('td_id');
         $role_id = $this->Crud->read_field('id', $log_id, 'user', 'role_id');
@@ -399,20 +397,20 @@ class Settings extends BaseController {
         $data['log_id'] = $log_id;
         $data['role'] = $role;
         $data['role_c'] = $role_c;
+       
 		
-		$table = 'trade';
-
-        $data['current_language'] = $this->session->get('current_language');
-		$form_link = site_url('settings/trade/');
-		if($param1){$form_link .= $param1.'/';}
-		if($param2){$form_link .= $param2.'/';}
-		if($param3){$form_link .= $param3.'/';}
+		$table = 'partnership';
+		$form_link = site_url($mod);
+		if($param1){$form_link .= '/'.$param1;}
+		if($param2){$form_link .= '/'.$param2.'/';}
+		if($param3){$form_link .= $param3;}
 		
 		// pass parameters to view
 		$data['param1'] = $param1;
 		$data['param2'] = $param2;
 		$data['param3'] = $param3;
-		$data['form_link'] = rtrim($form_link, '/');
+		$data['form_link'] = $form_link;
+        $data['current_language'] = $this->session->get('current_language');
 		
 		// manage record
 		if($param1 == 'manage') {
@@ -425,11 +423,18 @@ class Settings extends BaseController {
 							$data['d_id'] = $e->id;
 						}
 					}
-					
+
 					if($this->request->getMethod() == 'post'){
-						$del_id = $this->request->getVar('d_trade_id');
+						$del_id = $this->request->getVar('d_partnership_id');
+						///// store activities
+						$by = $this->Crud->read_field('id', $log_id, 'user', 'firstname');
+						$code = $this->Crud->read_field('id', $del_id, 'partnership', 'name');
+						$action = $by.' deleted Partnership ('.$code.') Record';
+
 						if($this->Crud->deletes('id', $del_id, $table) > 0) {
-							echo $this->Crud->msg('success', 'Record Deleted');
+							
+							$this->Crud->activity('user', $del_id, $action);
+							echo $this->Crud->msg('success', 'Partnership Deleted');
 							echo '<script>location.reload(false);</script>';
 						} else {
 							echo $this->Crud->msg('danger', 'Please try later');
@@ -446,30 +451,27 @@ class Settings extends BaseController {
 							foreach($edit as $e) {
 								$data['e_id'] = $e->id;
 								$data['e_name'] = $e->name;
-								$data['e_minimum'] = $e->minimum;
-								$data['e_medium'] = $e->medium;
-								$data['e_maximum'] = $e->maximum;
 							}
 						}
 					}
-				}
-				
-				if($this->request->getMethod() == 'post'){
-					$trade_id = $this->request->getVar('trade_id');
-					$name = $this->request->getVar('name');
-					$minimum = $this->request->getVar('minimum');
-					$medium = $this->request->getVar('medium');
-					$maximum = $this->request->getVar('maximum');
+				} 
 
+				if($this->request->getMethod() == 'post'){
+					$partnership_id = $this->request->getVar('partnership_id');
+					$name = $this->request->getVar('name');
+				
 					$ins_data['name'] = $name;
-					$ins_data['minimum'] = $minimum;
-					$ins_data['medium'] = $medium;
-					$ins_data['maximum'] = $maximum;
 					
 					// do create or update
-					if($trade_id) {
-						$upd_rec = $this->Crud->updates('id', $trade_id, $table, $ins_data);
+					if($partnership_id) {
+						$upd_rec = $this->Crud->updates('id', $partnership_id, $table, $ins_data);
 						if($upd_rec > 0) {
+							///// store activities
+							$by = $this->Crud->read_field('id', $log_id, 'user', 'firstname');
+							$code = $this->Crud->read_field('id', $partnership_id, 'partnership', 'name');
+							$action = $by.' updated Partnership ('.$code.') Record';
+							$this->Crud->activity('user', $partnership_id, $action);
+
 							echo $this->Crud->msg('success', 'Record Updated');
 							echo '<script>location.reload(false);</script>';
 						} else {
@@ -481,6 +483,12 @@ class Settings extends BaseController {
 						} else {
 							$ins_rec = $this->Crud->create($table, $ins_data);
 							if($ins_rec > 0) {
+								///// store activities
+								$by = $this->Crud->read_field('id', $log_id, 'user', 'firstname');
+								$code = $this->Crud->read_field('id', $ins_rec, 'partnership', 'name');
+								$action = $by.' created Partnership ('.$code.') Record';
+								$this->Crud->activity('user', $ins_rec, $action);
+
 								echo $this->Crud->msg('success', 'Record Created');
 								echo '<script>location.reload(false);</script>';
 							} else {
@@ -488,13 +496,14 @@ class Settings extends BaseController {
 							}	
 						}
 					}
-					exit;	
+
+					die;	
 				}
 			}
 		}
-		
-		 // record listing
-		 if($param1 == 'load') {
+
+        // record listing
+		if($param1 == 'load') {
 			$limit = $param2;
 			$offset = $param3;
 
@@ -503,25 +512,13 @@ class Settings extends BaseController {
             if(empty($limit)) {$limit = $rec_limit;}
 			if(empty($offset)) {$offset = 0;}
 			
-			if(!empty($this->request->getVar('start_date'))){$start_date = $this->request->getVar('start_date');}else{$start_date = '';}
-			if(!empty($this->request->getVar('end_date'))){$end_date = $this->request->getVar('end_date');}else{$end_date = '';}
-
-			if(!empty($this->request->getPost('state_id'))) { $state_id = $this->request->getPost('state_id'); } else { $state_id = ''; }
-			if(!empty($this->request->getPost('status'))) { $status = $this->request->getPost('status'); } else { $status = ''; }
-			if(!empty($this->request->getPost('ref_status'))) { $ref_status = $this->request->getPost('ref_status'); } else { $ref_status = ''; }
 			$search = $this->request->getPost('search');
-
-			if(empty($ref_status))$ref_status = 0;
+			
 			$items = '
 				<div class="nk-tb-item nk-tb-head">
-					<div class="nk-tb-col"><span class="sub-text">'.translate_phrase('Name').'</span></div>
-					<div class="nk-tb-col"><span class="sub-text">'.translate_phrase('Minimum').'</span></div>
-					<div class="nk-tb-col tb-col"><span class="sub-text">'.translate_phrase('Medium').'</span></div>
-					<div class="nk-tb-col tb-col-md"><span class="sub-text">'.translate_phrase('Maximum').'</span></div>
-					<div class="nk-tb-col nk-tb-col-tools">
-						<ul class="nk-tb-actions gx-1 my-n1">
-							
-						</ul>
+					<div class="nk-tb-col"><span class="sub-text text-dark"><b>'.translate_phrase('Name').'</b></span></div>
+					<div class="nk-tb-col text-center">
+						<b>Actions</b>
 					</div>
 				</div><!-- .nk-tb-item -->
 		
@@ -535,11 +532,11 @@ class Settings extends BaseController {
 				$item = '<div class="text-center text-muted">'.translate_phrase('Session Timeout! - Please login again').'</div>';
 			} else {
 				
-				$all_rec = $this->Crud->filter_trade('', '',  $search);
+				$all_rec = $this->Crud->filter_partnership('', '', $search);
                 // $all_rec = json_decode($all_rec);
 				if(!empty($all_rec)) { $counts = count($all_rec); } else { $counts = 0; }
 
-				$query = $this->Crud->filter_trade($limit, $offset,  $search);
+				$query = $this->Crud->filter_partnership($limit, $offset, $search);
 				$data['count'] = $counts;
 				
 
@@ -547,18 +544,14 @@ class Settings extends BaseController {
 					foreach ($query as $q) {
 						$id = $q->id;
 						$name = $q->name;
-						$minimum = $q->minimum;
-						$medium = $q->medium;
-						$maximum = $q->maximum;
 						
 						// add manage buttons
 						if ($role_u != 1) {
 							$all_btn = '';
 						} else {
-							$all_btn = '
-								<li><a href="javascript:;" class="text-primary pop" pageTitle="Edit ' . $name . '" pageName="' . site_url('settings/trade/manage/edit/' . $id) . '"><em class="icon ni ni-edit-alt"></em><span>'.translate_phrase('Edit').'</span></a></li>
-								<li><a href="javascript:;" class="text-danger pop" pageTitle="Delete ' . $name . '" pageName="' . site_url('settings/trade/manage/delete/' . $id) . '"><em class="icon ni ni-trash-alt"></em><span>'.translate_phrase('Delete').'</span></a></li>
-								
+							$all_btn = '<div class="text-center">
+								<a href="javascript:;" class="text-primary pop m-3 mr-3" pageTitle="Edit ' . $name . '" pageSize="modal-sm"  pageName="' . site_url($mod . '/manage/edit/' . $id) . '"><em class="icon ni ni-edit-alt"></em><span>'.translate_phrase('Edit').'</span></a> <a href="javascript:;" class="text-danger pop" pageTitle="Delete ' . $name . '" pageSize="modal-sm"  pageName="' . site_url($mod . '/manage/delete/' . $id) . '"><em class="icon ni ni-trash-alt"></em><span>'.translate_phrase('Delete').'</span></a>
+								</div>
 								
 							';
 						}
@@ -566,34 +559,12 @@ class Settings extends BaseController {
 						$item .= '
 							<div class="nk-tb-item">
 								<div class="nk-tb-col">
-									<div class="user-card">
-										<div class="user-info">
-											<span class="tb-lead">' . ucwords($name) . '
-										</div>
+									<div class="user-info">
+										<span class="tb-lead">' . ucwords($name) . ' </span>
 									</div>
 								</div>
-								<div class="nk-tb-col tb-col">
-									<span class="text-dark"><b>' . curr.number_format($minimum) . '</b></span>
-								</div>
-								<div class="nk-tb-col">
-									<span class="text-info"><b>' . curr.number_format($medium) . '</b></span>
-								</div>
-								<div class="nk-tb-col tb-col-md">
-									<b>' . curr.number_format($maximum) . '</b>
-								</div>
 								<div class="nk-tb-col nk-tb-col-tools">
-									<ul class="nk-tb-actions gx-1">
-										<li>
-											<div class="drodown">
-												<a href="#" class="dropdown-toggle btn btn-icon btn-trigger" data-bs-toggle="dropdown"><em class="icon ni ni-more-h"></em></a>
-												<div class="dropdown-menu dropdown-menu-end">
-													<ul class="link-list-opt no-bdr">
-														' . $all_btn . '
-													</ul>
-												</div>
-											</div>
-										</li>
-									</ul>
+									' . $all_btn . '
 								</div>
 							</div><!-- .nk-tb-item -->
 						';
@@ -607,7 +578,7 @@ class Settings extends BaseController {
 				$resp['item'] = $items.'
 					<div class="text-center text-muted">
 						<br/><br/><br/><br/>
-						<i class="ni ni-users" style="font-size:150px;"></i><br/><br/>'.translate_phrase('No Trade Line Returned').'
+						<i class="ni ni-link" style="font-size:100px;"></i><br/><br/>'.translate_phrase('No Partnership Returned').'
 					</div>
 				';
 			} else {
@@ -635,278 +606,15 @@ class Settings extends BaseController {
 			die;
 		}
 
-		
 		if($param1 == 'manage') { // view for form data posting
-			return view('setting/trade_form', $data);
+			return view('setting/partnership_form', $data);
 		} else { // view for main page
 			
-			$data['title'] = translate_phrase('Trade Line').' - '.app_name;
-			$data['page_active'] = 'trade';
-			
-			return view('setting/trade', $data);
+			$data['title'] = translate_phrase('Partnership').' - '.app_name;
+			$data['page_active'] = $mod;
+			return view('setting/partnership', $data);
 		}
-	
-	}
-	
-	public function territory($param1='', $param2='', $param3='') {
-		// check login
-        $log_id = $this->session->get('td_id');
-        if(empty($log_id)) return redirect()->to(site_url('auth'));
-
-		$role_id = $this->Crud->read_field('id', $log_id, 'user', 'role_id');
-		$role = strtolower($this->Crud->read_field('id', $role_id, 'access_role', 'name'));
-		
-        $data['log_id'] = $log_id;
-		
-        $mod = 'settings/territory';
-
-        $log_id = $this->session->get('td_id');
-        $role_id = $this->Crud->read_field('id', $log_id, 'user', 'role_id');
-        $role = strtolower($this->Crud->read_field('id', $role_id, 'access_role', 'name'));
-        $role_c = $this->Crud->module($role_id, $mod, 'create');
-        $role_r = $this->Crud->module($role_id, $mod, 'read');
-        $role_u = $this->Crud->module($role_id, $mod, 'update');
-        $role_d = $this->Crud->module($role_id, $mod, 'delete');
-        if($role_r == 0){
-            return redirect()->to(site_url('dashboard'));	
-        }
-        $data['log_id'] = $log_id;
-        $data['role'] = $role;
-        $data['role_c'] = $role_c;
-		
-		$table = 'territory';
-
-        $data['current_language'] = $this->session->get('current_language');
-		$form_link = site_url('settings/territory/');
-		if($param1){$form_link .= $param1.'/';}
-		if($param2){$form_link .= $param2.'/';}
-		if($param3){$form_link .= $param3.'/';}
-		
-		// pass parameters to view
-		$data['param1'] = $param1;
-		$data['param2'] = $param2;
-		$data['param3'] = $param3;
-		$data['form_link'] = rtrim($form_link, '/');
-		
-		// manage record
-		if($param1 == 'manage') {
-			// prepare for delete
-			if($param2 == 'delete') {
-				if($param3) {
-					$edit = $this->Crud->read_single('id', $param3, $table);
-					if(!empty($edit)) {
-						foreach($edit as $e) {
-							$data['d_id'] = $e->id;
-						}
-					}
-					
-					if($this->request->getMethod() == 'post'){
-						$del_id = $this->request->getVar('d_trade_id');
-						if($this->Crud->deletes('id', $del_id, $table) > 0) {
-							echo $this->Crud->msg('success', 'Record Deleted');
-							echo '<script>location.reload(false);</script>';
-						} else {
-							echo $this->Crud->msg('danger', 'Please try later');
-						}
-						exit;	
-					}
-				}
-			} else {
-				// prepare for edit
-				if($param2 == 'edit') {
-					if($param3) {
-						$edit = $this->Crud->read_single('id', $param3, $table);
-						if(!empty($edit)) {
-							foreach($edit as $e) {
-								$data['e_id'] = $e->id;
-								$data['e_name'] = $e->name;
-								$data['e_lga_id'] = $e->lga_id;
-							}
-						}
-					}
-				}
-				
-				if($this->request->getMethod() == 'post'){
-					$territory_id = $this->request->getVar('territory_id');
-					$name = $this->request->getVar('name');
-					$lga_id = $this->request->getVar('lga_id');
-
-					$ins_data['lga_id'] = $lga_id;
-					$ins_data['name'] = $name;
-					
-					// do create or update
-					if($territory_id) {
-						$upd_rec = $this->Crud->updates('id', $territory_id, $table, $ins_data);
-						if($upd_rec > 0) {
-							echo $this->Crud->msg('success', 'Record Updated');
-							///// store activities
-							$code = $this->Crud->read_field('id', $log_id, 'user', 'fullname');
-							$action = $code.' updated Territory ('.$name.')';
-							$this->Crud->activity('territory', $territory_id, $action);
-
-							echo '<script>location.reload(false);</script>';
-						} else {
-							echo $this->Crud->msg('info', 'No Changes');	
-						}
-					}  else {
-						if($this->Crud->check2('lga_id', $lga_id, 'name', $name, $table) > 0) {
-							echo $this->Crud->msg('warning', 'Record Already Exist');
-						} else {
-							$ins_rec = $this->Crud->create($table, $ins_data);
-							if($ins_rec > 0) {
-								echo $this->Crud->msg('success', 'Record Created');
-								///// store activities
-								$code = $this->Crud->read_field('id', $log_id, 'user', 'fullname');
-								$action = $code.' created Territory ('.$name.')';
-								$this->Crud->activity('territory', $ins_rec, $action);
-
-								echo '<script>location.reload(false);</script>';
-							} else {
-								echo $this->Crud->msg('danger', 'Please try later');	
-							}	
-						}
-					}
-					exit;	
-				}
-			}
-		}
-		
-		 // record listing
-		 if($param1 == 'load') {
-			$limit = $param2;
-			$offset = $param3;
-
-			$rec_limit = 40;
-			$item = '';
-            if(empty($limit)) {$limit = $rec_limit;}
-			if(empty($offset)) {$offset = 0;}
-			
-			
-			$search = $this->request->getPost('search');
-			if(!empty($this->request->getPost('territory'))){$territory = $this->request->getPost('territory');} else{$territory = '';}
-			$items = '
-				<div class="nk-tb-item nk-tb-head">
-					<div class="nk-tb-col"><span class="sub-text">'.translate_phrase('Territory').'</span></div>
-					<div class="nk-tb-col"><span class="sub-text">'.translate_phrase('Delta Local Government').'</span></div>
-					<div class="nk-tb-col nk-tb-col-tools">
-						<ul class="nk-tb-actions gx-1 my-n1">
-							
-						</ul>
-					</div>
-				</div><!-- .nk-tb-item -->
-		
-				
-			';
-			$a = 1;
-
-            //echo $status;
-			$log_id = $this->session->get('td_id');
-			if(!$log_id) {
-				$item = '<div class="text-center text-muted">'.translate_phrase('Session Timeout! - Please login again').'</div>';
-			} else {
-				
-				$all_rec = $this->Crud->filter_territory('', '', $territory, $search);
-                // $all_rec = json_decode($all_rec);
-				if(!empty($all_rec)) { $counts = count($all_rec); } else { $counts = 0; }
-
-				$query = $this->Crud->filter_territory($limit, $offset, $territory, $search);
-				$data['count'] = $counts;
-				
-
-				if(!empty($query)) {
-					foreach ($query as $q) {
-						$id = $q->id;
-						$name = $q->name;
-						$lga_id = $q->lga_id;
-						$lga = $this->Crud->read_field('id', $lga_id, 'city', 'name');
-						
-						// add manage buttons
-						if ($role_u != 1) {
-							$all_btn = '';
-						} else {
-							$all_btn = '
-								<li><a href="javascript:;" class="text-primary pop" pageTitle="Edit ' . $name . '" pageName="' . site_url('settings/territory/manage/edit/' . $id) . '"><em class="icon ni ni-edit-alt"></em><span>'.translate_phrase('Edit').'</span></a></li>
-							';
-						}
-
-						$item .= '
-							<div class="nk-tb-item">
-								<div class="nk-tb-col">
-									<div class="user-card">
-										<div class="user-info">
-											<span class="tb-lead">' . ucwords($name) . '
-										</div>
-									</div>
-								</div>
-								<div class="nk-tb-col tb-col">
-									<span class="text-dark"><span>' .ucwords($lga) . '</span></span>
-								</div>
-								<div class="nk-tb-col nk-tb-col-tools">
-									<ul class="nk-tb-actions gx-1">
-										<li>
-											<div class="drodown">
-												<a href="#" class="dropdown-toggle btn btn-icon btn-trigger" data-bs-toggle="dropdown"><em class="icon ni ni-more-h"></em></a>
-												<div class="dropdown-menu dropdown-menu-end">
-													<ul class="link-list-opt no-bdr">
-														' . $all_btn . '
-													</ul>
-												</div>
-											</div>
-										</li>
-									</ul>
-								</div>
-							</div><!-- .nk-tb-item -->
-						';
-						$a++;
-					}
-				}
-				
-			}
-			
-			if(empty($item)) {
-				$resp['item'] = $items.'
-					<div class="text-center text-muted">
-						<br/><br/><br/><br/>
-						<i class="ni ni-users" style="font-size:150px;"></i><br/><br/>'.translate_phrase('No Territory Returned').'
-					</div>
-				';
-			} else {
-				$resp['item'] = $items . $item;
-				if($offset >= 45){
-					$resp['item'] = $item;
-				}
-				
-			}
-
-			$resp['count'] = $counts;
-
-			$more_record = $counts - ($offset + $rec_limit);
-			$resp['left'] = $more_record;
-
-			if($counts > ($offset + $rec_limit)) { // for load more records
-				$resp['limit'] = $rec_limit;
-				$resp['offset'] = $offset + $limit;
-			} else {
-				$resp['limit'] = 0;
-				$resp['offset'] = 0;
-			}
-
-			echo json_encode($resp);
-			die;
-		}
-
-		
-		if($param1 == 'manage') { // view for form data posting
-			return view('setting/territory_form', $data);
-		} else { // view for main page
-			
-			$data['title'] = translate_phrase('Territory').' - '.app_name;
-			$data['page_active'] = 'territory';
-			
-			return view('setting/territory', $data);
-		}
-	
-	}
+    }
 	/////// language
 	public function language($param1='', $param2='', $param3='') {
 		// check login
