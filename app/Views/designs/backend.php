@@ -2,8 +2,8 @@
     use App\Models\Crud;
     $this->Crud = new Crud();
     
-    $username = $this->Crud->read_field('id', $log_id, 'user', 'surname').' '.$this->Crud->read_field('id', $log_id, 'user', 'firstname');
-    $log_name = $this->Crud->read_field('id', $log_id, 'user', 'surname').' '.$this->Crud->read_field('id', $log_id, 'user', 'firstname');
+    $username = $this->Crud->read_field('id', $log_id, 'user', 'firstname').' '.$this->Crud->read_field('id', $log_id, 'user', 'surname');
+    $log_name = $this->Crud->read_field('id', $log_id, 'user', 'firstname').' '.$this->Crud->read_field('id', $log_id, 'user', 'surname');
     $email = $this->Crud->read_field('id', $log_id, 'user', 'email');
     $log_role_id = $this->Crud->read_field('id', $log_id, 'user', 'role_id');
 	$log_role = strtolower($this->Crud->read_field('id', $log_role_id, 'access_role', 'name'));

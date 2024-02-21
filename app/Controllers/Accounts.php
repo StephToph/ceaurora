@@ -1032,11 +1032,10 @@ class Accounts extends BaseController {
 					}
 
 					if($this->request->getMethod() == 'post'){
-						$del_id = $this->request->getVar('d_cell_id');
+						$del_id = $this->request->getVar('d_giving_id');
 						///// store activities
 						$by = $this->Crud->read_field('id', $log_id, 'user', 'firstname');
-						$code = $this->Crud->read_field('id', $del_id, 'cell', 'name');
-						$action = $by.' deleted Cell ('.$code.') Record';
+						$action = $by.' deleted Giving Partnership Record';
 
 						if($this->Crud->deletes('id', $del_id, $table) > 0) {
 							
@@ -1057,46 +1056,53 @@ class Accounts extends BaseController {
 						if(!empty($edit)) {
 							foreach($edit as $e) {
 								$data['e_id'] = $e->id;
-								$data['e_location'] = $e->location;
-								$data['e_name'] = $e->name;
-								$data['e_roles'] = json_decode($e->roles);
-								$data['e_time'] = json_decode($e->time);
+								$data['e_member_id'] = $e->member_id;
+								$data['e_partnership_id'] = $e->partnership_id;
+								$data['e_amount_paid'] = $e->amount_paid;
+								$data['e_status'] = $e->status;
+								$data['e_img'] = $e->file;
 							}
 						}
 					}
 				} 
 
 				if($this->request->getMethod() == 'post'){
-					$cell_id = $this->request->getVar('cell_id');
-					$name = $this->request->getVar('name');
-					$roles = $this->request->getVar('roles');
-					$location = $this->request->getVar('location');
-					$times = $this->request->getVar('times');
-					$days = $this->request->getVar('days');
+					$giving_id = $this->request->getVar('giving_id');
+					$member_id = $this->request->getVar('member_id');
+					$partnership_id = $this->request->getVar('partnership_id');
+					$amount = $this->request->getVar('amount');
+					$status = $this->request->getVar('status');
+					$img_id = $this->request->getVar('img');
 					
-					$time = [];
-					for($i=0;$i < count($days);$i++ ){
-						$day = $days[$i];
-						// echo $day;
-						$time[$day] = $times[$i];
+					 //// Image upload
+					 if(file_exists($this->request->getFile('pics'))) {
+						if(!empty($img_id)){
+							unlink(FCPATH . $img_id);
+						}
+
+						$path = 'assets/images/givings/';
+						$file = $this->request->getFile('pics');
+						$getImg = $this->Crud->img_upload($path, $file);
+						
+						if(!empty($getImg->path)) $img_id = $getImg->path;
 					}
-					// print_r($time);
-					// print_r($days);
-					// die;
-					$ins_data['name'] = $name;
-					$ins_data['roles'] = json_encode($roles);
-					$ins_data['location'] = $location;
-					$ins_data['time'] = json_encode($time);
+					
+					$ins_data['member_id'] = $member_id;
+					$ins_data['partnership_id'] = $partnership_id;
+					$ins_data['amount_paid'] = $amount;
+					$ins_data['status'] = $status;
+					$ins_data['file'] = $img_id;
 					
 					// do create or update
-					if($cell_id) {
-						$upd_rec = $this->Crud->updates('id', $cell_id, $table, $ins_data);
+					if($giving_id) {
+						$upd_rec = $this->Crud->updates('id', $giving_id, $table, $ins_data);
 						if($upd_rec > 0) {
 							///// store activities
+							///// store activities
 							$by = $this->Crud->read_field('id', $log_id, 'user', 'firstname');
-							$code = $this->Crud->read_field('id', $cell_id, 'dept', 'name');
-							$action = $by.' updated Department ('.$code.') Record';
-							$this->Crud->activity('user', $cell_id, $action);
+							$code = $this->Crud->read_field('id', $partnership_id, 'partnership', 'name');
+							$action = $by.' updated ('.$code.') Partnership Giving Record';
+							$this->Crud->activity('user', $giving_id, $action);
 
 							echo $this->Crud->msg('success', 'Record Updated');
 							echo '<script>location.reload(false);</script>';
@@ -1104,23 +1110,20 @@ class Accounts extends BaseController {
 							echo $this->Crud->msg('info', 'No Changes');	
 						}
 					} else {
-						if($this->Crud->check('name', $name, $table) > 0) {
-							echo $this->Crud->msg('warning', 'Record Already Exist');
-						} else {
-							$ins_rec = $this->Crud->create($table, $ins_data);
-							if($ins_rec > 0) {
-								///// store activities
-								$by = $this->Crud->read_field('id', $log_id, 'user', 'firstname');
-								$code = $this->Crud->read_field('id', $ins_rec, 'dept', 'name');
-								$action = $by.' created Department ('.$code.') Record';
-								$this->Crud->activity('user', $ins_rec, $action);
+						$ins_data['reg_date'] = date(fdate);
+						$ins_rec = $this->Crud->create($table, $ins_data);
+						if($ins_rec > 0) {
+							///// store activities
+							$by = $this->Crud->read_field('id', $member_id, 'user', 'firstname');
+							$code = $this->Crud->read_field('id', $partnership_id, 'partnership', 'name');
+							$action = $by.' paid ('.$code.') Partnership';
+							$this->Crud->activity('user', $ins_rec, $action);
 
-								echo $this->Crud->msg('success', 'Record Created');
-								echo '<script>location.reload(false);</script>';
-							} else {
-								echo $this->Crud->msg('danger', 'Please try later');	
-							}	
-						}
+							echo $this->Crud->msg('success', 'Giving Paid Successful');
+							echo '<script>location.reload(false);</script>';
+						} else {
+							echo $this->Crud->msg('danger', 'Please try later');	
+						}	
 					}
 
 					die;	
@@ -1146,6 +1149,7 @@ class Accounts extends BaseController {
 					<div class="nk-tb-col"><span class="sub-text text-dark"><b>'.translate_phrase('Partnership').'</b></span></div>
 					<div class="nk-tb-col nk-tb-col-md"><span class="sub-text text-dark"><b>'.translate_phrase('Member').'</b></span></div>
 					<div class="nk-tb-col"><span class="sub-text text-dark"><b>'.translate_phrase('Amount').'</b></span></div>
+					<div class="nk-tb-col"><span class="sub-text text-dark"><b>'.translate_phrase('Status').'</b></span></div>
 					<div class="nk-tb-col nk-tb-col-tools">
 						<ul class="nk-tb-actions gx-1 my-n1">
 							
@@ -1163,40 +1167,36 @@ class Accounts extends BaseController {
 				$item = '<div class="text-center text-muted">'.translate_phrase('Session Timeout! - Please login again').'</div>';
 			} else {
 				
-				$all_rec = $this->Crud->filter_givings('', '', $search);
+				$all_rec = $this->Crud->filter_givings('', '', $search, $log_id);
                 // $all_rec = json_decode($all_rec);
 				if(!empty($all_rec)) { $counts = count($all_rec); } else { $counts = 0; }
 
-				$query = $this->Crud->filter_givings($limit, $offset, $search);
+				$query = $this->Crud->filter_givings($limit, $offset, $search, $log_id);
 				$data['count'] = $counts;
 				
 
 				if(!empty($query)) {
 					foreach ($query as $q) {
 						$id = $q->id;
-						$name = $q->name;
-						$location = $q->location;
-						$time = $q->time;
-						$roles = $q->roles;
-						$rolesa = json_decode($roles);
-						$rols = '';
-						if(!empty($rolesa)){
-							foreach($rolesa as $r => $val){
-								$rols .= $val.', ';
-							}
-						}
-
-						$times = '<span class="text-danger">No Meeting Time</span>';
-						if(!empty($time)){
-							$times = '<a href="javascript:;" class="text-primary pop" pageTitle="View Time " pageName="' . site_url($mod . '/manage/view/' . $id) . '"><em class="icon ni ni-eye"></em> <span>'.translate_phrase('View Meeting Time').'</span></a>';
+						$member_id = $q->member_id;
+						$partnership_id = $q->partnership_id;
+						$amount_paid = $q->amount_paid;
+						$status = $q->status;
+						$reg_date = date('d M Y h:iA', strtotime($q->reg_date));
+						$member = $this->Crud->read_field('id', $member_id, 'user', 'firstname').' '.$this->Crud->read_field('id', $member_id, 'user', 'surname');
+						$partnership = $this->Crud->read_field('id', $partnership_id, 'partnership', 'name');
+						
+						$st = '<span class="text-warning">Pending</span>';
+						if($status > 0){
+							$st = '<span class="text-success">Confirmed</span>';
 						}
 						// add manage buttons
 						if ($role_u != 1) {
 							$all_btn = '';
 						} else {
 							$all_btn = '
-								<li><a href="javascript:;" class="text-primary pop" pageTitle="Edit ' . $name . '" pageName="' . site_url($mod . '/manage/edit/' . $id) . '"><em class="icon ni ni-edit-alt"></em><span>'.translate_phrase('Edit').'</span></a></li>
-								<li><a href="javascript:;" class="text-danger pop" pageTitle="Delete ' . $name . '" pageName="' . site_url($mod . '/manage/delete/' . $id) . '"><em class="icon ni ni-trash-alt"></em><span>'.translate_phrase('Delete').'</span></a></li>
+								<li><a href="javascript:;" class="text-primary pop" pageTitle="Edit" pageName="' . site_url($mod . '/manage/edit/' . $id) . '"><em class="icon ni ni-edit-alt"></em><span>'.translate_phrase('Edit').'</span></a></li>
+								<li><a href="javascript:;" class="text-danger pop" pageTitle="Delete" pageName="' . site_url($mod . '/manage/delete/' . $id) . '"><em class="icon ni ni-trash-alt"></em><span>'.translate_phrase('Delete').'</span></a></li>
 								
 								
 							';
@@ -1206,17 +1206,20 @@ class Accounts extends BaseController {
 							<div class="nk-tb-item">
 								<div class="nk-tb-col">
 									<div class="user-info">
-										<span class="tb-lead">' . ucwords($name) . ' </span>
+										<span class="tb-lead">' . ucwords($reg_date) . ' </span>
 									</div>
 								</div>
 								<div class="nk-tb-col tb-col-md">
-									<span class="text-dark">' . ucwords($location) . '</span>
+									<span class="text-dark">' . ucwords($member) . '</span>
 								</div>
 								<div class="nk-tb-col tb-col">
-									<span class="text-dark"><b>' . ucwords(rtrim($rols, ', ')) . '</b></span>
+									<span class="text-dark">' . ucwords($partnership) . '</span>
 								</div>
 								<div class="nk-tb-col tb-col-md">
-									<span class="text-dark">' . ($times) . '</span>
+									<span class="text-dark">$' . number_format($amount_paid,2) . '</span>
+								</div>
+								<div class="nk-tb-col tb-col-md">
+									<span class="text-dark">' . ($st) . '</span>
 								</div>
 								<div class="nk-tb-col nk-tb-col-tools">
 									<ul class="nk-tb-actions gx-1">
@@ -1818,7 +1821,7 @@ class Accounts extends BaseController {
 				if(empty($this->Crud->read_field('id', $user_id, 'user', 'last_log'))){
 					$data['last_log'] = 'Not Logged In';
 				}
-				$data['fullname'] = $this->Crud->read_field('id', $user_id, 'user', 'surname').' '.$this->Crud->read_field('id', $user_id, 'user', 'firstname').' '.$this->Crud->read_field('id', $user_id, 'user', 'othername');
+				$data['fullname'] = $this->Crud->read_field('id', $user_id, 'user', 'firstname').' '.$this->Crud->read_field('id', $user_id, 'user', 'surname').' '.$this->Crud->read_field('id', $user_id, 'user', 'othername');
 				$role_id = $this->Crud->read_field('id', $user_id, 'user', 'role_id');
 				$role = $this->Crud->read_field('id', $role_id, 'access_role', 'name');
 				$data['role'] = $this->Crud->read_field('id', $role_id, 'access_role', 'name');
@@ -1845,7 +1848,7 @@ class Accounts extends BaseController {
 				if(!empty($v_img_id)){
 					$img = '<img src="'.site_url($this->Crud->image($v_img_id, "big")).'">';
 				} else {
-					$img = $this->Crud->image_name($this->Crud->read_field('id', $user_id, 'user', 'surname').' '.$this->Crud->read_field('id', $user_id, 'user', 'firstname').' '.$this->Crud->read_field('id', $user_id, 'user', 'othername'));
+					$img = $this->Crud->image_name($this->Crud->read_field('id', $user_id, 'user', 'firstname').' '.$this->Crud->read_field('id', $user_id, 'user', 'othername').' '.$this->Crud->read_field('id', $user_id, 'user', 'surname'));
 				}
 				$data['v_img'] = $img;
 
