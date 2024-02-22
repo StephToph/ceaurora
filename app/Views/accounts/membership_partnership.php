@@ -17,6 +17,9 @@
                     <div class="nk-block-between">
                         <div class="nk-block-head-content">
                             <h3 class="nk-block-title page-title"><?php if(!empty($param2)){echo ucwords($this->Crud->read_field('id', $param2, 'user', 'surname')).'`s '; } ?><?=translate_phrase('Partnership');?></h3>
+                        </div>
+                        <div class="nk-block-head-content">
+                            <a class="btn btn-info" href="<?=site_url('accounts/membership'); ?>"><em class="icon ni ni-arrow-long-left"></em>Back to Membership</a>
                         </div><!-- .nk-block-head-content -->
                     </div><!-- .nk-block-between -->
                 </div><!-- .nk-block-head -->
