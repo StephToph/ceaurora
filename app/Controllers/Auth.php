@@ -649,7 +649,7 @@ class Auth extends BaseController {
 		$data['email'] = $this->Crud->read_field('id', $log_id, 'user', 'email');
 		$data['address'] = $this->Crud->read_field('id', $log_id, 'user', 'address');
 		$data['chat_handle'] = $this->Crud->read_field('id', $log_id, 'user', 'chat_handle');
-		$data['fullname'] = $this->Crud->read_field('id', $log_id, 'user', 'surname').' '.$this->Crud->read_field('id', $log_id, 'user', 'firstname');
+		$data['fullname'] = $this->Crud->read_field('id', $log_id, 'user', 'firstname').' '.$this->Crud->read_field('id', $log_id, 'user', 'surname');
        	$data['phone'] = $this->Crud->read_field('id', $log_id, 'user', 'phone');
 		
 

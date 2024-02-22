@@ -1821,7 +1821,7 @@ class Accounts extends BaseController {
 				if(empty($this->Crud->read_field('id', $user_id, 'user', 'last_log'))){
 					$data['last_log'] = 'Not Logged In';
 				}
-				$data['fullname'] = $this->Crud->read_field('id', $user_id, 'user', 'surname').' '.$this->Crud->read_field('id', $user_id, 'user', 'firstname').' '.$this->Crud->read_field('id', $user_id, 'user', 'othername');
+				$data['fullname'] = $this->Crud->read_field('id', $user_id, 'user', 'firstname').' '.$this->Crud->read_field('id', $user_id, 'user', 'surname').' '.$this->Crud->read_field('id', $user_id, 'user', 'othername');
 				$role_id = $this->Crud->read_field('id', $user_id, 'user', 'role_id');
 				$role = $this->Crud->read_field('id', $role_id, 'access_role', 'name');
 				$data['role'] = $this->Crud->read_field('id', $role_id, 'access_role', 'name');
@@ -1848,7 +1848,7 @@ class Accounts extends BaseController {
 				if(!empty($v_img_id)){
 					$img = '<img src="'.site_url($this->Crud->image($v_img_id, "big")).'">';
 				} else {
-					$img = $this->Crud->image_name($this->Crud->read_field('id', $user_id, 'user', 'surname').' '.$this->Crud->read_field('id', $user_id, 'user', 'firstname').' '.$this->Crud->read_field('id', $user_id, 'user', 'othername'));
+					$img = $this->Crud->image_name($this->Crud->read_field('id', $user_id, 'user', 'firstname').' '.$this->Crud->read_field('id', $user_id, 'user', 'othername').' '.$this->Crud->read_field('id', $user_id, 'user', 'surname'));
 				}
 				$data['v_img'] = $img;
 
