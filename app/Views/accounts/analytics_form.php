@@ -58,7 +58,7 @@ $this->Crud = new Crud();
                             
                         
                     } else{
-                        echo '<tr><td colspan="3">No Records</td></tr>';
+                        echo '<tr><td colspan="3" class="text-center">No Records</td></tr>';
                     }
                     
                 ?>
