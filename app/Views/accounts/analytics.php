@@ -99,12 +99,15 @@
        
         var search = $('#search').val();
         var member_id = $('#member_id').val();
+        var start_date = $('#start_date').val();
+        var end_date = $('#end_date').val();
+
         //alert(status);
 
         $.ajax({
             url: site_url + 'accounts/analytics/load' + methods,
             type: 'post',
-            data: { search: search, member_id:member_id },
+            data: { search: search, start_date:start_date,end_date:end_date },
             success: function (data) {
                 var dt = JSON.parse(data);
                 if (more == 'no') {

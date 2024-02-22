@@ -1456,6 +1456,10 @@ class Accounts extends BaseController {
 			if(empty($offset)) {$offset = 0;}
 			
 			$search = $this->request->getPost('search');
+			if(!empty($this->request->getVar('start_date'))) { $start_date = $this->request->getVar('start_date'); } else { $start_date = date('Y-01-01'); }
+			if(!empty($this->request->getVar('end_date'))) { $end_date = $this->request->getVar('end_date'); } else { $end_date = date('Y-m-d'); }
+			$this->session->set('p_start_date', $start_date);
+			$this->session->set('p_end_date', $end_date);
 			
 			$items = '
 				<div class="nk-tb-item nk-tb-head">
@@ -1509,9 +1513,9 @@ class Accounts extends BaseController {
 										if($id == $pa){
 											$goal += (float)$val;
 											if($val > 0)$p_participant++;
-											
-											$g_participant = $this->Crud->check('partnership_id', $pa, 'partners_history');
-											$paids = $this->Crud->read_single('partnership_id', $pa, 'partners_history');
+
+											$g_participant = $this->Crud->date_check2($start_date, 'reg_date', $end_date, 'reg_date', 'status', 1, 'partnership_id', $pa, 'partners_history');
+											$paids = $this->Crud->date_range2($start_date, 'reg_date', $end_date, 'reg_date','partnership_id', $pa, 'status', 1,  'partners_history');
 											if(!empty($paids)){
 												foreach($paids as $p){
 													$given += (float)$p->amount_paid;

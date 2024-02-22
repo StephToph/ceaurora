@@ -24,6 +24,49 @@ $this->Crud = new Crud();
         </div>
     <?php } ?>
 
+        
+    <?php if($param2 == 'view'){?>
+        <b><?=ucwords($this->Crud->read_field('id', $param3, 'partnership', 'name')).'`s Partnership History '; ?></b><br>
+        <table id="dtable" class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Members</th>
+                    <th>Amount Paid</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php 
+                    $pays = $this->Crud->read2('status', 1,'partnership_id', $param3, 'partners_history');
+
+                    $total = 0;
+                    if(!empty($pays)){
+                        foreach($pays as $p){
+                            $time = $p->reg_date;
+                            $member_id = $p->member_id;
+                            $amount_paid = $p->amount_paid;
+                            
+                        
+                            ?>
+                                <tr>
+                                    <td><?=date('d M Y h:iA', strtotime($time)); ?></td>
+                                    <td><?=ucwords($this->Crud->read_field('id', $member_id, 'user', 'firstname').' '.$this->Crud->read_field('id', $member_id, 'user', 'surname')); ?></td>
+                                    <td><?='$'.number_format($amount_paid,2); ?></td>
+                                </tr>
+                    <?php
+                                }
+                            
+                        
+                    } else{
+                        echo '<tr><td colspan="3">No Records</td></tr>';
+                    }
+                    
+                ?>
+            </tbody>
+        </table>
+
+    <?php } ?>
+
     <!-- insert/edit view -->
     <?php if($param2 == 'edit' || $param2 == '') { ?>
         <div class="row">
