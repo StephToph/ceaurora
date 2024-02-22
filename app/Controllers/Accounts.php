@@ -1059,6 +1059,7 @@ class Accounts extends BaseController {
 								$data['e_member_id'] = $e->member_id;
 								$data['e_partnership_id'] = $e->partnership_id;
 								$data['e_amount_paid'] = $e->amount_paid;
+								$data['e_date_paid'] = $e->date_paid;
 								$data['e_status'] = $e->status;
 								$data['e_img'] = $e->file;
 							}
@@ -1072,6 +1073,7 @@ class Accounts extends BaseController {
 					$partnership_id = $this->request->getVar('partnership_id');
 					$amount = $this->request->getVar('amount');
 					$status = $this->request->getVar('status');
+					$date_paid = $this->request->getVar('date_paid');
 					$img_id = $this->request->getVar('img');
 					
 					 //// Image upload
@@ -1091,6 +1093,7 @@ class Accounts extends BaseController {
 					$ins_data['partnership_id'] = $partnership_id;
 					$ins_data['amount_paid'] = $amount;
 					$ins_data['status'] = $status;
+					$ins_data['date_paid'] = $date_paid;
 					$ins_data['file'] = $img_id;
 					
 					// do create or update
@@ -1187,7 +1190,7 @@ class Accounts extends BaseController {
 						$partnership_id = $q->partnership_id;
 						$amount_paid = $q->amount_paid;
 						$status = $q->status;
-						$reg_date = date('d M Y h:iA', strtotime($q->reg_date));
+						$reg_date = date('d M Y h:iA', strtotime($q->date_paid));
 						$member = $this->Crud->read_field('id', $member_id, 'user', 'firstname').' '.$this->Crud->read_field('id', $member_id, 'user', 'surname');
 						$partnership = $this->Crud->read_field('id', $partnership_id, 'partnership', 'name');
 						
@@ -1443,7 +1446,9 @@ class Accounts extends BaseController {
 					die;	
 				}
 			}
-		}
+		}$data['p_start_date'] = $this->session->get('p_start_date');
+		$data['p_end_date'] = $this->session->get('p_end_date');
+		
 
         // record listing
 		if($param1 == 'load') {
@@ -1460,6 +1465,7 @@ class Accounts extends BaseController {
 			if(!empty($this->request->getVar('end_date'))) { $end_date = $this->request->getVar('end_date'); } else { $end_date = date('Y-m-d'); }
 			$this->session->set('p_start_date', $start_date);
 			$this->session->set('p_end_date', $end_date);
+			
 			
 			$items = '
 				<div class="nk-tb-item nk-tb-head">
@@ -1514,8 +1520,8 @@ class Accounts extends BaseController {
 											$goal += (float)$val;
 											if($val > 0)$p_participant++;
 
-											$g_participant = $this->Crud->date_check2($start_date, 'reg_date', $end_date, 'reg_date', 'status', 1, 'partnership_id', $pa, 'partners_history');
-											$paids = $this->Crud->date_range2($start_date, 'reg_date', $end_date, 'reg_date','partnership_id', $pa, 'status', 1,  'partners_history');
+											$g_participant = $this->Crud->date_check2($start_date, 'date_paid', $end_date, 'date_paid', 'status', 1, 'partnership_id', $pa, 'partners_history');
+											$paids = $this->Crud->date_range2($start_date, 'date_paid', $end_date, 'date_paid','partnership_id', $pa, 'status', 1,  'partners_history');
 											if(!empty($paids)){
 												foreach($paids as $p){
 													$given += (float)$p->amount_paid;
@@ -1628,7 +1634,7 @@ class Accounts extends BaseController {
     }
 
 	//Customer
-	public function membership($param1='', $param2='', $param3='') {
+	public function membership($param1='', $param2='', $param3='', $param4='') {
 		// check session login
 		if($this->session->get('td_id') == ''){
 			$request_uri = uri_string();
@@ -1657,13 +1663,15 @@ class Accounts extends BaseController {
 		$form_link = site_url($mod);
 		if($param1){$form_link .= '/'.$param1;}
 		if($param2){$form_link .= '/'.$param2.'/';}
-		if($param3){$form_link .= $param3;}
+		if($param2){$form_link .= '/'.$param3.'/';}
+		if($param3){$form_link .= $param4;}
 		
 		// pass parameters to view
 		$data['param1'] = $param1;
 		$data['param2'] = $param2;
 		$data['param3'] = $param3;
-		$data['form_link'] = $form_link;
+		$data['param4'] = $param4;
+		$data['form_link'] = rtrim($form_link, '/');
         $data['current_language'] = $this->session->get('current_language');
 		
 		// manage record
@@ -2339,11 +2347,8 @@ class Accounts extends BaseController {
 								$all_btn = '';
 							} else {
 								$all_btn = '
-									<li><a href="' . site_url($mod . '/manages/edit/' . $id) . '" class="text-info" pageTitle="Edit ' . $name . '" pageName="' . site_url($mod . '/manages/edit/' . $id) . '"><em class="icon ni ni-edit-alt"></em><span>'.translate_phrase('Edit').'</span></a></li>
-									<li><a href="javascript:;" class="text-danger pop" pageTitle="Delete ' . $name . '" pageName="' . site_url($mod . '/manage/delete/' . $id) . '"><em class="icon ni ni-trash-alt"></em><span>'.translate_phrase('Delete').'</span></a></li>
-									<li><a href="' . site_url($mod . '/view/' . $id) . '" class="text-success" pageTitle="View ' . $name . '" pageSize="modal-lg" pageName=""><em class="icon ni ni-eye"></em><span>'.translate_phrase('View Records').'</span></a></li>
-									<li><a href="' . site_url($mod . '/partnership/' . $id) . '" class="text-primary" pageTitle="View ' . $name . '" pageSize="modal-lg" pageName=""><em class="icon ni ni-link"></em><span>'.translate_phrase('Partnership Records').'</span></a></li>
-									
+								<li><a href="javascript:;" class="text-primary pop" pageTitle="View ' . $name . '" pageName="' . site_url($mod . '/manage/view/' . $id.'/'.$member_id) . '"><em class="icon ni ni-eye"></em><span>'.translate_phrase('View').'</span></a></li>
+								
 									
 								';
 							}
@@ -2370,20 +2375,7 @@ class Accounts extends BaseController {
 											<span class="tb-lead">$' .number_format($balance,2) . '</span>
 										</div>
 									</div>
-									<div class="nk-tb-col nk-tb-col-tools">
-										<ul class="nk-tb-actions gx-1">
-											<li>
-												<div class="drodown">
-													<a href="#" class="dropdown-toggle btn btn-icon btn-trigger" data-bs-toggle="dropdown"><em class="icon ni ni-more-h"></em></a>
-													<div class="dropdown-menu dropdown-menu-end">
-														<ul class="link-list-opt no-bdr">
-															' . $all_btn . '
-														</ul>
-													</div>
-												</div>
-											</li>
-										</ul>
-									</div>
+									<div class="nk-tb-col nk-tb-col-tools">' . $all_btn . '</div>
 								</div><!-- .nk-tb-item -->
 							';
 							$a++;
