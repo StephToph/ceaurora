@@ -33,25 +33,38 @@ $this->Crud = new Crud();
                     <th>Date</th>
                     <th>Members</th>
                     <th>Amount Paid</th>
+                    <th>Status</th>
                 </tr>
             </thead>
             <tbody>
                 <?php 
-                    $pays = $this->Crud->read2('status', 1,'partnership_id', $param3, 'partners_history');
+                    $start_date = $p_start_date;
+                    $end_date = $p_end_date;
+                    
+                    if(!empty($start_date) && !empty($end_date)){
+                        $pays = $this->Crud->date_range1($start_date, 'date_paid', $end_date, 'date_paid', 'partnership_id', $param3, 'partners_history');
 
+                    } else{
+                        $pays = $this->Crud->read_single('partnership_id', $param3, 'partners_history');
+
+                    }
+                   
                     $total = 0;
                     if(!empty($pays)){
                         foreach($pays as $p){
-                            $time = $p->reg_date;
+                            $time = $p->date_paid;
                             $member_id = $p->member_id;
                             $amount_paid = $p->amount_paid;
-                            
+                            $status = $p->status;
+                            $st = '<span class="text-warning">Pending</span>';
+                            if($status > 0)$st = '<span class="text-success">Confirmed</span>';
                         
                             ?>
                                 <tr>
                                     <td><?=date('d M Y h:iA', strtotime($time)); ?></td>
                                     <td><?=ucwords($this->Crud->read_field('id', $member_id, 'user', 'firstname').' '.$this->Crud->read_field('id', $member_id, 'user', 'surname')); ?></td>
                                     <td><?='$'.number_format($amount_paid,2); ?></td>
+                                    <td><?=''.($st); ?></td>
                                 </tr>
                     <?php
                                 }

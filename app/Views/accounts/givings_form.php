@@ -25,41 +25,41 @@ $this->Crud = new Crud();
     <?php } ?>
 
     
-<?php if($param2 == 'view'){?>
-    <table id="dtable" class="table table-striped">
-        <thead>
-            <tr>
-                <th>Day</th>
-                <th>Time</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php 
-                $pays = $this->Crud->read_single('id', $param3, 'cells');
+    <?php if($param2 == 'view'){?>
+        <table id="dtable" class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Day</th>
+                    <th>Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php 
+                    $pays = $this->Crud->read_single('id', $param3, 'cells');
 
-                $total = 0;
-                if(!empty($pays)){
-                    foreach($pays as $p){
-                        $time = $p->time;
-                        if(!empty(json_decode($time))){
-                            foreach(json_decode($time) as $t => $val){
-                       
-                        ?>
-                            <tr>
-                                <td><?=$t ?></td>
-                                <td><?=date('h:iA', strtotime($val)); ?></td>
-                            </tr>
-                   <?php
+                    $total = 0;
+                    if(!empty($pays)){
+                        foreach($pays as $p){
+                            $time = $p->time;
+                            if(!empty(json_decode($time))){
+                                foreach(json_decode($time) as $t => $val){
+                        
+                            ?>
+                                <tr>
+                                    <td><?=$t ?></td>
+                                    <td><?=date('h:iA', strtotime($val)); ?></td>
+                                </tr>
+                    <?php
+                                }
                             }
                         }
                     }
-                }
-                
-            ?>
-        </tbody>
-    </table>
+                    
+                ?>
+            </tbody>
+        </table>
 
-<?php } ?>
+    <?php } ?>
     <!-- insert/edit view -->
     <?php if($param2 == 'edit' || $param2 == '') { ?>
         <div class="row">
@@ -69,6 +69,14 @@ $this->Crud = new Crud();
         
         <div class="row">
             <input type="hidden" name="giving_id" value="<?php if(!empty($e_id)){echo $e_id;} ?>" />
+            <div class="col-sm-12 mb-3">
+                <div class="form-group">*<label class="form-label">Date Paid</label>
+                    <div class="form-control-wrap">
+                        <div class="form-icon form-icon-right"><em class="icon ni ni-calendar"></em> </div>
+                        <input type="text" name="date_paid" value="<?php if(!empty($e_date_paid)){echo $e_date_paid;} ?>" class="form-control date-picker" data-date-format="yyyy-mm-dd" placeholder="yyyy-mm-dd" required>
+                    </div>
+                </div>
+            </div>
             <div class="col-sm-12 mb-3">
                 <div class="form-group">
                     <label for="name">*<?=translate_phrase('Members'); ?></label>
@@ -159,7 +167,7 @@ $this->Crud = new Crud();
 <?php echo form_close(); ?>
 <script>
     $('.js-select2').select2();
-                            
+    $('.date-picker').datepicker();        
     function readURL(input, id) {
 		if (input.files && input.files[0]) {
 			var reader = new FileReader();
