@@ -13,7 +13,7 @@ $this->Crud = new Crud();
         <div class="row">
             <div class="col-sm-12 text-center">
                 <h3><b><?=translate_phrase('Are you sure?');?></b></h3>
-                <input type="hidden" name="d_cell_id" value="<?php if(!empty($d_id)){echo $d_id;} ?>" />
+                <input type="hidden" name="d_giving_id" value="<?php if(!empty($d_id)){echo $d_id;} ?>" />
             </div>
             
             <div class="col-sm-12 text-center">
@@ -79,7 +79,13 @@ $this->Crud = new Crud();
                             $part = $this->Crud->read_single_order('role_id', 4, 'user', 'surname', 'asc');
                             if(!empty($part)){
                                 foreach($part as $p){
-                                    echo '<option value="'.$p->id.'">'.ucwords($p->firstname.' '.$p->surname).'</option>';
+                                    $sel = '';
+                                    if(!empty($e_member_id)){
+                                        if($e_member_id == $p->id){
+                                            $sel = 'selected';
+                                        }
+                                    }
+                                    echo '<option value="'.$p->id.'" '.$sel.'>'.ucwords($p->firstname.' '.$p->surname).'</option>';
                                 }
                             }
                         ?>
@@ -94,8 +100,14 @@ $this->Crud = new Crud();
                         <?php
                             $part = $this->Crud->read_order('partnership', 'name', 'asc');
                             if(!empty($part)){
-                                foreach($part as $p){
-                                    echo '<option value="'.$p->id.'">'.ucwords($p->name).'</option>';
+                                foreach($part as $p){ 
+                                    $sel = '';
+                                    if(!empty($e_partnership_id)){
+                                        if($e_partnership_id == $p->id){
+                                            $sel = 'selected';
+                                        }
+                                    }
+                                    echo '<option value="'.$p->id.'" '.$sel.'>'.ucwords($p->name).'</option>';
                                 }
                             }
                         ?>
@@ -105,7 +117,7 @@ $this->Crud = new Crud();
             <div class="col-sm-12 mb-3">
                 <div class="form-group">
                     <label for="name">*<?=translate_phrase('Amount'); ?></label>
-                    <input class="form-control" type="text" id="amount" name="amount" value="<?php if(!empty($e_amount)) {echo $e_amount;} ?>" required>
+                    <input class="form-control" type="text" id="amount" name="amount" value="<?php if(!empty($e_amount_paid)) {echo $e_amount_paid;} ?>" required>
                 </div>
             </div>
 
@@ -126,8 +138,8 @@ $this->Crud = new Crud();
                     <div class="form-group">
                         <label for="name">*<?=translate_phrase('Payment Status'); ?></label>
                         <select id="status" name="status" class="js-select2">
-                            <option value="0">Pending</option>
-                            <option value="1">Confirmed</option>
+                            <option value="0" <?php if(!empty($e_status)){if($e_status == 0){echo 'selected';}} ?>>Pending</option>
+                            <option value="1" <?php if(!empty($e_status)){if($e_status == 1){echo 'selected';}} ?>>Confirmed</option>
                         </select>
                     </div>
                 </div>

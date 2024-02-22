@@ -1032,11 +1032,10 @@ class Accounts extends BaseController {
 					}
 
 					if($this->request->getMethod() == 'post'){
-						$del_id = $this->request->getVar('d_cell_id');
+						$del_id = $this->request->getVar('d_giving_id');
 						///// store activities
 						$by = $this->Crud->read_field('id', $log_id, 'user', 'firstname');
-						$code = $this->Crud->read_field('id', $del_id, 'cell', 'name');
-						$action = $by.' deleted Cell ('.$code.') Record';
+						$action = $by.' deleted Giving Partnership Record';
 
 						if($this->Crud->deletes('id', $del_id, $table) > 0) {
 							
@@ -1057,10 +1056,11 @@ class Accounts extends BaseController {
 						if(!empty($edit)) {
 							foreach($edit as $e) {
 								$data['e_id'] = $e->id;
-								$data['e_location'] = $e->location;
-								$data['e_name'] = $e->name;
-								$data['e_roles'] = json_decode($e->roles);
-								$data['e_time'] = json_decode($e->time);
+								$data['e_member_id'] = $e->member_id;
+								$data['e_partnership_id'] = $e->partnership_id;
+								$data['e_amount_paid'] = $e->amount_paid;
+								$data['e_status'] = $e->status;
+								$data['e_img'] = $e->file;
 							}
 						}
 					}
@@ -1098,9 +1098,10 @@ class Accounts extends BaseController {
 						$upd_rec = $this->Crud->updates('id', $giving_id, $table, $ins_data);
 						if($upd_rec > 0) {
 							///// store activities
+							///// store activities
 							$by = $this->Crud->read_field('id', $log_id, 'user', 'firstname');
-							$code = $this->Crud->read_field('id', $giving_id, $table, 'name');
-							$action = $by.' updated Department ('.$code.') Record';
+							$code = $this->Crud->read_field('id', $partnership_id, 'partnership', 'name');
+							$action = $by.' updated ('.$code.') Partnership Giving Record';
 							$this->Crud->activity('user', $giving_id, $action);
 
 							echo $this->Crud->msg('success', 'Record Updated');
@@ -1148,6 +1149,7 @@ class Accounts extends BaseController {
 					<div class="nk-tb-col"><span class="sub-text text-dark"><b>'.translate_phrase('Partnership').'</b></span></div>
 					<div class="nk-tb-col nk-tb-col-md"><span class="sub-text text-dark"><b>'.translate_phrase('Member').'</b></span></div>
 					<div class="nk-tb-col"><span class="sub-text text-dark"><b>'.translate_phrase('Amount').'</b></span></div>
+					<div class="nk-tb-col"><span class="sub-text text-dark"><b>'.translate_phrase('Status').'</b></span></div>
 					<div class="nk-tb-col nk-tb-col-tools">
 						<ul class="nk-tb-actions gx-1 my-n1">
 							
@@ -1165,11 +1167,11 @@ class Accounts extends BaseController {
 				$item = '<div class="text-center text-muted">'.translate_phrase('Session Timeout! - Please login again').'</div>';
 			} else {
 				
-				$all_rec = $this->Crud->filter_givings('', '', $search);
+				$all_rec = $this->Crud->filter_givings('', '', $search, $log_id);
                 // $all_rec = json_decode($all_rec);
 				if(!empty($all_rec)) { $counts = count($all_rec); } else { $counts = 0; }
 
-				$query = $this->Crud->filter_givings($limit, $offset, $search);
+				$query = $this->Crud->filter_givings($limit, $offset, $search, $log_id);
 				$data['count'] = $counts;
 				
 
@@ -1183,6 +1185,11 @@ class Accounts extends BaseController {
 						$reg_date = date('d M Y h:iA', strtotime($q->reg_date));
 						$member = $this->Crud->read_field('id', $member_id, 'user', 'firstname').' '.$this->Crud->read_field('id', $member_id, 'user', 'surname');
 						$partnership = $this->Crud->read_field('id', $partnership_id, 'partnership', 'name');
+						
+						$st = '<span class="text-warning">Pending</span>';
+						if($status > 0){
+							$st = '<span class="text-success">Confirmed</span>';
+						}
 						// add manage buttons
 						if ($role_u != 1) {
 							$all_btn = '';
@@ -1210,6 +1217,9 @@ class Accounts extends BaseController {
 								</div>
 								<div class="nk-tb-col tb-col-md">
 									<span class="text-dark">$' . number_format($amount_paid,2) . '</span>
+								</div>
+								<div class="nk-tb-col tb-col-md">
+									<span class="text-dark">' . ($st) . '</span>
 								</div>
 								<div class="nk-tb-col nk-tb-col-tools">
 									<ul class="nk-tb-actions gx-1">
