@@ -1290,6 +1290,315 @@ class Accounts extends BaseController {
 		}
     }
 
+	public function analytics($param1='', $param2='', $param3='') {
+		// check session login
+		if($this->session->get('td_id') == ''){
+			$request_uri = uri_string();
+			$this->session->set('td_redirect', $request_uri);
+			return redirect()->to(site_url('auth'));
+		} 
+
+        $mod = 'accounts/analytics';
+
+        $log_id = $this->session->get('td_id');
+        $role_id = $this->Crud->read_field('id', $log_id, 'user', 'role_id');
+        $role = strtolower($this->Crud->read_field('id', $role_id, 'access_role', 'name'));
+        $role_c = $this->Crud->module($role_id, $mod, 'create');
+        $role_r = $this->Crud->module($role_id, $mod, 'read');
+        $role_u = $this->Crud->module($role_id, $mod, 'update');
+        $role_d = $this->Crud->module($role_id, $mod, 'delete');
+        if($role_r == 0){
+            return redirect()->to(site_url('dashboard'));	
+        }
+        $data['log_id'] = $log_id;
+        $data['role'] = $role;
+        $data['role_c'] = $role_c;
+       
+		
+		$table = 'partners_history';
+		$form_link = site_url($mod);
+		if($param1){$form_link .= '/'.$param1;}
+		if($param2){$form_link .= '/'.$param2.'/';}
+		if($param3){$form_link .= $param3;}
+		
+		// pass parameters to view
+		$data['param1'] = $param1;
+		$data['param2'] = $param2;
+		$data['param3'] = $param3;
+		$data['form_link'] = $form_link;
+        $data['current_language'] = $this->session->get('current_language');
+		
+		// manage record
+		if($param1 == 'manage') {
+			// prepare for delete
+			if($param2 == 'delete') {
+				if($param3) {
+					$edit = $this->Crud->read_single('id', $param3, $table);
+					if(!empty($edit)) {
+						foreach($edit as $e) {
+							$data['d_id'] = $e->id;
+						}
+					}
+
+					if($this->request->getMethod() == 'post'){
+						$del_id = $this->request->getVar('d_giving_id');
+						///// store activities
+						$by = $this->Crud->read_field('id', $log_id, 'user', 'firstname');
+						$action = $by.' deleted Giving Partnership Record';
+
+						if($this->Crud->deletes('id', $del_id, $table) > 0) {
+							
+							$this->Crud->activity('user', $del_id, $action);
+							echo $this->Crud->msg('success', 'Cell Deleted');
+							echo '<script>location.reload(false);</script>';
+						} else {
+							echo $this->Crud->msg('danger', 'Please try later');
+						}
+						exit;	
+					}
+				}
+			} else {
+				// prepare for edit
+				if($param2 == 'edit') {
+					if($param3) {
+						$edit = $this->Crud->read_single('id', $param3, $table);
+						if(!empty($edit)) {
+							foreach($edit as $e) {
+								$data['e_id'] = $e->id;
+								$data['e_member_id'] = $e->member_id;
+								$data['e_partnership_id'] = $e->partnership_id;
+								$data['e_amount_paid'] = $e->amount_paid;
+								$data['e_status'] = $e->status;
+								$data['e_img'] = $e->file;
+							}
+						}
+					}
+				} 
+
+				if($this->request->getMethod() == 'post'){
+					$giving_id = $this->request->getVar('giving_id');
+					$member_id = $this->request->getVar('member_id');
+					$partnership_id = $this->request->getVar('partnership_id');
+					$amount = $this->request->getVar('amount');
+					$status = $this->request->getVar('status');
+					$img_id = $this->request->getVar('img');
+					
+					 //// Image upload
+					 if(file_exists($this->request->getFile('pics'))) {
+						if(!empty($img_id)){
+							unlink(FCPATH . $img_id);
+						}
+
+						$path = 'assets/images/givings/';
+						$file = $this->request->getFile('pics');
+						$getImg = $this->Crud->img_upload($path, $file);
+						
+						if(!empty($getImg->path)) $img_id = $getImg->path;
+					}
+					
+					$ins_data['member_id'] = $member_id;
+					$ins_data['partnership_id'] = $partnership_id;
+					$ins_data['amount_paid'] = $amount;
+					$ins_data['status'] = $status;
+					$ins_data['file'] = $img_id;
+					
+					// do create or update
+					if($giving_id) {
+						$upd_rec = $this->Crud->updates('id', $giving_id, $table, $ins_data);
+						if($upd_rec > 0) {
+							///// store activities
+							///// store activities
+							$by = $this->Crud->read_field('id', $log_id, 'user', 'firstname');
+							$code = $this->Crud->read_field('id', $partnership_id, 'partnership', 'name');
+							$action = $by.' updated ('.$code.') Partnership Giving Record';
+							$this->Crud->activity('user', $giving_id, $action);
+
+							echo $this->Crud->msg('success', 'Record Updated');
+							echo '<script>location.reload(false);</script>';
+						} else {
+							echo $this->Crud->msg('info', 'No Changes');	
+						}
+					} else {
+						if(empty($this->Crud->read_field('id', $member_id, 'user', 'partnership'))){
+							echo $this->Crud->msg('danger', 'This Member does not  have a Partnership Record');
+						}else{
+							$ins_data['reg_date'] = date(fdate);
+							$ins_rec = $this->Crud->create($table, $ins_data);
+							if($ins_rec > 0) {
+								///// store activities
+								$by = $this->Crud->read_field('id', $member_id, 'user', 'firstname');
+								$code = $this->Crud->read_field('id', $partnership_id, 'partnership', 'name');
+								$action = $by.' paid ('.$code.') Partnership';
+								$this->Crud->activity('user', $ins_rec, $action);
+
+								echo $this->Crud->msg('success', 'Giving Paid Successful');
+								echo '<script>location.reload(false);</script>';
+							} else {
+								echo $this->Crud->msg('danger', 'Please try later');	
+							}
+						}
+							
+					}
+
+					die;	
+				}
+			}
+		}
+
+        // record listing
+		if($param1 == 'load') {
+			$limit = $param2;
+			$offset = $param3;
+
+			$rec_limit = 25;
+			$item = '';
+            if(empty($limit)) {$limit = $rec_limit;}
+			if(empty($offset)) {$offset = 0;}
+			
+			$search = $this->request->getPost('search');
+			
+			$items = '
+				<div class="nk-tb-item nk-tb-head">
+					<div class="nk-tb-col nk-tb-col-md"><span class="sub-text text-dark"><b>'.('Date').'</b></span></div>
+					<div class="nk-tb-col"><span class="sub-text text-dark"><b>'.translate_phrase('Partnership').'</b></span></div>
+					<div class="nk-tb-col nk-tb-col-md"><span class="sub-text text-dark"><b>'.translate_phrase('Member').'</b></span></div>
+					<div class="nk-tb-col"><span class="sub-text text-dark"><b>'.translate_phrase('Amount').'</b></span></div>
+					<div class="nk-tb-col"><span class="sub-text text-dark"><b>'.translate_phrase('Status').'</b></span></div>
+					<div class="nk-tb-col nk-tb-col-tools">
+						<ul class="nk-tb-actions gx-1 my-n1">
+							
+						</ul>
+					</div>
+				</div><!-- .nk-tb-item -->
+		
+				
+			';
+			$a = 1;
+
+            //echo $status;
+			$log_id = $this->session->get('td_id');
+			if(!$log_id) {
+				$item = '<div class="text-center text-muted">'.translate_phrase('Session Timeout! - Please login again').'</div>';
+			} else {
+				
+				$all_rec = $this->Crud->filter_givings('', '', $search, $log_id);
+                // $all_rec = json_decode($all_rec);
+				if(!empty($all_rec)) { $counts = count($all_rec); } else { $counts = 0; }
+
+				$query = $this->Crud->filter_givings($limit, $offset, $search, $log_id);
+				$data['count'] = $counts;
+				
+
+				if(!empty($query)) {
+					foreach ($query as $q) {
+						$id = $q->id;
+						$member_id = $q->member_id;
+						$partnership_id = $q->partnership_id;
+						$amount_paid = $q->amount_paid;
+						$status = $q->status;
+						$reg_date = date('d M Y h:iA', strtotime($q->reg_date));
+						$member = $this->Crud->read_field('id', $member_id, 'user', 'firstname').' '.$this->Crud->read_field('id', $member_id, 'user', 'surname');
+						$partnership = $this->Crud->read_field('id', $partnership_id, 'partnership', 'name');
+						
+						$st = '<span class="text-warning">Pending</span>';
+						if($status > 0){
+							$st = '<span class="text-success">Confirmed</span>';
+						}
+						// add manage buttons
+						if ($role_u != 1) {
+							$all_btn = '';
+						} else {
+							$all_btn = '
+								<li><a href="javascript:;" class="text-primary pop" pageTitle="Edit" pageName="' . site_url($mod . '/manage/edit/' . $id) . '"><em class="icon ni ni-edit-alt"></em><span>'.translate_phrase('Edit').'</span></a></li>
+								<li><a href="javascript:;" class="text-danger pop" pageTitle="Delete" pageName="' . site_url($mod . '/manage/delete/' . $id) . '"><em class="icon ni ni-trash-alt"></em><span>'.translate_phrase('Delete').'</span></a></li>
+								
+								
+							';
+						}
+
+						$item .= '
+							<div class="nk-tb-item">
+								<div class="nk-tb-col">
+									<div class="user-info">
+										<span class="tb-lead">' . ucwords($reg_date) . ' </span>
+									</div>
+								</div>
+								<div class="nk-tb-col tb-col-md">
+									<span class="text-dark">' . ucwords($member) . '</span>
+								</div>
+								<div class="nk-tb-col tb-col">
+									<span class="text-dark">' . ucwords($partnership) . '</span>
+								</div>
+								<div class="nk-tb-col tb-col-md">
+									<span class="text-dark">$' . number_format($amount_paid,2) . '</span>
+								</div>
+								<div class="nk-tb-col tb-col-md">
+									<span class="text-dark">' . ($st) . '</span>
+								</div>
+								<div class="nk-tb-col nk-tb-col-tools">
+									<ul class="nk-tb-actions gx-1">
+										<li>
+											<div class="drodown">
+												<a href="#" class="dropdown-toggle btn btn-icon btn-trigger" data-bs-toggle="dropdown"><em class="icon ni ni-more-h"></em></a>
+												<div class="dropdown-menu dropdown-menu-end">
+													<ul class="link-list-opt no-bdr">
+														' . $all_btn . '
+													</ul>
+												</div>
+											</div>
+										</li>
+									</ul>
+								</div>
+							</div><!-- .nk-tb-item -->
+						';
+						$a++;
+					}
+				}
+				
+			}
+			
+			if(empty($item)) {
+				$resp['item'] = $items.'
+					<div class="text-center text-muted">
+						<br/><br/><br/><br/>
+						<i class="ni ni-cc-secure" style="font-size:150px;"></i><br/><br/>'.translate_phrase('No Givings Returned').'
+					</div>
+				';
+			} else {
+				$resp['item'] = $items . $item;
+				if($offset >= 25){
+					$resp['item'] = $item;
+				}
+				
+			}
+
+			$resp['count'] = $counts;
+
+			$more_record = $counts - ($offset + $rec_limit);
+			$resp['left'] = $more_record;
+
+			if($counts > ($offset + $rec_limit)) { // for load more records
+				$resp['limit'] = $rec_limit;
+				$resp['offset'] = $offset + $limit;
+			} else {
+				$resp['limit'] = 0;
+				$resp['offset'] = 0;
+			}
+
+			echo json_encode($resp);
+			die;
+		}
+
+		if($param1 == 'manage') { // view for form data posting
+			return view($mod.'_form', $data);
+		} else { // view for main page
+			
+			$data['title'] = translate_phrase('Parnership Analytics').' - '.app_name;
+			$data['page_active'] = $mod;
+			return view($mod, $data);
+		}
+    }
+
 	//Customer
 	public function membership($param1='', $param2='', $param3='') {
 		// check session login
@@ -1982,9 +2291,19 @@ class Accounts extends BaseController {
 									foreach($partss as $pa => $val){
 										if($id == $pa){
 											$goal = (float)$val;
+
+											$paids = $this->Crud->read2('member_id', $member_id, 'partnership_id', $pa, 'partners_history');
+											if(!empty($paids)){
+												foreach($paids as $p){
+													$given += (float)$p->amount_paid;
+												}
+											}
 										}
 									}
 								}
+								$balance = (float)$goal - (float)$given;
+								if($balance < 0)$balance = 0;
+								
 							}
 							
 							// add manage buttons
