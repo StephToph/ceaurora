@@ -1714,7 +1714,7 @@ class Accounts extends BaseController {
 						if(!empty($q->cell_id)){
 							$cell = $this->Crud->read_field('id', $q->cell_id, 'cells', 'name');
 						}
-						$name = $surname.' '.$firstname.' '.$othername;
+						$name = $firstname.' '.$othername.' '.$surname;
 
 						if(empty($phone))$phone = '-';
 						if(empty($email))$email = '-';
