@@ -1067,36 +1067,41 @@ class Accounts extends BaseController {
 				} 
 
 				if($this->request->getMethod() == 'post'){
-					$cell_id = $this->request->getVar('cell_id');
-					$name = $this->request->getVar('name');
-					$roles = $this->request->getVar('roles');
-					$location = $this->request->getVar('location');
-					$times = $this->request->getVar('times');
-					$days = $this->request->getVar('days');
+					$giving_id = $this->request->getVar('giving_id');
+					$member_id = $this->request->getVar('member_id');
+					$partnership_id = $this->request->getVar('partnership_id');
+					$amount = $this->request->getVar('amount');
+					$status = $this->request->getVar('status');
+					$img_id = $this->request->getVar('img');
 					
-					$time = [];
-					for($i=0;$i < count($days);$i++ ){
-						$day = $days[$i];
-						// echo $day;
-						$time[$day] = $times[$i];
+					 //// Image upload
+					 if(file_exists($this->request->getFile('pics'))) {
+						if(!empty($img_id)){
+							unlink(FCPATH . $img_id);
+						}
+
+						$path = 'assets/images/givings/';
+						$file = $this->request->getFile('pics');
+						$getImg = $this->Crud->img_upload($path, $file);
+						
+						if(!empty($getImg->path)) $img_id = $getImg->path;
 					}
-					// print_r($time);
-					// print_r($days);
-					// die;
-					$ins_data['name'] = $name;
-					$ins_data['roles'] = json_encode($roles);
-					$ins_data['location'] = $location;
-					$ins_data['time'] = json_encode($time);
+					
+					$ins_data['member_id'] = $member_id;
+					$ins_data['partnership_id'] = $partnership_id;
+					$ins_data['amount_paid'] = $amount;
+					$ins_data['status'] = $status;
+					$ins_data['file'] = $img_id;
 					
 					// do create or update
-					if($cell_id) {
-						$upd_rec = $this->Crud->updates('id', $cell_id, $table, $ins_data);
+					if($giving_id) {
+						$upd_rec = $this->Crud->updates('id', $giving_id, $table, $ins_data);
 						if($upd_rec > 0) {
 							///// store activities
 							$by = $this->Crud->read_field('id', $log_id, 'user', 'firstname');
-							$code = $this->Crud->read_field('id', $cell_id, 'dept', 'name');
+							$code = $this->Crud->read_field('id', $giving_id, $table, 'name');
 							$action = $by.' updated Department ('.$code.') Record';
-							$this->Crud->activity('user', $cell_id, $action);
+							$this->Crud->activity('user', $giving_id, $action);
 
 							echo $this->Crud->msg('success', 'Record Updated');
 							echo '<script>location.reload(false);</script>';
@@ -1104,23 +1109,20 @@ class Accounts extends BaseController {
 							echo $this->Crud->msg('info', 'No Changes');	
 						}
 					} else {
-						if($this->Crud->check('name', $name, $table) > 0) {
-							echo $this->Crud->msg('warning', 'Record Already Exist');
-						} else {
-							$ins_rec = $this->Crud->create($table, $ins_data);
-							if($ins_rec > 0) {
-								///// store activities
-								$by = $this->Crud->read_field('id', $log_id, 'user', 'firstname');
-								$code = $this->Crud->read_field('id', $ins_rec, 'dept', 'name');
-								$action = $by.' created Department ('.$code.') Record';
-								$this->Crud->activity('user', $ins_rec, $action);
+						$ins_data['reg_date'] = date(fdate);
+						$ins_rec = $this->Crud->create($table, $ins_data);
+						if($ins_rec > 0) {
+							///// store activities
+							$by = $this->Crud->read_field('id', $member_id, 'user', 'firstname');
+							$code = $this->Crud->read_field('id', $partnership_id, 'partnership', 'name');
+							$action = $by.' paid ('.$code.') Partnership';
+							$this->Crud->activity('user', $ins_rec, $action);
 
-								echo $this->Crud->msg('success', 'Record Created');
-								echo '<script>location.reload(false);</script>';
-							} else {
-								echo $this->Crud->msg('danger', 'Please try later');	
-							}	
-						}
+							echo $this->Crud->msg('success', 'Giving Paid Successful');
+							echo '<script>location.reload(false);</script>';
+						} else {
+							echo $this->Crud->msg('danger', 'Please try later');	
+						}	
 					}
 
 					die;	
@@ -1174,29 +1176,20 @@ class Accounts extends BaseController {
 				if(!empty($query)) {
 					foreach ($query as $q) {
 						$id = $q->id;
-						$name = $q->name;
-						$location = $q->location;
-						$time = $q->time;
-						$roles = $q->roles;
-						$rolesa = json_decode($roles);
-						$rols = '';
-						if(!empty($rolesa)){
-							foreach($rolesa as $r => $val){
-								$rols .= $val.', ';
-							}
-						}
-
-						$times = '<span class="text-danger">No Meeting Time</span>';
-						if(!empty($time)){
-							$times = '<a href="javascript:;" class="text-primary pop" pageTitle="View Time " pageName="' . site_url($mod . '/manage/view/' . $id) . '"><em class="icon ni ni-eye"></em> <span>'.translate_phrase('View Meeting Time').'</span></a>';
-						}
+						$member_id = $q->member_id;
+						$partnership_id = $q->partnership_id;
+						$amount_paid = $q->amount_paid;
+						$status = $q->status;
+						$reg_date = date('d M Y h:iA', strtotime($q->reg_date));
+						$member = $this->Crud->read_field('id', $member_id, 'user', 'firstname').' '.$this->Crud->read_field('id', $member_id, 'user', 'surname');
+						$partnership = $this->Crud->read_field('id', $partnership_id, 'partnership', 'name');
 						// add manage buttons
 						if ($role_u != 1) {
 							$all_btn = '';
 						} else {
 							$all_btn = '
-								<li><a href="javascript:;" class="text-primary pop" pageTitle="Edit ' . $name . '" pageName="' . site_url($mod . '/manage/edit/' . $id) . '"><em class="icon ni ni-edit-alt"></em><span>'.translate_phrase('Edit').'</span></a></li>
-								<li><a href="javascript:;" class="text-danger pop" pageTitle="Delete ' . $name . '" pageName="' . site_url($mod . '/manage/delete/' . $id) . '"><em class="icon ni ni-trash-alt"></em><span>'.translate_phrase('Delete').'</span></a></li>
+								<li><a href="javascript:;" class="text-primary pop" pageTitle="Edit" pageName="' . site_url($mod . '/manage/edit/' . $id) . '"><em class="icon ni ni-edit-alt"></em><span>'.translate_phrase('Edit').'</span></a></li>
+								<li><a href="javascript:;" class="text-danger pop" pageTitle="Delete" pageName="' . site_url($mod . '/manage/delete/' . $id) . '"><em class="icon ni ni-trash-alt"></em><span>'.translate_phrase('Delete').'</span></a></li>
 								
 								
 							';
@@ -1206,17 +1199,17 @@ class Accounts extends BaseController {
 							<div class="nk-tb-item">
 								<div class="nk-tb-col">
 									<div class="user-info">
-										<span class="tb-lead">' . ucwords($name) . ' </span>
+										<span class="tb-lead">' . ucwords($reg_date) . ' </span>
 									</div>
 								</div>
 								<div class="nk-tb-col tb-col-md">
-									<span class="text-dark">' . ucwords($location) . '</span>
+									<span class="text-dark">' . ucwords($member) . '</span>
 								</div>
 								<div class="nk-tb-col tb-col">
-									<span class="text-dark"><b>' . ucwords(rtrim($rols, ', ')) . '</b></span>
+									<span class="text-dark">' . ucwords($partnership) . '</span>
 								</div>
 								<div class="nk-tb-col tb-col-md">
-									<span class="text-dark">' . ($times) . '</span>
+									<span class="text-dark">$' . number_format($amount_paid,2) . '</span>
 								</div>
 								<div class="nk-tb-col nk-tb-col-tools">
 									<ul class="nk-tb-actions gx-1">

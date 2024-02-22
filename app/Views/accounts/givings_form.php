@@ -108,22 +108,36 @@ $this->Crud = new Crud();
                     <input class="form-control" type="text" id="amount" name="amount" value="<?php if(!empty($e_amount)) {echo $e_amount;} ?>" required>
                 </div>
             </div>
-            <div class="col-sm-12">
-                <div class="form-group"><b>Upload Receipt </b><span class="text-danger small">(Screenshot)</span><br>
-                    <label for="img-upload" class="pointer text-center" style="width:100%;">
-                        <input type="hidden" name="img" value="<?php if(!empty($e_img)){echo $e_img;} ?>" />
-                        <img id="img" src="<?php if(!empty($e_img)){echo site_url( $e_img);} ?>" style="max-width:100%;" />
-                        <span class="btn btn-info btn-block no-mrg-btm">Upload Screenshot</span>
-                        <input class="d-none" type="file" name="pics" accept="image/*" id="img-upload">
-                    </label>
+
+            <?php if($role == 'member'){?>
+                <div class="col-sm-12 mb-3">
+                    <div class="form-group"><b>Upload Receipt </b><span class="text-danger small">(Screenshot)</span><br>
+                        <label for="img-upload" class="pointer text-center" style="width:100%;">
+                            <input type="hidden" name="img" value="<?php if(!empty($e_img)){echo $e_img;} ?>" />
+                            <img id="img" src="<?php if(!empty($e_img)){echo site_url( $e_img);} ?>" style="max-width:100%;" />
+                            <span class="btn btn-info btn-block no-mrg-btm">Upload Screenshot</span>
+                            <input class="d-none" type="file" name="pics" accept="image/*" id="img-upload">
+                        </label>
+                    </div>
                 </div>
-            </div>
+            <?php } ?>
+            <?php if($role != 'member'){?>
+                <div class="col-sm-12 mb-3">
+                    <div class="form-group">
+                        <label for="name">*<?=translate_phrase('Payment Status'); ?></label>
+                        <select id="status" name="status" class="js-select2">
+                            <option value="0">Pending</option>
+                            <option value="1">Confirmed</option>
+                        </select>
+                    </div>
+                </div>
+            <?php } ?>
             
         </div>
 
         <div class="row" >
             
-            <div class="col-sm-12 text-center mt-3">
+            <div class="col-sm-12 text-center mt-5">
                 <button class="btn btn-primary bb_fo_btn" type="submit">
                     <i class="icon ni ni-save"></i> <?=translate_phrase('Save Record');?>
                 </button>
