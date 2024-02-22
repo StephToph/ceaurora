@@ -1582,6 +1582,20 @@ class Accounts extends BaseController {
 								$code = $this->Crud->read_field('id', $ins_rec, 'user', 'surname');
 								$action = $by.' created Membership ('.$code.') Record';
 								$this->Crud->activity('user', $ins_rec, $action);
+								$name = ucwords($firstname.' '.$othername.' '.$lastname);
+								$body = '
+									Dear '.$name.', <br><br>
+										A Membership Account Has been Created with This Email on Chrsit Embassy Aurora Platform;<br>
+										Below are your login Credentials:<br><br>
+
+										Email: '.$email.'<br>
+										Phone: '.$phone.'<br>
+										Password: '.$password.'<br><br>
+										Do not disclose your Login credentials with anyone to avoid unauthorized access.
+										
+								';
+								$this->Crud->send_email($email, 'Membership Account', $body);
+
 
 								echo $this->Crud->msg('success', 'Membership Created');
 								echo '<script>window.location.replace("'.site_url('accounts/membership').'");</script>';
