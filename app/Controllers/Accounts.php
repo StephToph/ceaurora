@@ -734,7 +734,7 @@ class Accounts extends BaseController {
 						$del_id = $this->request->getVar('d_cell_id');
 						///// store activities
 						$by = $this->Crud->read_field('id', $log_id, 'user', 'firstname');
-						$code = $this->Crud->read_field('id', $del_id, 'cell', 'name');
+						$code = $this->Crud->read_field('id', $del_id, 'cells', 'name');
 						$action = $by.' deleted Cell ('.$code.') Record';
 
 						if($this->Crud->deletes('id', $del_id, $table) > 0) {
@@ -793,8 +793,8 @@ class Accounts extends BaseController {
 						if($upd_rec > 0) {
 							///// store activities
 							$by = $this->Crud->read_field('id', $log_id, 'user', 'firstname');
-							$code = $this->Crud->read_field('id', $cell_id, 'dept', 'name');
-							$action = $by.' updated Department ('.$code.') Record';
+							$code = $this->Crud->read_field('id', $cell_id, 'cells', 'name');
+							$action = $by.' updated Cell ('.$code.') Record';
 							$this->Crud->activity('user', $cell_id, $action);
 
 							echo $this->Crud->msg('success', 'Record Updated');
@@ -810,8 +810,8 @@ class Accounts extends BaseController {
 							if($ins_rec > 0) {
 								///// store activities
 								$by = $this->Crud->read_field('id', $log_id, 'user', 'firstname');
-								$code = $this->Crud->read_field('id', $ins_rec, 'dept', 'name');
-								$action = $by.' created Department ('.$code.') Record';
+								$code = $this->Crud->read_field('id', $ins_rec, 'cells', 'name');
+								$action = $by.' created Cell ('.$code.') Record';
 								$this->Crud->activity('user', $ins_rec, $action);
 
 								echo $this->Crud->msg('success', 'Record Created');

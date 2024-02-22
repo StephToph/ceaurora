@@ -78,6 +78,17 @@ $this->Crud = new Crud();
             <div class="col-sm-12 mb-3">
                 <div class="form-group">
                     <label for="name">*<?=translate_phrase('Partnership'); ?></label>
+                    <select id="role_id" name="partnership_id" class="js-select2" required>
+                        <option value="">Select</option>
+                        <?php
+                            $part = $this->Crud->read_order('partnership', 'name', 'asc');
+                            if(!empty($part)){
+                                foreach($part as $p){
+                                    echo '<option value="'.$p->id.'">'.ucwords($p->name).'</option>';
+                                }
+                            }
+                        ?>
+                    </select>
                     <input class="form-control" type="text" id="location" name="location" value="<?php if(!empty($e_location)) {echo $e_location;} ?>" required>
                 </div>
             </div>
@@ -104,55 +115,7 @@ $this->Crud = new Crud();
 <?php echo form_close(); ?>
 <script>
     $('.js-select2').select2();
-    document.getElementById('addMore').addEventListener('click', function() {
-        var container = document.getElementById('container');
-        var div = container.children[0].cloneNode(true);
-        
-        // Clear input value of the cloned div
-        div.querySelector('input').value = '';
-        div.querySelector('input').removeAttribute('required');
-        
-        // Show delete button in the cloned div
-        div.querySelector('.deleteBtn').style.display = 'inline-block';
-        
-        // Add event listener to delete button
-        div.querySelector('.deleteBtn').addEventListener('click', function() {
-            div.parentNode.removeChild(div);
-        });
-        
-        container.appendChild(div);
-    });
-
-    $('#addMores').on('click', function() {
-        var container = $('#containers');
-        var clonedRow = container.children('.row').first().clone();
-
-        // Clear values of cloned inputs
-        clonedRow.find('input').val('');
-        clonedRow.find('select, input').removeAttr('required');
-        
-        // Hide delete button in the cloned row
-        clonedRow.find('.deleteBtns').show();
-
-        clonedRow.find('.js-select2').select2();
-        // Append cloned row to container
-        container.append(clonedRow);
-    });
-
-    // Event delegation to handle dynamically added delete buttons
-    $('#containers').on('click', '.deleteBtns', function() {
-        $(this).closest('.row').remove();
-    });
-
-    $('#containers').on('change', 'select[name="day[]"]', function() {
-        var timeInput = $(this).closest('.row').find('input[name="time[]"]');
-        if ($(this).val()) {
-            timeInput.attr('required', 'required');
-        } else {
-            timeInput.removeAttr('required');
-        }
-    });
-
+   
 </script>
 
 <script src="<?php echo site_url(); ?>assets/js/jsform.js"></script
