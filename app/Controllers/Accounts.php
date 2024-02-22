@@ -1040,7 +1040,7 @@ class Accounts extends BaseController {
 						if($this->Crud->deletes('id', $del_id, $table) > 0) {
 							
 							$this->Crud->activity('user', $del_id, $action);
-							echo $this->Crud->msg('success', 'Cell Deleted');
+							echo $this->Crud->msg('success', 'Givings Deleted');
 							echo '<script>location.reload(false);</script>';
 						} else {
 							echo $this->Crud->msg('danger', 'Please try later');
