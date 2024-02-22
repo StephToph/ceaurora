@@ -265,7 +265,7 @@
                                 </div>
                                 <div class="col-md-6 col-lg-4 col-xxl-3">
                                     <div class="form-group">
-                                        <label class="form-label" for="password">Employer Address</label>
+                                        <label class="form-label" for="password">Employer Name</label>
                                         <input class="form-control" type="text" id="employer_address" name="employer_address" value="<?php if(!empty($e_employer_address)){echo $e_employer_address;}?>">
                                     </div>
                                 </div>
