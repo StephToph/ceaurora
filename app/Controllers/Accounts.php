@@ -1471,8 +1471,7 @@ class Accounts extends BaseController {
 						</ul>
 					</div>
 				</div><!-- .nk-tb-item -->
-		
-				
+			
 			';
 			$a = 1;
 
@@ -1481,37 +1480,58 @@ class Accounts extends BaseController {
 			if(!$log_id) {
 				$item = '<div class="text-center text-muted">'.translate_phrase('Session Timeout! - Please login again').'</div>';
 			} else {
-				
-				$all_rec = $this->Crud->filter_analytics('', '', $search, $log_id);
-                // $all_rec = json_decode($all_rec);
+					
+				$all_rec = $this->Crud->read_order('partnership', 'name', 'asc');
+				// $all_rec = json_decode($all_rec);
 				if(!empty($all_rec)) { $counts = count($all_rec); } else { $counts = 0; }
-
-				$query = $this->Crud->filter_analytics($limit, $offset, $search, $log_id);
+				$query = $this->Crud->read_order('partnership', 'name', 'asc');
 				$data['count'] = $counts;
 				
-
+				$roles_id = $this->Crud->read_field('name', 'Member', 'access_role', 'id');
 				if(!empty($query)) {
 					foreach ($query as $q) {
 						$id = $q->id;
-						$member_id = $q->member_id;
-						$partnership_id = $q->partnership_id;
-						$amount_paid = $q->amount_paid;
-						$status = $q->status;
-						$reg_date = date('d M Y h:iA', strtotime($q->reg_date));
-						$member = $this->Crud->read_field('id', $member_id, 'user', 'firstname').' '.$this->Crud->read_field('id', $member_id, 'user', 'surname');
-						$partnership = $this->Crud->read_field('id', $partnership_id, 'partnership', 'name');
+						$name = $q->name;
+						$goal = 0;
 						
-						$st = '<span class="text-warning">Pending</span>';
-						if($status > 0){
-							$st = '<span class="text-success">Confirmed</span>';
+						$balance = 0;
+						$p_participant = 0;
+						$g_participant = 0;
+
+						$user = $this->Crud->read_single('role_id', $roles_id, 'user');
+						if(!empty($user)){
+							foreach($user as $u){$given = 0;
+								$member_id = $u->id;
+								$parts = $u->partnership;
+								if(!empty($parts)){
+									$partss = json_decode($parts);
+									foreach($partss as $pa => $val){
+										if($id == $pa){
+											$goal += (float)$val;
+											if($val > 0)$p_participant++;
+											
+											$g_participant = $this->Crud->check('partnership_id', $pa, 'partners_history');
+											$paids = $this->Crud->read_single('partnership_id', $pa, 'partners_history');
+											if(!empty($paids)){
+												foreach($paids as $p){
+													$given += (float)$p->amount_paid;
+												}
+											}
+										}
+									}
+								}
+								$balance = (float)$goal - (float)$given;
+								if($balance < 0)$balance = 0;
+								
+							}
 						}
+						
 						// add manage buttons
 						if ($role_u != 1) {
 							$all_btn = '';
 						} else {
 							$all_btn = '
-								<li><a href="javascript:;" class="text-primary pop" pageTitle="Edit" pageName="' . site_url($mod . '/manage/edit/' . $id) . '"><em class="icon ni ni-edit-alt"></em><span>'.translate_phrase('Edit').'</span></a></li>
-								<li><a href="javascript:;" class="text-danger pop" pageTitle="Delete" pageName="' . site_url($mod . '/manage/delete/' . $id) . '"><em class="icon ni ni-trash-alt"></em><span>'.translate_phrase('Delete').'</span></a></li>
+								<li><a href="javascript:;" class="text-primary pop" pageTitle="View ' . $name . '" pageName="' . site_url($mod . '/manage/view/' . $id) . '"><em class="icon ni ni-eye"></em><span>'.translate_phrase('View').'</span></a></li>
 								
 								
 							';
@@ -1521,34 +1541,37 @@ class Accounts extends BaseController {
 							<div class="nk-tb-item">
 								<div class="nk-tb-col">
 									<div class="user-info">
-										<span class="tb-lead">' . ucwords($reg_date) . ' </span>
+										<span class="tb-lead text-primary">' . ucwords($name) . '</span>
 									</div>
 								</div>
-								<div class="nk-tb-col tb-col-md">
-									<span class="text-dark">' . ucwords($member) . '</span>
+								<div class="nk-tb-col">
+									<div class="user-info">
+										<span class="tb-lead">$' . number_format($goal,2) . ' </span>
+									</div>
 								</div>
-								<div class="nk-tb-col tb-col">
-									<span class="text-dark">' . ucwords($partnership) . '</span>
+								<div class="nk-tb-col">
+									<div class="user-info">
+										<span class="tb-lead">' . number_format($p_participant) . ' </span>
+									</div>
 								</div>
-								<div class="nk-tb-col tb-col-md">
-									<span class="text-dark">$' . number_format($amount_paid,2) . '</span>
+								<div class="nk-tb-col">
+									<div class="user-info">
+										<span class="tb-lead">$' . number_format($given,2) . '</span>
+									</div>
 								</div>
-								<div class="nk-tb-col tb-col-md">
-									<span class="text-dark">' . ($st) . '</span>
+								<div class="nk-tb-col">
+									<div class="user-info">
+										<span class="tb-lead">$' .number_format($balance,2) . '</span>
+									</div>
+								</div>
+								<div class="nk-tb-col">
+									<div class="user-info">
+										<span class="tb-lead">' . number_format($g_participant) . ' </span>
+									</div>
 								</div>
 								<div class="nk-tb-col nk-tb-col-tools">
-									<ul class="nk-tb-actions gx-1">
-										<li>
-											<div class="drodown">
-												<a href="#" class="dropdown-toggle btn btn-icon btn-trigger" data-bs-toggle="dropdown"><em class="icon ni ni-more-h"></em></a>
-												<div class="dropdown-menu dropdown-menu-end">
-													<ul class="link-list-opt no-bdr">
-														' . $all_btn . '
-													</ul>
-												</div>
-											</div>
-										</li>
-									</ul>
+									' . $all_btn . '
+													
 								</div>
 							</div><!-- .nk-tb-item -->
 						';

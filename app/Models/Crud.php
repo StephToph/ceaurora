@@ -1754,7 +1754,7 @@ class Crud extends Model {
         $db->close();
     }
 
-	public function filter_anaytics($limit='', $offset='', $search='', $log_id) {
+	public function filter_analytics($limit='', $offset='', $search='', $log_id) {
         $db = db_connect();
         $builder = $db->table('partners_history');
 

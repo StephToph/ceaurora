@@ -18,8 +18,25 @@
                         <div class="nk-block-head-content">
                             <h3 class="nk-block-title page-title"><?=translate_phrase('Partnership Analytics');?></h3>
                         </div>
+                        <div class="nk-block-head-content">
+                            <button type="button" onclick="$('#filter_resp').toggle(500);" class="btn btn-primary">Filter</button>
+                        </div>
                         
                     </div><!-- .nk-block-between -->
+                </div><!-- .nk-block-head -->
+                <div class="nk-block-head nk-block-head-sm row" style="display:none" id="filter_resp">
+                    <div class="col-sm-6 row">
+                        <div class="col-sm-6">
+                            <input type="date" class="form-control" name="start_date" id="start_date" oninput="loads()" style="border:1px solid #ddd;" placeholder="<?=translate_phrase('START DATE');?>">
+                            <span class="text-danger">Start Date</span>
+                        </div>
+                        <div class="col-sm-6">
+                            <input type="date" class="form-control" name="end_date" id="end_date" oninput="loads()" style="border:1px solid #ddd;" placeholder="<?=translate_phrase('END DATE');?>">
+                            <span class="text-danger">End Date</span>
+                            
+                        </div>
+                        <div class="col-md-12" style="color:transparent;  text-white align:right;"><span id="date_resul"></span></div>
+                    </div>
                 </div><!-- .nk-block-head -->
                 <div class="nk-block">
                     <div class="card card-bordered card-stretch">
@@ -49,6 +66,21 @@
         load('', '');
     });
    
+    function loads() {
+        var start_date = $('#start_date').val();
+        var end_date = $('#end_date').val();
+
+        if(!start_date || !end_date){
+            $('#date_resul').css('color', 'Red');
+            $('#date_resul').html('<?=translate_phrase('Enter Start and End Date');?>!!');
+        } else if(start_date > end_date){
+            $('#date_resul').css('color', 'Red');
+            $('#date_resul').html('<?=translate_phrase('Start Date cannot be greater');?>!');
+        } else {
+            $('#date_resul').html('');
+            load('', '');
+        }
+    }
    
     function load(x, y) {
         var more = 'no';
