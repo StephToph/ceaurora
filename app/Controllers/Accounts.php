@@ -1918,7 +1918,7 @@ class Accounts extends BaseController {
 							echo $this->Crud->msg('info', 'No Changes');	
 						}
 					} else {
-						if($this->Crud->check('firstname', $firstname, $table) > 0) {
+						if($this->Crud->check('email', $email, $table) > 0) {
 							echo $this->Crud->msg('warning', 'Membership Already Exist');
 						} else {
 							$role_id = $this->Crud->read_field('name', 'Member', 'access_role', 'id');
