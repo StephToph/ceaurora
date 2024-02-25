@@ -1927,7 +1927,7 @@ class Accounts extends BaseController {
 							///// store activities
 							$by = $this->Crud->read_field('id', $log_id, 'user', 'firstname');
 							$code = $this->Crud->read_field('id', $ins_rec, 'user', 'surname');
-							$this->Crud->updates('id', $ins_rec, 'user', array('user_no'=>'CEAM-'.$ins_rec));
+							$this->Crud->updates('id', $ins_rec, 'user', array('user_no'=>'CEAM-00'.$ins_rec));
 
 							$user_no = 'CEAM-00'.$ins_rec;
 
