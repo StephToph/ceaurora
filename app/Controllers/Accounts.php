@@ -1918,41 +1918,43 @@ class Accounts extends BaseController {
 							echo $this->Crud->msg('info', 'No Changes');	
 						}
 					} else {
-						if($this->Crud->check('email', $email, $table) > 0) {
-							echo $this->Crud->msg('warning', 'Membership Already Exist');
+						$role_id = $this->Crud->read_field('name', 'Member', 'access_role', 'id');
+						$ins_data['role_id'] = $role_id;
+						$ins_data['activate'] = 1;
+						$ins_data['reg_date'] = date(fdate);
+						$ins_rec = $this->Crud->create($table, $ins_data);
+						if($ins_rec > 0) {
+							///// store activities
+							$by = $this->Crud->read_field('id', $log_id, 'user', 'firstname');
+							$code = $this->Crud->read_field('id', $ins_rec, 'user', 'surname');
+							$this->Crud->updates('id', $ins_rec, 'user', array('user_no'=>'CEAM-'.$ins_rec));
+
+							$user_no = 'CEAM-00'.$ins_rec;
+
+							$action = $by.' created Membership ('.$code.') Record';
+							$this->Crud->activity('user', $ins_rec, $action);
+							$name = ucwords($firstname.' '.$othername.' '.$lastname);
+							$body = '
+								Dear '.$name.', <br><br>
+									A Membership Account Has been Created with This Email on Chrsit Embassy Aurora Platform;<br>
+									Below are your login Credentials:<br><br>
+
+									Membership ID: '.$user_no.'<br>
+									Email: '.$email.'<br>
+									Phone: '.$phone.'<br>
+									Password: '.$password.'<br><br>
+									Do not disclose your Login credentials with anyone to avoid unauthorized access.
+									
+							';
+							$this->Crud->send_email($email, 'Membership Account', $body);
+
+
+							echo $this->Crud->msg('success', 'Membership Created');
+							echo '<script>window.location.replace("'.site_url('accounts/membership').'");</script>';
 						} else {
-							$role_id = $this->Crud->read_field('name', 'Member', 'access_role', 'id');
-							$ins_data['role_id'] = $role_id;
-							$ins_data['activate'] = 1;
-							$ins_data['reg_date'] = date(fdate);
-							$ins_rec = $this->Crud->create($table, $ins_data);
-							if($ins_rec > 0) {
-								///// store activities
-								$by = $this->Crud->read_field('id', $log_id, 'user', 'firstname');
-								$code = $this->Crud->read_field('id', $ins_rec, 'user', 'surname');
-								$action = $by.' created Membership ('.$code.') Record';
-								$this->Crud->activity('user', $ins_rec, $action);
-								$name = ucwords($firstname.' '.$othername.' '.$lastname);
-								$body = '
-									Dear '.$name.', <br><br>
-										A Membership Account Has been Created with This Email on Chrsit Embassy Aurora Platform;<br>
-										Below are your login Credentials:<br><br>
-
-										Email: '.$email.'<br>
-										Phone: '.$phone.'<br>
-										Password: '.$password.'<br><br>
-										Do not disclose your Login credentials with anyone to avoid unauthorized access.
-										
-								';
-								$this->Crud->send_email($email, 'Membership Account', $body);
-
-
-								echo $this->Crud->msg('success', 'Membership Created');
-								echo '<script>window.location.replace("'.site_url('accounts/membership').'");</script>';
-							} else {
-								echo $this->Crud->msg('danger', 'Please try later');	
-							}	
-						}
+							echo $this->Crud->msg('danger', 'Please try later');	
+						}	
+					
 					}
 
 					die;	

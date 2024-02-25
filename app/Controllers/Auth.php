@@ -60,19 +60,14 @@ class Auth extends BaseController {
 		$msg = $this->session->get('td_auth_message');
 
 		if($this->request->getMethod() == 'post') {
-            $email = $this->request->getVar('email');
+            $email = $this->request->getVar('membership_id');
             $password = $this->request->getVar('password');
 
 			if($email && $password) {
 				$password = md5($password);
-				$type = 'email';
-				$query = $this->Crud->read2('email', $email, 'password', $password, 'user');
-				if(empty($query)) {
-					$type = 'phone';
-					$query = $this->Crud->read2('phone', $email, 'password', $password, 'user');
-	
-					
-				}
+				$type = 'user_no';
+				$query = $this->Crud->read2('user_no', $email, 'password', $password, 'user');
+				
 	
 				if(empty($query)) {
 					$msg = 'Invalid Authentication!';
@@ -81,7 +76,7 @@ class Auth extends BaseController {
 				} else {
 					$act = $this->Crud->check2($type, $email, 'activate', 0, 'user');
 					if ($act > 0) {
-						$msg = 'Account not Activated, Please validate account';
+						$msg = 'Account not Activated, Contact Administrator';
 						echo $this->Crud->msg('danger', translate_phrase($msg));
 						$id = $this->Crud->read_field('email', $email, 'user', 'id');
 						$this->session->set('td_id', $id);
