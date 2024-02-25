@@ -2033,6 +2033,7 @@ class Accounts extends BaseController {
 				<div class="nk-tb-item nk-tb-head">
 					<div class="nk-tb-col nk-tb-col-md"><span class="sub-text text-dark"><b>'.translate_phrase('Title').'</b></span></div>
 					<div class="nk-tb-col"><span class="sub-text text-dark"><b>'.translate_phrase('Name').'</b></span></div>
+					<div class="nk-tb-col"><span class="sub-text text-dark"><b>'.translate_phrase('Member ID').'</b></span></div>
 					<div class="nk-tb-col nk-tb-col-md"><span class="sub-text text-dark"><b>'.('Phone').'</b></span></div>
 					<div class="nk-tb-col"><span class="sub-text text-dark"><b>'.translate_phrase('Email').'</b></span></div>
 					<div class="nk-tb-col nk-tb-col-md"><span class="sub-text text-dark"><b>'.translate_phrase('Kingschat Handle').'</b></span></div>
@@ -2068,10 +2069,12 @@ class Accounts extends BaseController {
 						$firstname = $q->firstname;
 						$othername = $q->othername;
 						$surname = $q->surname;
+						$user_no = $q->user_no;
 						$phone = $q->phone;
 						$email = $q->email;
 						$chat_handle = $q->chat_handle;
 						$dob = date('d M Y', strtotime($q->dob));
+						if(empty($dob))$dob = '-';
 						$cell_id = $q->cell_id;
 						$title = $q->title;
 						$activate = $q->activate;
@@ -2109,6 +2112,9 @@ class Accounts extends BaseController {
 									<div class="user-info">
 										<span class="tb-lead"><b>' . ucwords($name) . '</b> </span>
 									</div>
+								</div>
+								<div class="nk-tb-col tb-col-md">
+									<span class="text-dark">' . ($user_no) . '</span>
 								</div>
 								<div class="nk-tb-col tb-col-md">
 									<span class="text-dark">' . ($phone) . '</span>
@@ -2193,6 +2199,7 @@ class Accounts extends BaseController {
 				$data['role'] = $this->Crud->read_field('id', $role_id, 'access_role', 'name');
 				$data['v_phone'] = $this->Crud->read_field('id', $user_id, 'user', 'phone');
 				$data['v_dob'] = $this->Crud->read_field('id', $user_id, 'user', 'dob');
+				$data['v_user_no'] = $this->Crud->read_field('id', $user_id, 'user', 'user_no');
 				$data['v_gender'] = $this->Crud->read_field('id', $user_id, 'user', 'gender');
 				$data['v_title'] = $this->Crud->read_field('id', $user_id, 'user', 'title');
 				$data['v_chat_handle'] = $this->Crud->read_field('id', $user_id, 'user', 'chat_handle');

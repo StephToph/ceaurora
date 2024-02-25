@@ -38,12 +38,12 @@
                                     <li class="nav-item">
                                         <a class="nav-link active" data-bs-toggle="tab" href="#personal-info"><em class="icon ni ni-user-circle"></em><span><?=translate_phrase('Personal');?></span></a>
                                     </li>
-                                    <li class="nav-item">
+                                    <!-- <li class="nav-item">
                                         <a class="nav-link" data-bs-toggle="tab" href="#notification"><em class="icon ni ni-bell"></em><span><?=translate_phrase('Partnership');?></span></a>
                                     </li>
                                     <li class="nav-item">
                                         <a class="nav-link"  data-bs-toggle="tab" href="#activity"><em class="icon ni ni-activity"></em><span><?=translate_phrase('Activities');?></span></a>
-                                    </li>
+                                    </li> -->
                                     <li class="nav-item nav-item-trigger d-xxl-none">
                                         <a href="#" class="toggle btn btn-icon btn-trigger" data-target="userAside"><em class="icon ni ni-user-list-fill"></em></a>
                                     </li>
@@ -64,14 +64,20 @@
                                                     </div>
                                                     <div class="profile-ud-item">
                                                         <div class="profile-ud wider">
-                                                            <span class="profile-ud-label"><?=translate_phrase('Mobile Number');?></span>
-                                                            <span class="profile-ud-value"><?=$v_phone; ?></span>
+                                                            <span class="profile-ud-label"><?=translate_phrase('Membership ID');?></span>
+                                                            <span class="profile-ud-value"><?=($v_user_no); ?></span>
                                                         </div>
                                                     </div>
                                                     <div class="profile-ud-item">
                                                         <div class="profile-ud wider">
                                                             <span class="profile-ud-label"><?=translate_phrase('Full Name');?></span>
                                                             <span class="profile-ud-value"><?=ucwords($fullname); ?></span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="profile-ud-item">
+                                                        <div class="profile-ud wider">
+                                                            <span class="profile-ud-label"><?=translate_phrase('Mobile Number');?></span>
+                                                            <span class="profile-ud-value"><?=$v_phone; ?></span>
                                                         </div>
                                                     </div>
                                                     <div class="profile-ud-item">
