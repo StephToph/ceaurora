@@ -77,14 +77,14 @@
                                 <?php echo form_open_multipart('auth/login', array('id'=>'bb_ajax_form', 'class'=>'')); ?>
                                     <div class="row mb-3"><div id="bb_ajax_msg"></div></div>
                                     <div class="form-group">
-                                        <div class="form-label-group"><label class="form-label" for="default-01">Email</label></div>
+                                        <div class="form-label-group"><label class="form-label" for="default-01">Membership ID</label></div>
                                         <div class="form-control-wrap"><input type="text"
-                                                class="form-control form-control-lg" name="email" id="default-01"
-                                                placeholder="Enter your email address or username"></div>
+                                                class="form-control form-control-lg" name="membership_id" id="default-01"
+                                                placeholder="Enter your Membership ID"></div>
                                     </div>
                                     <div class="form-group">
                                         <div class="form-label-group"><label class="form-label"
-                                                for="password">Passcode</label><a class="link link-primary link-sm"
+                                                for="password">Password</label><a class="link link-primary link-sm"
                                                 tabindex="-1" href="<?=site_url('auth/forgot'); ?>">Reset Password?</a></div>
                                         <div class="form-control-wrap"><a tabindex="-1" href="#"
                                                 class="form-icon form-icon-right passcode-switch lg"
@@ -92,7 +92,7 @@
                                                     class="passcode-icon icon-show icon ni ni-eye"></em><em
                                                     class="passcode-icon icon-hide icon ni ni-eye-off"></em></a><input
                                                 type="password" name="password" class="form-control form-control-lg" id="password"
-                                                placeholder="Enter your passcode"></div>
+                                                placeholder="Enter your password"></div>
                                     </div>
                                     <div class="form-group"><button class="btn btn-lg btn-primary btn-block">Sign
                                             in</button></div>
