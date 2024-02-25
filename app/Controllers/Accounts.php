@@ -1939,6 +1939,7 @@ class Accounts extends BaseController {
 									A Membership Account Has been Created with This Email on Chrsit Embassy Aurora Platform;<br>
 									Below are your login Credentials:<br><br>
 
+									Website: '.site_url().'
 									Membership ID: '.$user_no.'<br>
 									Email: '.$email.'<br>
 									Phone: '.$phone.'<br>
