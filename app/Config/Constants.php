@@ -52,11 +52,11 @@ defined('DECADE') || define('DECADE', 315360000);
  */
 defined('app_name') || define('app_name', 'CEAURORA');
 defined('app_meta_desc') || define('app_meta_desc', 'Church Management System');
-defined('app_email') || define('app_email', '');
-defined('app_website') || define('app_website', '');
-defined('push_email') || define('push_email', '');
+defined('app_email') || define('app_email', 'admin@ceaurora.vip');
+defined('app_website') || define('app_website', 'ceaurora.vip');
+defined('push_email') || define('push_email', 'admin@ceaurora.vip');
 defined('fdate') || define('fdate', 'Y-m-d H:i:s');
-defined('curr') || define('curr', '&#8358;');
+defined('curr') || define('curr', '$;');
 defined('pay_server') || define('pay_server', 'test');
 
 /*
