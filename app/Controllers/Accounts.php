@@ -1126,7 +1126,7 @@ class Accounts extends BaseController {
 							echo $this->Crud->msg('info', 'No Changes');	
 						}
 					} else {
-						echo $date;
+						// echo $date;
 						if($this->Crud->check('date', $dates, $table) > 0) {
 							echo $this->Crud->msg('warning', 'Record Already Exist');
 						} else {

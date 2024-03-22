@@ -3,11 +3,11 @@
 use App\Models\Crud;
 $this->Crud = new Crud();
 ?>
-<?php echo form_open_multipart($form_link, array('id'=>'bb_ajax_form', 'class'=>'')); ?>
+<?php echo form_open_multipart($form_link, array('id'=>'bb_ajax_form2', 'class'=>'')); ?>
     <!-- delete view -->
     <?php if($param2 == 'delete') { ?>
         <div class="row">
-            <div class="col-sm-12"><div id="bb_ajax_msg"></div></div>
+            <div class="col-sm-12"><div id="bb_ajax_msg2"></div></div>
         </div>
 
         <div class="row">
@@ -187,57 +187,5 @@ $this->Crud = new Crud();
         </div>
     <?php } ?>
 <?php echo form_close(); ?>
-<script>
-    $('.js-select2').select2();
-    document.getElementById('addMore').addEventListener('click', function() {
-        var container = document.getElementById('container');
-        var div = container.children[0].cloneNode(true);
-        
-        // Clear input value of the cloned div
-        div.querySelector('input').value = '';
-        div.querySelector('input').removeAttribute('required');
-        
-        // Show delete button in the cloned div
-        div.querySelector('.deleteBtn').style.display = 'inline-block';
-        
-        // Add event listener to delete button
-        div.querySelector('.deleteBtn').addEventListener('click', function() {
-            div.parentNode.removeChild(div);
-        });
-        
-        container.appendChild(div);
-    });
-
-    $('#addMores').on('click', function() {
-        var container = $('#containers');
-        var clonedRow = container.children('.row').first().clone();
-
-        // Clear values of cloned inputs
-        clonedRow.find('input').val('');
-        clonedRow.find('select, input').removeAttr('required');
-        
-        // Hide delete button in the cloned row
-        clonedRow.find('.deleteBtns').show();
-
-        clonedRow.find('.js-select2').select2();
-        // Append cloned row to container
-        container.append(clonedRow);
-    });
-
-    // Event delegation to handle dynamically added delete buttons
-    $('#containers').on('click', '.deleteBtns', function() {
-        $(this).closest('.row').remove();
-    });
-
-    $('#containers').on('change', 'select[name="day[]"]', function() {
-        var timeInput = $(this).closest('.row').find('input[name="time[]"]');
-        if ($(this).val()) {
-            timeInput.attr('required', 'required');
-        } else {
-            timeInput.removeAttr('required');
-        }
-    });
-
-</script>
 
 <script src="<?php echo site_url(); ?>assets/js/jsform.js"></script>
