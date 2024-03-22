@@ -1018,6 +1018,26 @@ class Accounts extends BaseController {
 		$data['form_link'] = $form_link;
         $data['current_language'] = $this->session->get('current_language');
 		
+		if($param1 == 'edit') {
+			if($param2) {
+				$edit = $this->Crud->read_single('id', $param2, $table);
+				if(!empty($edit)) {
+					foreach($edit as $e) {
+						$edata['e_id'] = $e->id;
+						$edata['e_cell_id'] = $e->cell_id;
+						$edata['e_type'] = $e->type;
+						$edata['e_date'] = $e->date;
+						$edata['e_attendance'] = $e->attendance;
+						$edata['e_new_convert'] = $e->new_convert;
+						$edata['e_first_timer'] = $e->first_timer;
+						$edata['e_offering'] = $e->offering;
+						$edata['e_note'] = $e->note;
+					}
+				}
+			}
+			echo json_encode($edata);
+			die;
+		} 
 		// manage record
 		if($param1 == 'manage') {
 			// prepare for delete
@@ -1060,7 +1080,7 @@ class Accounts extends BaseController {
 								$data['e_date'] = $e->date;
 								$data['e_attendance'] = $e->attendance;
 								$data['e_new_convert'] = $e->new_convert;
-								$data['e_first_time'] = $e->first_time;
+								$data['e_first_timer'] = $e->first_timer;
 								$data['e_offering'] = $e->offering;
 								$data['e_note'] = $e->note;
 							}
@@ -1093,15 +1113,14 @@ class Accounts extends BaseController {
 					
 					// do create or update
 					if($creport_id) {
-						$upd_rec = $this->Crud->updates('id', $cell_id, $table, $ins_data);
+						$upd_rec = $this->Crud->updates('id', $creport_id, $table, $ins_data);
 						if($upd_rec > 0) {
 							///// store activities
 							$by = $this->Crud->read_field('id', $log_id, 'user', 'firstname');
-							$code = $this->Crud->read_field('id', $cell_id, 'cells', 'name');
-							$action = $by.' updated Cell ('.$code.') Record';
+							$action = $by.' updated Cell Meeting Report';
 							$this->Crud->activity('user', $cell_id, $action);
 
-							echo $this->Crud->msg('success', 'Record Updated');
+							echo $this->Crud->msg('success', 'Report Updated');
 							echo '<script>location.reload(false);</script>';
 						} else {
 							echo $this->Crud->msg('info', 'No Changes');	
