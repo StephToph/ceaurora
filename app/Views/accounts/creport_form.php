@@ -25,36 +25,46 @@ $this->Crud = new Crud();
     <?php } ?>
 
     
-    <?php if($param2 == 'view'){?>
-        <table id="dtable" class="table table-striped">
+    <?php if($param2 == 'attendance'){?>
+        <table id="dtable" class="table table-striped table-hover">
             <thead>
                 <tr>
-                    <th>Day</th>
-                    <th>Time</th>
+                    <th>Member</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
                 <?php 
-                    $pays = $this->Crud->read_single('id', $param3, 'cells');
-
-                    $total = 0;
-                    if(!empty($pays)){
-                        foreach($pays as $p){
-                            $time = $p->time;
-                            if(!empty(json_decode($time))){
-                                foreach(json_decode($time) as $t => $val){
-                        
+                    $roles = $this->Crud->read_field('name', 'Member', 'access_role', 'id');
+                    $user = $this->Crud->read_single('role_id', $roles, 'user');
+                    if(!empty($user)){
+                        foreach($user as $p){
+                            
+                            $img = $this->Crud->image($p->img_id, 'big');
                             ?>
-                                <tr>
-                                    <td><?=$t ?></td>
-                                    <td><?=date('h:iA', strtotime($val)); ?></td>
-                                </tr>
+                            <tr>
+                                <td>
+                                    <div class="user-card">
+										<div class="user-avatar ">
+											<img alt="" src="<?=site_url($img); ?>" height="40px"/>
+										</div>
+										<div class="user-info">
+											<span class="tb-lead"><?=ucwords($p->firstname.' '.$p->surname); ?></span>
+										</div>
+									</div>
+                                </td>
+                                <td align="right"> 
+                                    <div class="custom-control custom-switch">    
+                                        <input type="checkbox" class="custom-control-input" id="customSwitch<?=$p->id;?>">    
+                                        <label class="custom-control-label" for="customSwitch<?=$p->id;?>">Mark</label>
+                                    </div>
+                                    
+                                </td>
+                            </tr>
                     <?php
-                                }
-                            }
                         }
                     }
-                    
+                       
                 ?>
             </tbody>
         </table>
