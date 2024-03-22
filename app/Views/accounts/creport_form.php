@@ -61,7 +61,7 @@ $this->Crud = new Crud();
 
     <?php } ?>
     <!-- insert/edit view -->
-    <?php if($param2 == 'edit' || $param2 == '') { ?>
+    <?php if($param2 == 'edi' || $param2 == '') { ?>
         <div class="row">
             <div class="col-sm-12"><div id="bb_ajax_msg"></div></div>
         </div>
