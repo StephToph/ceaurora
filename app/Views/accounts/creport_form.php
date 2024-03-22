@@ -55,7 +55,7 @@ $this->Crud = new Crud();
                                 </td>
                                 <td align="right"> 
                                     <div class="custom-control custom-switch">    
-                                        <input type="checkbox" class="custom-control-input" id="customSwitch<?=$p->id;?>">    
+                                        <input type="checkbox" name="" class="custom-control-input" id="customSwitch<?=$p->id;?>">    
                                         <label class="custom-control-label" for="customSwitch<?=$p->id;?>">Mark</label>
                                     </div>
                                     
