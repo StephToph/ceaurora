@@ -1697,6 +1697,32 @@ class Crud extends Model {
         $db->close();
     }
 
+	public function filter_cell_report($limit='', $offset='', $search='') {
+        $db = db_connect();
+        $builder = $db->table('cell_report');
+
+        // build query
+		$builder->orderBy('id', 'asc');
+		
+        if(!empty($search)) {
+            $builder->like('meeting', $search);
+        }
+
+		
+        // limit query
+        if($limit && $offset) {
+			$query = $builder->get($limit, $offset);
+		} else if($limit) {
+			$query = $builder->get($limit);
+		} else {
+            $query = $builder->get();
+        }
+
+        // return query
+        return $query->getResult();
+        $db->close();
+    }
+
 	public function filter_partnership($limit='', $offset='', $search='') {
         $db = db_connect();
         $builder = $db->table('partnership');
