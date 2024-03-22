@@ -32,24 +32,13 @@
                                     <div class="card-tools me-n1">
                                         <ul class="btn-toolbar gx-1">
                                             <li>
-                                                <a href="javascript:;" class="btn btn-icon search-toggle toggle-search" data-target="search"><em class="icon ni ni-search"></em></a>
-                                            </li>
-                                            <li class="btn-toolbar-sep"></li><!-- li -->
-                                            <li>
                                                 <a href="javascript:;"  id="add_btn" class="btn btn-icon btn-outline-primary"><em class="icon ni ni-plus-c"></em></a>
                                             </li><!-- li -->
                                            
                                         </ul><!-- .btn-toolbar -->
                                     </div><!-- .card-tools -->
                                 </div><!-- .card-title-group -->
-                                <div class="card-search search-wrap" data-search="search">
-                                    <div class="card-body">
-                                        <div class="search-content">
-                                            <a href="#" class="search-back btn btn-icon toggle-search" data-target="search"><em class="icon ni ni-arrow-left"></em></a>
-                                            <input type="text" class="form-control border-transparent form-focus-none" placeholder="Search by name" oninput="load('', '')" id="search">
-                                        </div>
-                                    </div>
-                                </div><!-- .card-search -->
+                                
                             </div><!-- .card-inner -->
                             <div class="card-inner" id="show">
                                 <div class="nk-tb-list nk-tb-ulist" id="load_data">
@@ -60,6 +49,9 @@
                             </div>
                             <div class="card-inner" id="form" style="display:none;">
                                <div class="row">
+                                    <div class="nk-block-head-sub" id="prev" style="display:none;">
+                                        <a class="back-to" id="back_btn" href="javascript:;"><em class="icon ni ni-arrow-left"></em><span>Cell Reports</span></a>
+                                    </div>
                                     <h5>Enter the Details for the Cell Meeting Below</h5>
                                     
                                     <?php echo form_open_multipart('accounts/creport/manage/add', array('id'=>'bb_ajax_form', 'class'=>'row mt-4')); ?>
@@ -99,7 +91,7 @@
                                             <div class="form-group">    
                                                 <label class="name">*Date</label>    
                                                 <div class="form-control-wrap">        
-                                                    <input type="text" name="date" class="form-control date-picker" required>   
+                                                    <input type="text" name="dates" class="form-control date-picker" required>   
                                                 </div>
                                             </div>
                                         </div>
@@ -121,7 +113,7 @@
                                                 <label for="name"><?=translate_phrase('New Convert'); ?></label>
                                                 <div class="form-control-wrap">    
                                                     <div class="input-group">        
-                                                        <input type="text" class="form-control" oninput="this.value = this.value.replace(/[^\d.]/g,'');this.value = this.value.replace(/(\..*)\./g,'$1')" id="new_convert" placeholder="">        
+                                                        <input type="text" class="form-control" oninput="this.value = this.value.replace(/[^\d.]/g,'');this.value = this.value.replace(/(\..*)\./g,'$1')" name="new_convert" placeholder="">        
                                                         <div class="input-group-append">            
                                                             <button type="button"  class="btn btn-outline-primary btn-dim pop" pageTitle="Mark Meeting Attendance" pageSize="modal-lg" pageName="<?=site_url('accounts/creport/manage/new_convert'); ?>">ADD</button>        
                                                         </div>    
@@ -197,6 +189,7 @@
         $('#show').toggle(500);
         $('#form').toggle(500);
         
+        $('#prev').hide(500);
         // Toggle between initial and new info
         currentInfo = (currentInfo === initialInfo) ? newInfo : initialInfo;
 
@@ -206,6 +199,20 @@
         $(this).find('em').removeClass().addClass('icon ni ' + currentInfo.iconClass);
     });
 
+    $('#back_btn').click(function() {
+        $('#show').show(500);
+        $('#form').hide(500);
+        
+        $('#prev').hide(500);
+
+    });
+
+    function edit_report(id){
+        $('#show').hide(500);
+        $('#form').show(500);
+        $('#prev').show(500);
+
+    }
 
     function load(x, y) {
         var more = 'no';

@@ -25,41 +25,41 @@ $this->Crud = new Crud();
     <?php } ?>
 
     
-<?php if($param2 == 'view'){?>
-    <table id="dtable" class="table table-striped">
-        <thead>
-            <tr>
-                <th>Day</th>
-                <th>Time</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php 
-                $pays = $this->Crud->read_single('id', $param3, 'cells');
+    <?php if($param2 == 'view'){?>
+        <table id="dtable" class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Day</th>
+                    <th>Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php 
+                    $pays = $this->Crud->read_single('id', $param3, 'cells');
 
-                $total = 0;
-                if(!empty($pays)){
-                    foreach($pays as $p){
-                        $time = $p->time;
-                        if(!empty(json_decode($time))){
-                            foreach(json_decode($time) as $t => $val){
-                       
-                        ?>
-                            <tr>
-                                <td><?=$t ?></td>
-                                <td><?=date('h:iA', strtotime($val)); ?></td>
-                            </tr>
-                   <?php
+                    $total = 0;
+                    if(!empty($pays)){
+                        foreach($pays as $p){
+                            $time = $p->time;
+                            if(!empty(json_decode($time))){
+                                foreach(json_decode($time) as $t => $val){
+                        
+                            ?>
+                                <tr>
+                                    <td><?=$t ?></td>
+                                    <td><?=date('h:iA', strtotime($val)); ?></td>
+                                </tr>
+                    <?php
+                                }
                             }
                         }
                     }
-                }
-                
-            ?>
-        </tbody>
-    </table>
+                    
+                ?>
+            </tbody>
+        </table>
 
-<?php } ?>
+    <?php } ?>
     <!-- insert/edit view -->
     <?php if($param2 == 'edit' || $param2 == '') { ?>
         <div class="row">
@@ -91,7 +91,7 @@ $this->Crud = new Crud();
                         $r_val = 'style="display:display;"';$req = '';
                     }
                     ?>
-                     <div class="row">
+                        <div class="row">
                         <div class="col-sm-4 mb-3">
                             <div class="form-group">
                                 <label for="name">*<?=translate_phrase('Meeting Day'); ?></label>
@@ -164,7 +164,7 @@ $this->Crud = new Crud();
                     </div>
                     
                 </div>
-           <?php $a++; }} else {?>
+            <?php $a++; }} else {?>
                 <div class="col-sm-12 mb-3 ">
                     <div class="form-group input-group">
                         <input class="form-control" type="text" id="role" placeholder="Enter Cell Roles" name="roles[]" value="<?php if(!empty($val)) {echo $val;} ?>" required>
@@ -172,7 +172,7 @@ $this->Crud = new Crud();
                     </div>
                     
                 </div>
-           <?php }?>
+            <?php }?>
         </div>
 
         <div class="row" >

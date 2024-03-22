@@ -1034,13 +1034,12 @@ class Accounts extends BaseController {
 						$del_id = $this->request->getVar('d_cell_id');
 						///// store activities
 						$by = $this->Crud->read_field('id', $log_id, 'user', 'firstname');
-						$code = $this->Crud->read_field('id', $del_id, 'cells', 'name');
-						$action = $by.' deleted Cell ('.$code.') Record';
+						$action = $by.' deleted Cell Report';
 
 						if($this->Crud->deletes('id', $del_id, $table) > 0) {
 							
 							$this->Crud->activity('user', $del_id, $action);
-							echo $this->Crud->msg('success', 'Cell Deleted');
+							echo $this->Crud->msg('success', 'Report Deleted');
 							echo '<script>location.reload(false);</script>';
 						} else {
 							echo $this->Crud->msg('danger', 'Please try later');
@@ -1056,10 +1055,14 @@ class Accounts extends BaseController {
 						if(!empty($edit)) {
 							foreach($edit as $e) {
 								$data['e_id'] = $e->id;
-								$data['e_location'] = $e->location;
-								$data['e_name'] = $e->name;
-								$data['e_roles'] = json_decode($e->roles);
-								$data['e_time'] = json_decode($e->time);
+								$data['e_cell_id'] = $e->cell_id;
+								$data['e_type'] = $e->type;
+								$data['e_date'] = $e->date;
+								$data['e_attendance'] = $e->attendance;
+								$data['e_new_convert'] = $e->new_convert;
+								$data['e_first_time'] = $e->first_time;
+								$data['e_offering'] = $e->offering;
+								$data['e_note'] = $e->note;
 							}
 						}
 					}
@@ -1074,12 +1077,14 @@ class Accounts extends BaseController {
 					$first_timer = $this->request->getVar('first_timer');
 					$offering = $this->request->getVar('offering');
 					$note = $this->request->getVar('note');
-					$date = $this->request->getVar('date');
+					$date = $this->request->getVar('dates');
 					
+					// echo $date;die;
+					$dates = date('y-m-d', strtotime($date));
 
 					$ins_data['cell_id'] = $cell_id;
 					$ins_data['type'] = $type;
-					$ins_data['date'] = $date;
+					$ins_data['date'] = $dates;
 					$ins_data['attendance'] = $attendance;
 					$ins_data['new_convert'] = $new_convert;
 					$ins_data['first_timer'] = $first_timer;
@@ -1102,7 +1107,8 @@ class Accounts extends BaseController {
 							echo $this->Crud->msg('info', 'No Changes');	
 						}
 					} else {
-						if($this->Crud->check('date', $date, $table) > 0) {
+						echo $date;
+						if($this->Crud->check('date', $dates, $table) > 0) {
 							echo $this->Crud->msg('warning', 'Record Already Exist');
 						} else {
 							
@@ -1175,16 +1181,25 @@ class Accounts extends BaseController {
 						$type = $q->type;
 						$cell_id = $q->cell_id;
 						$attendance = $q->attendance;
-						$date = $q->date;
+						$date = date('d M Y', strtotime($q->date));
 						$reg_date = $q->reg_date;
 
+						$types = '';
+						if($type == 'wk1')$types = 'WK1 - Prayer and Planning';
+						if($type == 'wk2')$types = 'Wk2 - Bible Study';
+						if($type == 'wk3')$types = 'Wk3 - Bible Study';
+						if($type == 'wk4')$types = 'Wk4 - Fellowship / Outreach';
 						
+						$cell='';
+						if($role == 'developer' || $role == 'administrator'){
+							$cell = '<span class="text-info"><em class="icon ni ni-curve-down-right"></em> <span>'.strtoupper($this->Crud->read_field('id', $cell_id, 'cells', 'name')).'</span></span>';
+						}
 						// add manage buttons
 						if ($role_u != 1) {
 							$all_btn = '';
 						} else {
 							$all_btn = '
-								<li><a href="javascript:;" class="text-primary pop" pageTitle="Edit" pageName="' . site_url($mod . '/manage/edit/' . $id) . '"><em class="icon ni ni-edit-alt"></em><span>'.translate_phrase('Edit').'</span></a></li>
+								<li><a href="javascript:;" class="text-primary" onclick="edit_report('.$id.')"><em class="icon ni ni-edit-alt"></em><span>'.translate_phrase('Edit').'</span></a></li>
 								<li><a href="javascript:;" class="text-danger pop" pageTitle="Delete" pageName="' . site_url($mod . '/manage/delete/' . $id) . '"><em class="icon ni ni-trash-alt"></em><span>'.translate_phrase('Delete').'</span></a></li>
 								
 								
@@ -1196,10 +1211,11 @@ class Accounts extends BaseController {
 								<div class="nk-tb-col">
 									<div class="user-info">
 										<span class="tb-lead">' . ucwords($date) . ' </span>
+										'.$cell.'
 									</div>
 								</div>
 								<div class="nk-tb-col">
-									<span class="text-dark">' . ucwords($type) . '</span>
+									<span class="text-dark">' . ucwords($types) . '</span>
 								</div>
 								<div class="nk-tb-col tb-col">
 									<span class="text-dark"><b>' . ucwords($attendance) . '</b></span>
