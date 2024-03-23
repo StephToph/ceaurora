@@ -980,7 +980,7 @@ class Accounts extends BaseController {
 			return view($mod, $data);
 		}
     }
-	public function creport($param1='', $param2='', $param3='') {
+	public function creport($param1='', $param2='', $param3='', $param4='') {
 		// check session login
 		if($this->session->get('td_id') == ''){
 			$request_uri = uri_string();
@@ -1009,12 +1009,14 @@ class Accounts extends BaseController {
 		$form_link = site_url($mod);
 		if($param1){$form_link .= '/'.$param1;}
 		if($param2){$form_link .= '/'.$param2.'/';}
-		if($param3){$form_link .= $param3;}
+		if($param3){$form_link .= '/'.$param3.'/';}
+		if($param4){$form_link .= $param4;}
 		
 		// pass parameters to view
 		$data['param1'] = $param1;
 		$data['param2'] = $param2;
 		$data['param3'] = $param3;
+		$data['param4'] = $param4;
 		$data['form_link'] = rtrim($form_link, '/');
         $data['current_language'] = $this->session->get('current_language');
 		

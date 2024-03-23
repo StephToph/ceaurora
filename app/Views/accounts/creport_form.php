@@ -40,11 +40,12 @@ $this->Crud = new Crud();
             </thead>
             <tbody>
                 <?php
-                    $cell_id = $this->Crud->read_field('id', $param3, 'cell_report', 'cell_id');
+                    // $param3.' '.$param4;
+                    $cell_id = $this->Crud->read_field('id', $param4, 'cell_report', 'cell_id');
                     $roles = $this->Crud->read_field('name', 'Member', 'access_role', 'id');
 
-                    $user = $this->Crud->read2('cell_id', $cell_id,'role_id', $roles, 'user');
-                    $attends = json_decode($this->Crud->read_field('id', $param3, 'cell_report', 'attendant'));
+                    $user = $this->Crud->read2('cell_id', $param3,'role_id', $roles, 'user');
+                    $attends = json_decode($this->Crud->read_field('id', $param4, 'cell_report', 'attendant'));
                     // print_r($attends);
                     if(!empty($user)){
                         foreach($user as $p){
@@ -105,10 +106,10 @@ $this->Crud = new Crud();
             </div>
         <?php }else{?>
             <?php 
-                $cell_id = $this->Crud->read_field('id', $param3, 'cell_report', 'cell_id');
+                $cell_id = $this->Crud->read_field('id', $param4, 'cell_report', 'cell_id');
                 $roles = $this->Crud->read_field('name', 'Member', 'access_role', 'id');
 
-                $converts = json_decode($this->Crud->read_field('id', $param3, 'cell_report', 'converts'));
+                $converts = json_decode($this->Crud->read_field('id', $param4, 'cell_report', 'converts'));
                 if(!empty($converts)){
                     $firstIteration = true; // Flag to track the first iteration
 
@@ -225,10 +226,10 @@ $this->Crud = new Crud();
             </div>
         <?php }else{?>
             <?php 
-                $cell_id = $this->Crud->read_field('id', $param3, 'cell_report', 'cell_id');
+                $cell_id = $this->Crud->read_field('id', $param4, 'cell_report', 'cell_id');
                 $roles = $this->Crud->read_field('name', 'Member', 'access_role', 'id');
 
-                $converts = json_decode($this->Crud->read_field('id', $param3, 'cell_report', 'timers'));
+                $converts = json_decode($this->Crud->read_field('id', $param4, 'cell_report', 'timers'));
                 if(!empty($converts)){
                     $firstIteration = true; // Flag to track the first iteration
 
@@ -468,7 +469,7 @@ $this->Crud = new Crud();
          // Show the corresponding div based on the selected option
          if(selectedOption === "Member") {
             memberDiv.show(500);channelDiv.hide();
-        } else if(selectedOption === "Online") {
+        } else if(selectedOption === "Online" || selectedOption === "Others") {
             channelDiv.show(500);memberDiv.hide();
         }
     });
