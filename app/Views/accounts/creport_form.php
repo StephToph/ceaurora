@@ -106,10 +106,10 @@ $this->Crud = new Crud();
             </div>
         <?php }else{?>
             <?php 
-                $cell_id = $this->Crud->read_field('id', $param3, 'cell_report', 'cell_id');
+                $cell_id = $this->Crud->read_field('id', $param4, 'cell_report', 'cell_id');
                 $roles = $this->Crud->read_field('name', 'Member', 'access_role', 'id');
 
-                $converts = json_decode($this->Crud->read_field('id', $param3, 'cell_report', 'converts'));
+                $converts = json_decode($this->Crud->read_field('id', $param4, 'cell_report', 'converts'));
                 if(!empty($converts)){
                     $firstIteration = true; // Flag to track the first iteration
 
