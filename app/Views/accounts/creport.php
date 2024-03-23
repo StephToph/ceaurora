@@ -56,7 +56,9 @@
                                     <p class="text-danger">Always click the save record Button after update of attendance, first timers and new convert.</p>
                                     <?php echo form_open_multipart('accounts/creport/manage', array('id'=>'bb_ajax_form', 'class'=>'row mt-4')); ?>
                                         <input type="hidden" name="creport_id" id="report_id" value="<?php if(!empty($e_id)){echo $e_id;}?>">
-                                        <?php if($role == 'developer' || $role == 'administrator'){?>
+                                        <?php 
+                                        $celss = $this->Crud->read_field('id', $log_id, 'user', 'cell_id');
+                                        if($role == 'developer' || $role == 'administrator'){?>
                                         <div class="col-sm-4 mb-3">
                                             <div class="form-group">
                                                 <label for="name">*<?=translate_phrase('Cell'); ?></label>
@@ -78,7 +80,7 @@
                                             </div>
                                         </div>
                                         <?php } else{?>
-                                            <input type="hidden" name="cell_id" value="">
+                                            <input type="hidden" name="cell_id" value="<?=$this->Crud->read_field('id', $log_id, 'user', 'cell_id'); ?>">
                                         <?php } ?>
                                         <div class="col-sm-4 mb-3">
                                             <div class="form-group">
@@ -107,7 +109,7 @@
                                                     <div class="input-group">        
                                                         <input type="text" name="attendance" id="attendance" oninput="this.value = this.value.replace(/[^\d.]/g,'');this.value = this.value.replace(/(\..*)\./g,'$1')" class="form-control" placeholder="">        
                                                         <div class="input-group-append">            
-                                                            <button type="button"  class="btn btn-outline-primary btn-dim pop" pageTitle="Mark Meeting Attendance" pageSize="modal-lg" pageName="<?php echo  site_url('accounts/creport/manage/attendance'); ?>" id="markButton">MARK</button>        
+                                                            <button type="button"  class="btn btn-outline-primary btn-dim pop" pageTitle="Mark Meeting Attendance" pageSize="modal-lg" pageName="<?php echo  site_url('accounts/creport/manage/attendance/'.$celss); ?>" id="markButton">MARK</button>        
                                                         </div>    
                                                     </div>
                                                 </div>
@@ -120,7 +122,7 @@
                                                     <div class="input-group">        
                                                         <input type="text" id="new_convert" class="form-control" oninput="this.value = this.value.replace(/[^\d.]/g,'');this.value = this.value.replace(/(\..*)\./g,'$1')" name="new_convert" placeholder="">        
                                                         <div class="input-group-append">            
-                                                            <button type="button"  class="btn btn-outline-primary btn-dim pop" pageTitle="New Convert" pageSize="modal-xl" pageName="<?=site_url('accounts/creport/manage/new_convert'); ?>" id="convertBtn">ADD</button>        
+                                                            <button type="button"  class="btn btn-outline-primary btn-dim pop" pageTitle="New Convert" pageSize="modal-xl" pageName="<?=site_url('accounts/creport/manage/new_convert/'.$celss); ?>" id="convertBtn">ADD</button>        
                                                         </div>    
                                                     </div>
                                                 </div>
@@ -133,7 +135,7 @@
                                                     <div class="input-group">        
                                                         <input type="text" id="first_timer" name="first_timer" oninput="this.value = this.value.replace(/[^\d.]/g,'');this.value = this.value.replace(/(\..*)\./g,'$1')" class="form-control" placeholder="">        
                                                         <div class="input-group-append">            
-                                                            <button type="button"  class="btn btn-outline-primary btn-dim pop" pageTitle="First Timer" pageSize="modal-xl" pageName="<?=site_url('accounts/creport/manage/first_timer'); ?>" id="timerBtn">ADD</button>        
+                                                            <button type="button"  class="btn btn-outline-primary btn-dim pop" pageTitle="First Timer" pageSize="modal-xl" pageName="<?=site_url('accounts/creport/manage/first_timer/'.$celss); ?>" id="timerBtn">ADD</button>        
                                                         </div>    
                                                     </div>
                                                 </div>
@@ -249,15 +251,15 @@
                 $('#converts').val(dt.e_converts);
                 
                 var url = site_url + 'accounts/creport/manage/attendance';
-                var updatedPageName = url + "/" + dt.e_id;
+                var updatedPageName = url + "/" + dt.e_cell_id + "/" + dt.e_id;
                 markButton.setAttribute("pageName", updatedPageName);
 
                 var urls = site_url + 'accounts/creport/manage/new_convert';
-                var updatedPageName = urls + "/" + dt.e_id;
+                var updatedPageName = urls + "/" + dt.e_cell_id + "/" + dt.e_id;
                 convertBtn.setAttribute("pageName", updatedPageName);
                 
                 var urls = site_url + 'accounts/creport/manage/first_timer';
-                var updatedPageName = urls + "/" + dt.e_id;
+                var updatedPageName = urls + "/" + dt.e_cell_id + "/" + dt.e_id;
                 timerBtn.setAttribute("pageName", updatedPageName);
                 $('#bb_ajax_msg').html('');
             }
