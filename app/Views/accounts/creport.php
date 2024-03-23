@@ -53,7 +53,7 @@
                                         <a class="back-to" id="back_btn" href="javascript:;"><em class="icon ni ni-arrow-left"></em><span>Cell Reports</span></a>
                                     </div>
                                     <h5>Enter the Details for the Cell Meeting Below</h5>
-                                    
+                                    <p class="text-danger">Always click the save record Button after update of attendance, first timers and new convert.</p>
                                     <?php echo form_open_multipart('accounts/creport/manage', array('id'=>'bb_ajax_form', 'class'=>'row mt-4')); ?>
                                         <input type="hidden" name="creport_id" id="report_id" value="<?php if(!empty($e_id)){echo $e_id;}?>">
                                         <?php if($role == 'developer' || $role == 'administrator'){?>
@@ -193,7 +193,9 @@
     $('#add_btn').click(function() {
         $('#show').toggle(500);
         $('#form').toggle(500);
-        
+        document.getElementById("bb_ajax_form").reset();
+        document.getElementById("cells_id").value = '';
+        document.getElementById("type").value = '';
         $('#prev').hide(500);
         // Toggle between initial and new info
         currentInfo = (currentInfo === initialInfo) ? newInfo : initialInfo;
@@ -213,9 +215,16 @@
     });
 
     function edit_report(id){
+        $('#bb_ajax_msg').html('<div class="col-sm-12 text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>');
         $('#show').hide(500);
         $('#form').show(500);
         $('#prev').show(500);
+        currentInfo = (currentInfo === initialInfo) ? newInfo : initialInfo;
+
+        // Update button class, onclick function, and icon class
+        $(this).removeClass().addClass('btn btn-icon ' + currentInfo.class);
+        // $(this).attr('onclick', currentInfo.onclick);
+        $(this).find('em').removeClass().addClass('icon ni ' + currentInfo.iconClass);
 
         $.ajax({
             url: site_url + 'accounts/creport/edit/' + id,
@@ -233,8 +242,9 @@
                 $('#note').val(dt.e_note);
                 
                 var url = site_url + 'accounts/creport/manage/attendance';
-                var updatedPageName = url + "/" + dt.e_cell_id;
+                var updatedPageName = url + "/" + dt.e_id;
                 markButton.setAttribute("pageName", updatedPageName);
+                $('#bb_ajax_msg').html('');
             }
         });
 

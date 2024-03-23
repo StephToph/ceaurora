@@ -40,11 +40,20 @@ $this->Crud = new Crud();
             </thead>
             <tbody>
                 <?php
+                    $cell_id = $this->Crud->read_field('id', $param3, 'cell_report', 'cell_id');
                     $roles = $this->Crud->read_field('name', 'Member', 'access_role', 'id');
                     $user = $this->Crud->read2('cell_id', $param3,'role_id', $roles, 'user');
+                    $attends = json_decode($this->Crud->read_field('id', $param3, 'cell_report', 'attendant'));
+                    // print_r($attends);
                     if(!empty($user)){
                         foreach($user as $p){
-                            
+                            $sel = '';
+                            if(!empty($attends)){
+                                if(in_array($p->id, $attends)){
+                                    $sel = 'checked';
+                                }
+                            }
+                           
                             $img = $this->Crud->image($p->img_id, 'big');
                             ?>
                             <tr>
@@ -60,7 +69,7 @@ $this->Crud = new Crud();
                                 </td>
                                 <td align="right"> 
                                     <div class="custom-control custom-switch">    
-                                        <input type="checkbox" name="mark[]" class="custom-control-input" id="customSwitch<?=$p->id;?>" value="<?=$p->id;?>">    
+                                        <input type="checkbox" name="mark[]" class="custom-control-input" id="customSwitch<?=$p->id;?>" <?=$sel; ?> value="<?=$p->id;?>">    
                                         <label class="custom-control-label" for="customSwitch<?=$p->id;?>">Mark</label>
                                     </div>
                                     

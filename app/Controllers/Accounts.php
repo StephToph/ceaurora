@@ -1069,19 +1069,29 @@ class Accounts extends BaseController {
 				}
 			
 			} elseif($param2 == 'attendance'){
-				//When Adding Save in Session
-				if($this->request->getMethod() == 'post'){
-					$mark = $this->request->getPost('mark');
-					if(empty($mark)){
-						echo $this->Crud->msg('danger', 'Mark Meeting Attendance');
-						die;
-					} else{
-						$this->session->set('cell_attendance', json_encode($mark));
-						echo $this->Crud->msg('success', 'Meeting Attendance Submitted');
-						echo json_encode($mark);
-						echo '<script>$("#modal").modal("hide");</script>';
+				
+				if($param3) {
+					$edit = $this->Crud->read2('type_id', $param3, 'type', 'cell', 'attendance');
+					if(!empty($edit)) {
+						foreach($edit as $e) {
+							$data['d_id'] = $e->id;
+							$data['d_attendant'] = $e->attendant;
+						}
 					}
-					
+					//When Adding Save in Session
+					if($this->request->getMethod() == 'post'){
+						$mark = $this->request->getPost('mark');
+						if(empty($mark)){
+							echo $this->Crud->msg('danger', 'Mark Meeting Attendance');
+							die;
+						} else{
+							$this->session->set('cell_attendance', json_encode($mark));
+							echo $this->Crud->msg('success', 'Meeting Attendance Submitted');
+							echo json_encode($mark);
+							echo '<script>$("#modal").modal("hide");</script>';
+						}
+						
+					}
 				}
 
 			} else {
@@ -1127,11 +1137,17 @@ class Accounts extends BaseController {
 					$ins_data['first_timer'] = $first_timer;
 					$ins_data['offering'] = $offering;
 					$ins_data['note'] = $note;
+					$ins_data['attendant'] = $this->session->get('cell_attendance');
+							
 					
 					// do create or update
 					if($creport_id) {
 						$upd_rec = $this->Crud->updates('id', $creport_id, $table, $ins_data);
 						if($upd_rec > 0) {
+							$at['attendant'] = $this->session->get('cell_attendance');
+							$at_id = $this->Crud->read_field2('type_id', $creport_id, 'type', 'cell', 'attendance', 'id');
+							$this->Crud->updates('id', $at_id, 'attendance', $at);
+							$this->session->set('cell_attendance', '');
 							///// store activities
 							$by = $this->Crud->read_field('id', $log_id, 'user', 'firstname');
 							$action = $by.' updated Cell Meeting Report';
@@ -1193,7 +1209,10 @@ class Accounts extends BaseController {
 				<div class="nk-tb-item nk-tb-head">
 					<div class="nk-tb-col"><span class="sub-text text-dark">'.translate_phrase('Date').'</span></div>
 					<div class="nk-tb-col"><span class="sub-text text-dark">'.translate_phrase('Meeting').'</span></div>
+					<div class="nk-tb-col"><span class="sub-text text-dark">'.translate_phrase('Offering').'</span></div>
 					<div class="nk-tb-col nk-tb-col-md"><span class="sub-text text-dark">'.translate_phrase('Attendance').'</span></div>
+					<div class="nk-tb-col nk-tb-col-md"><span class="sub-text text-dark">'.('FT').'</span></div>
+					<div class="nk-tb-col nk-tb-col-md"><span class="sub-text text-dark">'.('NC').'</span></div>
 					<div class="nk-tb-col nk-tb-col-tools">
 						<ul class="nk-tb-actions gx-1 my-n1">
 							
@@ -1225,6 +1244,9 @@ class Accounts extends BaseController {
 						$type = $q->type;
 						$cell_id = $q->cell_id;
 						$attendance = $q->attendance;
+						$offering = $q->offering;
+						$new_convert = $q->new_convert;
+						$first_timer = $q->first_timer;
 						$date = date('d M Y', strtotime($q->date));
 						$reg_date = $q->reg_date;
 
@@ -1261,8 +1283,17 @@ class Accounts extends BaseController {
 								<div class="nk-tb-col">
 									<span class="text-dark">' . ucwords($types) . '</span>
 								</div>
+								<div class="nk-tb-col">
+									<span class="text-dark">$' . number_format($offering,2) . '</span>
+								</div>
 								<div class="nk-tb-col tb-col">
-									<span class="text-dark"><b>' . ucwords($attendance) . '</b></span>
+									<span class="text-dark"><span>' . ucwords($attendance) . '</b></span>
+								</div>
+								<div class="nk-tb-col tb-col">
+									<span class="text-dark"><span>' . ucwords($first_timer) . '</b></span>
+								</div>
+								<div class="nk-tb-col tb-col">
+									<span class="text-dark"><span>' . ucwords($new_convert) . '</b></span>
 								</div>
 								<div class="nk-tb-col nk-tb-col-tools">
 									<ul class="nk-tb-actions gx-1">
