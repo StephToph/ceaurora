@@ -1019,7 +1019,9 @@ class Accounts extends BaseController {
         $data['current_language'] = $this->session->get('current_language');
 		
 		if($param1 == 'edit') {
+			$edata = [];
 			if($param2) {
+				// echo $param2;
 				$edit = $this->Crud->read_single('id', $param2, $table);
 				if(!empty($edit)) {
 					foreach($edit as $e) {
@@ -1088,7 +1090,9 @@ class Accounts extends BaseController {
 							$this->session->set('cell_attendance', json_encode($mark));
 							echo $this->Crud->msg('success', 'Meeting Attendance Submitted');
 							echo json_encode($mark);
-							echo '<script>$("#modal").modal("hide");</script>';
+							echo '<script> setTimeout(function() {
+								$("#modal").modal("hide");
+							}, 2000); </script>';
 						}
 						
 					}
@@ -1131,7 +1135,9 @@ class Accounts extends BaseController {
 							$this->session->set('cell_convert', json_encode($convert));
 							echo $this->Crud->msg('success', 'New Convert List Submitted');
 							// echo json_encode($mark);
-							echo '<script>$("#modal").modal("hide");</script>';
+							echo '<script> setTimeout(function() {
+								$("#modal").modal("hide");
+							}, 2000); </script>';
 						}
 						die;
 					}

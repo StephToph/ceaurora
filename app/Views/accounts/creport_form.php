@@ -42,7 +42,8 @@ $this->Crud = new Crud();
                 <?php
                     $cell_id = $this->Crud->read_field('id', $param3, 'cell_report', 'cell_id');
                     $roles = $this->Crud->read_field('name', 'Member', 'access_role', 'id');
-                    $user = $this->Crud->read2('cell_id', $param3,'role_id', $roles, 'user');
+
+                    $user = $this->Crud->read2('cell_id', $cell_id,'role_id', $roles, 'user');
                     $attends = json_decode($this->Crud->read_field('id', $param3, 'cell_report', 'attendant'));
                     // print_r($attends);
                     if(!empty($user)){
@@ -121,13 +122,84 @@ $this->Crud = new Crud();
                 <div class="col-sm-4 mb-3">
                     <div class="form-group">
                         <label for="name">*<?=translate_phrase('Email'); ?></label>
-                        <input class="form-control" type="email" id="email" name="email[]"  required>
+                        <input class="form-control" type="email" id="email" name="email[]"  >
                     </div>
                 </div>
                 <div class="col-sm-4 mb-3">
                     <div class="form-group">
                         <label for="name">*<?=translate_phrase('Phone'); ?></label>
                         <input class="form-control" type="text" id="phone" name="phone[]"  required>
+                    </div>
+                </div>
+                <div class="col-sm-4 mb-3">
+                    <div class="form-group">
+                        <label for="name">*<?=translate_phrase('Birthday'); ?></label>
+                        <input class="form-control" type="date" id="dob" name="dob[]" >
+                    </div>
+                </div>
+                
+            </div>
+            <div class="col-sm-12 my-3 text-center">
+                <button id="addMores" class="btn btn-ico btn-outline-info" type="button"><i class="icon ni ni-plus-c"></i>  <?=translate_phrase('Add More');?></button>
+            </div>
+
+
+            <div class="row" >
+            <div class="col-sm-12 text-center mt-3">
+                    <button class="btn btn-primary bb_fo_btn" type="submit">
+                        <i class="icon ni ni-save"></i> <?=translate_phrase('Save Record');?>
+                    </button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12"><div id="bb_ajax_msg2"></div></div>
+            </div>
+    <?php } }?>
+
+     <!-- insert/edit view -->
+     <?php if($param2 == 'first_timer') { ?>
+        <?php if(empty($param3)){?>
+            <div class="row">
+                <div class="col-sm-12 text-danger text-center">Select a Cell First</div>
+            </div>
+        <?php }else{?>
+            
+            
+            <div class="row border mb-3">
+                <div class="col-sm-6 mb-3">
+                    <div class="form-group">
+                        <label for="name">*<?=translate_phrase('First Name'); ?></label>
+                        <input class="form-control" type="text" id="first_name" name="first_name[]" required>
+                    </div>
+                </div>
+                <div class="col-sm-6 mb-3">
+                    <div class="form-group">
+                        <label for="name">*<?=translate_phrase('Surname'); ?></label>
+                        <input class="form-control" type="text" id="surname" name="surname[]"  required>
+                    </div>
+                </div>
+                <div class="col-sm-6 mb-3">
+                    <div class="form-group">
+                        <label for="name">*<?=translate_phrase('Email'); ?></label>
+                        <input class="form-control" type="email" id="email" name="email[]"  >
+                    </div>
+                </div>
+                <div class="col-sm-6 mb-3">
+                    <div class="form-group">
+                        <label for="name">*<?=translate_phrase('Phone'); ?></label>
+                        <input class="form-control" type="text" id="phone" name="phone[]"  required>
+                    </div>
+                </div>
+                <div class="col-sm-4 mb-3">
+                    <div class="form-group">
+                        <label for="name">*<?=translate_phrase('Birthday'); ?></label>
+                        <input class="form-control" type="date" id="dob" name="dob[]" >
+                    </div>
+                </div>
+                <div class="col-sm-4 mb-3">
+                    <div class="form-group">
+                        <label for="name">*<?=translate_phrase('Invited By'); ?></label>
+                        <input class="form-control" type="date" id="dob" name="dob[]" >
                     </div>
                 </div>
                 <div class="col-sm-4 mb-3">

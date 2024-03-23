@@ -133,7 +133,7 @@
                                                     <div class="input-group">        
                                                         <input type="text" id="first_timer" name="first_timer" oninput="this.value = this.value.replace(/[^\d.]/g,'');this.value = this.value.replace(/(\..*)\./g,'$1')" class="form-control" placeholder="">        
                                                         <div class="input-group-append">            
-                                                            <button type="button"  class="btn btn-outline-primary btn-dim pop" pageTitle="Mark Meeting Attendance" pageSize="modal-lg" pageName="<?=site_url('accounts/creport/manage/first_timer'); ?>">ADD</button>        
+                                                            <button type="button"  class="btn btn-outline-primary btn-dim pop" pageTitle="Mark Meeting Attendance" pageSize="modal-xl" pageName="<?=site_url('accounts/creport/manage/first_timer'); ?>" id="timerBtn">ADD</button>        
                                                         </div>    
                                                     </div>
                                                 </div>
@@ -248,6 +248,10 @@
                 var urls = site_url + 'accounts/creport/manage/new_convert';
                 var updatedPageName = urls + "/" + dt.e_id;
                 convertBtn.setAttribute("pageName", updatedPageName);
+                
+                var urls = site_url + 'accounts/creport/manage/first_timer';
+                var updatedPageName = urls + "/" + dt.e_id;
+                timerBtn.setAttribute("pageName", updatedPageName);
                 $('#bb_ajax_msg').html('');
             }
         });
@@ -258,6 +262,7 @@
         var selectElement = document.getElementById("cells_id");
         var markButton = document.getElementById("markButton");
         var convertBtn = document.getElementById("convertBtn");
+        var timerBtn = document.getElementById("timerBtn");
         
         var selectedValue = selectElement.value;
        
@@ -268,7 +273,11 @@
         var urls = site_url + 'accounts/creport/manage/new_convert';
         var updatedPageName = urls + "/" + selectedValue;
         convertBtn.setAttribute("pageName", updatedPageName);
-
+        
+        var urls = site_url + 'accounts/creport/manage/first_timer';
+        var updatedPageName = urls + "/" + selectedValue;
+        timerBtn.setAttribute("pageName", updatedPageName);
+                
         
     }
 
