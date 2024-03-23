@@ -151,6 +151,10 @@
                                                 <textarea class="form-control"  id="note" name="note" ></textarea>
                                             </div>
                                         </div>
+                                        <input type="hidden" name="attendant" id="attendant">
+                                        <input type="hidden" name="converts" id="converts">
+                                        <input type="hidden" name="timers" id="timers">
+                                        
                                         <div class="col-sm-12 text-center mt-3">
                                             <button class="btn btn-primary bb_fo_btn" type="submit">
                                                 <em class="icon ni ni-save"></em> <span><?=translate_phrase('Save Record');?></span>
@@ -240,6 +244,9 @@
                 $('#first_timer').val(dt.e_first_timer);
                 $('#offering').val(dt.e_offering);
                 $('#note').val(dt.e_note);
+                $('#attendant').val(dt.e_attendant);
+                $('#timers').val(dt.e_timers);
+                $('#converts').val(dt.e_converts);
                 
                 var url = site_url + 'accounts/creport/manage/attendance';
                 var updatedPageName = url + "/" + dt.e_id;
