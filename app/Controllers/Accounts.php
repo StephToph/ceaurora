@@ -1015,7 +1015,7 @@ class Accounts extends BaseController {
 		$data['param1'] = $param1;
 		$data['param2'] = $param2;
 		$data['param3'] = $param3;
-		$data['form_link'] = $form_link;
+		$data['form_link'] = rtrim($form_link, '/');
         $data['current_language'] = $this->session->get('current_language');
 		
 		if($param1 == 'edit') {
@@ -1067,6 +1067,23 @@ class Accounts extends BaseController {
 						exit;	
 					}
 				}
+			
+			} elseif($param2 == 'attendance'){
+				//When Adding Save in Session
+				if($this->request->getMethod() == 'post'){
+					$mark = $this->request->getPost('mark');
+					if(empty($mark)){
+						echo $this->Crud->msg('danger', 'Mark Meeting Attendance');
+						die;
+					} else{
+						$this->session->set('cell_attendance', json_encode($mark));
+						echo $this->Crud->msg('success', 'Meeting Attendance Submitted');
+						echo json_encode($mark);
+						echo '<script>$("#modal").modal("hide");</script>';
+					}
+					
+				}
+
 			} else {
 				// prepare for edit
 				if($param2 == 'edit') {
@@ -1134,6 +1151,12 @@ class Accounts extends BaseController {
 							$ins_data['reg_date'] = date(fdate);
 							$ins_rec = $this->Crud->create($table, $ins_data);
 							if($ins_rec > 0) {
+								$at['type'] = 'cell';
+								$at['type_id'] = $ins_rec;
+								$at['attendant'] = $this->session->get('cell_attendance');
+								$at['reg_date'] = date(fdate);
+								$this->Crud->create('attendance', $at);
+								$this->session->set('cell_attendance', '');
 								///// store activities
 								$by = $this->Crud->read_field('id', $log_id, 'user', 'firstname');
 								$action = $by.' created a Cell Meeting Report for ('.$date.')';
@@ -1150,6 +1173,8 @@ class Accounts extends BaseController {
 					die;	
 				}
 			}
+
+
 		}
 
         // record listing

@@ -26,6 +26,11 @@ $this->Crud = new Crud();
 
     
     <?php if($param2 == 'attendance'){?>
+        <?php if(empty($param3)){?>
+            <div class="row">
+                <div class="col-sm-12 text-danger text-center">Select a Cell First</div>
+            </div>
+        <?php }else{?>
         <table id="dtable" class="table table-striped table-hover">
             <thead>
                 <tr>
@@ -34,9 +39,9 @@ $this->Crud = new Crud();
                 </tr>
             </thead>
             <tbody>
-                <?php 
+                <?php
                     $roles = $this->Crud->read_field('name', 'Member', 'access_role', 'id');
-                    $user = $this->Crud->read_single('role_id', $roles, 'user');
+                    $user = $this->Crud->read2('cell_id', $param3,'role_id', $roles, 'user');
                     if(!empty($user)){
                         foreach($user as $p){
                             
@@ -55,21 +60,33 @@ $this->Crud = new Crud();
                                 </td>
                                 <td align="right"> 
                                     <div class="custom-control custom-switch">    
-                                        <input type="checkbox" name="" class="custom-control-input" id="customSwitch<?=$p->id;?>">    
+                                        <input type="checkbox" name="mark[]" class="custom-control-input" id="customSwitch<?=$p->id;?>" value="<?=$p->id;?>">    
                                         <label class="custom-control-label" for="customSwitch<?=$p->id;?>">Mark</label>
                                     </div>
                                     
                                 </td>
                             </tr>
-                    <?php
-                        }
-                    }
+                        <?php } ?>
+                        <tr>
+                            <td colspan="2" class="text-center">
+                                <button class="btn btn-primary bb_fo_btn" type="submit">
+                                    <i class="icon ni ni-save"></i> <?=translate_phrase('Save Record');?>
+                                </button>
+                            </td>
+                        </tr> 
+                   <?php } else{ ?>
+                    <tr>
+                        <td colspan="2">No Member in Cell</td>
+                    </tr>
+                  <?php  }
                        
                 ?>
             </tbody>
         </table>
-
-    <?php } ?>
+        <div class="row">
+            <div class="col-sm-12"><div id="bb_ajax_msg2"></div></div>
+        </div>
+    <?php }} ?>
     <!-- insert/edit view -->
     <?php if($param2 == 'edi' || $param2 == '') { ?>
         <div class="row">
