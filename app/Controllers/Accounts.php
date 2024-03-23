@@ -1034,6 +1034,9 @@ class Accounts extends BaseController {
 						$edata['e_first_timer'] = $e->first_timer;
 						$edata['e_offering'] = $e->offering;
 						$edata['e_note'] = $e->note;
+						$edata['e_attendant'] = $e->attendant;
+						$edata['e_timers'] = $e->timers;
+						$edata['e_converts'] = $e->converts;
 					}
 				}
 			}
@@ -1089,12 +1092,15 @@ class Accounts extends BaseController {
 						} else{
 							$this->session->set('cell_attendance', json_encode($mark));
 							echo $this->Crud->msg('success', 'Meeting Attendance Submitted');
-							echo json_encode($mark);
+							// echo json_encode($mark);
 							echo '<script> setTimeout(function() {
+								var jsonData = ' . json_encode($mark) . ';
+								var jsonString = JSON.stringify(jsonData);
+								$("#converts").val(jsonString);
 								$("#modal").modal("hide");
 							}, 2000); </script>';
 						}
-						
+						die;
 					}
 				}
 
@@ -1135,7 +1141,65 @@ class Accounts extends BaseController {
 							$this->session->set('cell_convert', json_encode($convert));
 							echo $this->Crud->msg('success', 'New Convert List Submitted');
 							// echo json_encode($mark);
+							
 							echo '<script> setTimeout(function() {
+								var jsonData = ' . json_encode($convert) . ';
+								var jsonString = JSON.stringify(jsonData);
+								$("#converts").val(jsonString);
+								$("#modal").modal("hide");
+							}, 2000); </script>';
+						}
+						die;
+					}
+				}
+
+			}elseif($param2 == 'first_timer'){
+				
+				if($param3) {
+					
+					//When Adding Save in Session
+					if($this->request->getMethod() == 'post'){
+						$first_name = $this->request->getPost('first_name');
+						$surname = $this->request->getPost('surname');
+						$email = $this->request->getPost('email');
+						$phone = $this->request->getPost('phone');
+						$dob = $this->request->getPost('dob');
+						$invited_by = $this->request->getPost('invited_by');
+						$channel = $this->request->getPost('channel');
+						$member_id = $this->request->getPost('member_id');
+
+						
+
+						$converts = [];
+						if(!empty($first_name) || !empty($surname)){
+							for($i=0;$i<count($first_name);$i++){
+								$invites = $member_id[$i];
+								if($invited_by[$i] != 'Member'){
+									$invites = $channel[$i];
+								}
+								$converts['fullname'] = $first_name[$i].' '.$surname[$i];
+								$converts['email'] = $email[$i];
+								$converts['phone'] = $phone[$i];
+								$converts['dob'] = $dob[$i];
+								$converts['invited_by'] = $invited_by[$i];
+								$converts['channel'] = $invites;
+								
+								$convert[] = $converts;
+							}
+						}
+						// echo json_encode($convert);
+						// die;
+						if(empty($convert)){
+							echo $this->Crud->msg('danger', 'Enter the First Timer Details');
+							
+						} else{
+							$this->session->set('cell_timers', json_encode($convert));
+							echo $this->Crud->msg('success', 'First Timer List Submitted');
+							// echo json_encode($mark);
+							echo '<script> setTimeout(function() {
+								var jsonData = ' . json_encode($convert) . ';
+								var jsonString = JSON.stringify(jsonData);
+								$("#converts").val(jsonString);
 								$("#modal").modal("hide");
 							}, 2000); </script>';
 						}
@@ -1174,10 +1238,14 @@ class Accounts extends BaseController {
 					$offering = $this->request->getVar('offering');
 					$note = $this->request->getVar('note');
 					$date = $this->request->getVar('dates');
+					$attendant = $this->request->getVar('attendant');
+					$converts = $this->request->getVar('converts');
+					$timers = $this->request->getVar('timers');
 					
 					// echo $date;die;
 					$dates = date('y-m-d', strtotime($date));
 
+					
 					$ins_data['cell_id'] = $cell_id;
 					$ins_data['type'] = $type;
 					$ins_data['date'] = $dates;
@@ -1186,12 +1254,17 @@ class Accounts extends BaseController {
 					$ins_data['first_timer'] = $first_timer;
 					$ins_data['offering'] = $offering;
 					$ins_data['note'] = $note;
-					$ins_data['attendant'] = $this->session->get('cell_attendance');
-					$ins_data['converts'] = $this->session->get('cell_convert');
-							
 					
+					if(!empty($attendant)){$attend = $attendant;}else{$attend = $this->session->get('cell_attendance');}
+					if(!empty($converts)){$conv = $converts;}else{$conv = $this->session->get('cell_convert');}
+					if(!empty($timers)){$times = $timers;}else{$times = $this->session->get('cell_timers');}
 					// do create or update
 					if($creport_id) {
+						
+						$ins_data['attendant'] = $attend;
+						$ins_data['converts'] = $conv;
+						$ins_data['timers'] = $times;
+								
 						$upd_rec = $this->Crud->updates('id', $creport_id, $table, $ins_data);
 						if($upd_rec > 0) {
 							$at['attendant'] = $this->session->get('cell_attendance');
@@ -1199,6 +1272,8 @@ class Accounts extends BaseController {
 							$this->Crud->updates('id', $at_id, 'attendance', $at);
 							$this->session->set('cell_attendance', '');
 							$this->session->set('cell_convert', '');
+							
+							$this->session->set('cell_timers', '');
 							///// store activities
 							$by = $this->Crud->read_field('id', $log_id, 'user', 'firstname');
 							$action = $by.' updated Cell Meeting Report';
@@ -1214,6 +1289,9 @@ class Accounts extends BaseController {
 						if($this->Crud->check('date', $dates, $table) > 0) {
 							echo $this->Crud->msg('warning', 'Record Already Exist');
 						} else {
+							$ins_data['attendant'] = $this->session->get('cell_attendance');
+							$ins_data['converts'] = $this->session->get('cell_convert');
+							$ins_data['timers'] = $this->session->get('cell_timers');
 							
 							$ins_data['reg_date'] = date(fdate);
 							$ins_rec = $this->Crud->create($table, $ins_data);
@@ -1225,6 +1303,7 @@ class Accounts extends BaseController {
 								$this->Crud->create('attendance', $at);
 								$this->session->set('cell_attendance', '');
 								$this->session->set('cell_convert', '');
+								$this->session->set('cell_timers', '');
 								
 								///// store activities
 								$by = $this->Crud->read_field('id', $log_id, 'user', 'firstname');
