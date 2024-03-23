@@ -199,7 +199,7 @@ $this->Crud = new Crud();
                 <div class="col-sm-4 mb-3">
                     <div class="form-group">
                         <label for="name">*<?=translate_phrase('Invited By'); ?></label>
-                        <select class=" js-select2" name="invited_by[]" required>
+                        <select class="form-select js-select2" name="invited_by[]" required>
                             <option value="">Select</option>
                             <option value="Member">Member</option>
                             <option value="Online">Online</option>
@@ -217,7 +217,7 @@ $this->Crud = new Crud();
                 <div class="col-sm-4 mb-3" name="member-div" style="display: none;">
                     <div class="form-group">
                         <label for="name"><?=translate_phrase('Member'); ?></label>
-                        <select class="js-select2" data-search="on" name="member_id[]">
+                        <select class="form-select js-select2" data-search="on" name="member_id[]">
                             <option value="">Select Member</option>
                             <?php 
                                 $roles_id = $this->Crud->read_field('name', 'Member', 'access_role', 'id');
@@ -256,7 +256,12 @@ $this->Crud = new Crud();
 
 <script>
     $(document).ready(function(){
-       
+        // Initialize Select2 for the original select dropdown
+        $('.js-select2').each(function() {
+            if (!$(this).data('select2')) {
+                $(this).select2();
+            }
+        });
         // Function to handle the click event of the "Add More Convert" button
         $('#addMores').click(function(){
             // Clone the first row
@@ -264,21 +269,16 @@ $this->Crud = new Crud();
             
             // Clear input values in the cloned row
             newRow.find('input[type="text"], input[type="email"], input[type="date"]').val('');
-           // Destroy Select2 instances on the cloned select elements
-            newRow.find('.js-select2').each(function() {
-                $(this).select2('destroy');
-            });
             
             // Append the cloned row after the last existing row
             $('.row.border').last().after(newRow);
             
-            // Reinitialize Select2 for the cloned select dropdown
-           
             // Add a delete button with icon to the cloned row
             newRow.append('<button class="btn btn-danger deleteRow"> <em class="icon ni ni-trash"></em> <span>Remove</span></button>');
-            
+             // Reinitialize Select2 for the cloned select dropdown
+             newRow.find('.js-select2').select2();
+            // Center align the delete button
             newRow.find('.deleteRow').addClass('d-flex justify-content-center align-items-center');
-            newRow.find('.js-select2').select2();
         });
 
         // Function to handle the click event of the delete button for dynamically added rows
