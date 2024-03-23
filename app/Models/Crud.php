@@ -1702,7 +1702,7 @@ class Crud extends Model {
         $builder = $db->table('cell_report');
 
         // build query
-		$builder->orderBy('id', 'asc');
+		$builder->orderBy('id', 'desc');
 		
         if(!empty($search)) {
             $builder->like('meeting', $search);

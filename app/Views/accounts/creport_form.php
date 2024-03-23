@@ -40,11 +40,20 @@ $this->Crud = new Crud();
             </thead>
             <tbody>
                 <?php
+                    $cell_id = $this->Crud->read_field('id', $param3, 'cell_report', 'cell_id');
                     $roles = $this->Crud->read_field('name', 'Member', 'access_role', 'id');
                     $user = $this->Crud->read2('cell_id', $param3,'role_id', $roles, 'user');
+                    $attends = json_decode($this->Crud->read_field('id', $param3, 'cell_report', 'attendant'));
+                    // print_r($attends);
                     if(!empty($user)){
                         foreach($user as $p){
-                            
+                            $sel = '';
+                            if(!empty($attends)){
+                                if(in_array($p->id, $attends)){
+                                    $sel = 'checked';
+                                }
+                            }
+                           
                             $img = $this->Crud->image($p->img_id, 'big');
                             ?>
                             <tr>
@@ -60,7 +69,7 @@ $this->Crud = new Crud();
                                 </td>
                                 <td align="right"> 
                                     <div class="custom-control custom-switch">    
-                                        <input type="checkbox" name="mark[]" class="custom-control-input" id="customSwitch<?=$p->id;?>" value="<?=$p->id;?>">    
+                                        <input type="checkbox" name="mark[]" class="custom-control-input" id="customSwitch<?=$p->id;?>" <?=$sel; ?> value="<?=$p->id;?>">    
                                         <label class="custom-control-label" for="customSwitch<?=$p->id;?>">Mark</label>
                                     </div>
                                     
@@ -88,131 +97,93 @@ $this->Crud = new Crud();
         </div>
     <?php }} ?>
     <!-- insert/edit view -->
-    <?php if($param2 == 'edi' || $param2 == '') { ?>
-        <div class="row">
-            <div class="col-sm-12"><div id="bb_ajax_msg"></div></div>
-        </div>
-
-        
-        <div class="row">
-            <input type="hidden" name="cell_id" value="<?php if(!empty($e_id)){echo $e_id;} ?>" />
-            <div class="col-sm-12 mb-3">
-                <div class="form-group">
-                    <label for="name">*<?=translate_phrase('Name'); ?></label>
-                    <input class="form-control" type="text" id="name" name="name" value="<?php if(!empty($e_name)) {echo $e_name;} ?>" required>
-                </div>
+    <?php if($param2 == 'new_convert') { ?>
+        <?php if(empty($param3)){?>
+            <div class="row">
+                <div class="col-sm-12 text-danger text-center">Select a Cell First</div>
             </div>
-            <div class="col-sm-12 mb-3">
-                <div class="form-group">
-                    <label for="name">*<?=translate_phrase('Location'); ?></label>
-                    <input class="form-control" type="text" id="location" name="location" value="<?php if(!empty($e_location)) {echo $e_location;} ?>" required>
-                </div>
-            </div>
+        <?php }else{?>
             
-        </div>
-        <div  id="containers">
-            <?php if(!empty($e_time)){$a = 0;
-                foreach($e_time as $k => $val){
-                    $r_val = 'style="display:none;"';$req = 'required';
-                    if($a > 0){
-                        $r_val = 'style="display:display;"';$req = '';
-                    }
-                    ?>
-                        <div class="row">
-                        <div class="col-sm-4 mb-3">
-                            <div class="form-group">
-                                <label for="name">*<?=translate_phrase('Meeting Day'); ?></label>
-                                <select class="form-control" name="days[]"  <?=$req; ?>>
-                                    <option value="">Select</option>
-                                    <option value="Sunday" <?php if($k == 'Sunday'){echo 'selected';} ?>>Sunday</option>
-                                    <option value="Monday" <?php if($k == 'Monday'){echo 'selected';} ?>>Monday</option>
-                                    <option value="Tuesday" <?php if($k == 'Tuesday'){echo 'selected';} ?>>Tuesday</option>
-                                    <option value="Wednesday" <?php if($k == 'Wednesday'){echo 'selected';} ?>>Wednesday</option>
-                                    <option value="Thursday" <?php if($k == 'Thursday'){echo 'selected';} ?>>Thursday</option>
-                                    <option value="Friday" <?php if($k == 'Friday'){echo 'selected';} ?>>Friday</option>
-                                    <option value="Saturday" <?php if($k == 'Saturday'){echo 'selected';} ?>>Saturday</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="col-sm-8 mb-3">
-                            <label for="name">*<?=translate_phrase('Meeting Time'); ?></label>
-                            <div class="form-group input-group">
-                                <input class="form-control" type="time" id="location" value="<?php if(!empty($val)){echo $val;} ?>" name="times[]"  <?=$req; ?>>
-                                <button <?=$r_val; ?>  class="btn btn-icon btn-outline-danger deleteBtns" type="button"><i class="icon ni ni-trash"></i> </button>
-                            </div>
-                        </div>
+            
+            <div class="row border mb-3">
+                <div class="col-sm-6 mb-3">
+                    <div class="form-group">
+                        <label for="name">*<?=translate_phrase('First Name'); ?></label>
+                        <input class="form-control" type="text" id="first_name" name="first_name[]" required>
                     </div>
                 </div>
-            <?php $a++; }} else {?>
-            <div class="row">
+                <div class="col-sm-6 mb-3">
+                    <div class="form-group">
+                        <label for="name">*<?=translate_phrase('Surname'); ?></label>
+                        <input class="form-control" type="text" id="surname" name="surname[]"  required>
+                    </div>
+                </div>
                 <div class="col-sm-4 mb-3">
                     <div class="form-group">
-                        <label for="name">*<?=translate_phrase('Meeting Day'); ?></label>
-                        <select class="form-control" name="days[]" required>
-                            <option value="">Select</option>
-                            <option value="Sunday">Sunday</option>
-                            <option value="Monday">Monday</option>
-                            <option value="Tuesday">Tuesday</option>
-                            <option value="Wednesday">Wednesday</option>
-                            <option value="Thursday">Thursday</option>
-                            <option value="Friday">Friday</option>
-                            <option value="Saturday">Saturday</option>
-                        </select>
+                        <label for="name">*<?=translate_phrase('Email'); ?></label>
+                        <input class="form-control" type="email" id="email" name="email[]"  required>
                     </div>
                 </div>
-                <div class="col-sm-8 mb-3">
-                        <label for="name">*<?=translate_phrase('Meeting Time'); ?></label>
-                    <div class="form-group input-group">
-                        <input class="form-control" type="time" id="location" name="times[]" required>
-                        <button style="display:none;"  class="btn btn-icon btn-outline-danger deleteBtns" type="button"><i class="icon ni ni-trash"></i> </button>
+                <div class="col-sm-4 mb-3">
+                    <div class="form-group">
+                        <label for="name">*<?=translate_phrase('Phone'); ?></label>
+                        <input class="form-control" type="text" id="phone" name="phone[]"  required>
                     </div>
                 </div>
+                <div class="col-sm-4 mb-3">
+                    <div class="form-group">
+                        <label for="name">*<?=translate_phrase('Birthday'); ?></label>
+                        <input class="form-control" type="date" id="dob" name="dob[]" >
+                    </div>
+                </div>
+                
             </div>
-            <?php } ?>
-        </div>
-        <div class="col-sm-12 mb-3 text-center">
-            <button id="addMores" class="btn btn-ico btn-outline-info" type="button"><i class="icon ni ni-plus-c"></i>  <?=translate_phrase('Add More Days');?></button>
-        </div>
-
-        <label for="name">*<?=translate_phrase('Cell Role');?></label>
-        <div class="row" id="container">
-            <?php if(!empty($e_roles)){$a = 0;
-                foreach($e_roles as $k => $val){
-                    $r_val = 'style="display:none;"';$req = 'required';
-                    if($a > 0){
-                        $r_val = 'style="display:display;"';$req = '';
-                    }
-                    ?>
-                <div class="col-sm-12 mb-3 ">
-                    <div class="form-group input-group">
-                        <input class="form-control" type="text" id="role" placeholder="Enter Cell Roles" name="roles[]" value="<?php if(!empty($val)) {echo $val;} ?>" <?=$req; ?>>
-                        <button <?=$r_val; ?>  class="btn btn-icon btn-outline-danger deleteBtn" type="button"><i class="icon ni ni-trash"></i> </button>
-                    </div>
-                    
-                </div>
-            <?php $a++; }} else {?>
-                <div class="col-sm-12 mb-3 ">
-                    <div class="form-group input-group">
-                        <input class="form-control" type="text" id="role" placeholder="Enter Cell Roles" name="roles[]" value="<?php if(!empty($val)) {echo $val;} ?>" required>
-                        <button style="display:none;" class="btn btn-icon btn-outline-danger deleteBtn" type="button"><i class="icon ni ni-trash"></i> </button>
-                    </div>
-                    
-                </div>
-            <?php }?>
-        </div>
-
-        <div class="row" >
-            <div class="col-sm-12 mb-3 text-center">
-                <button id="addMore" class="btn btn-ico btn-outline-primary" type="button"><i class="icon ni ni-plus"></i> <?=translate_phrase('Add More Roles');?></button>
+            <div class="col-sm-12 my-3 text-center">
+                <button id="addMores" class="btn btn-ico btn-outline-info" type="button"><i class="icon ni ni-plus-c"></i>  <?=translate_phrase('Add More');?></button>
             </div>
+
+
+            <div class="row" >
             <div class="col-sm-12 text-center mt-3">
-                <button class="btn btn-primary bb_fo_btn" type="submit">
-                    <i class="icon ni ni-save"></i> <?=translate_phrase('Save Record');?>
-                </button>
+                    <button class="btn btn-primary bb_fo_btn" type="submit">
+                        <i class="icon ni ni-save"></i> <?=translate_phrase('Save Record');?>
+                    </button>
+                </div>
             </div>
-        </div>
-    <?php } ?>
+            <div class="row">
+                <div class="col-sm-12"><div id="bb_ajax_msg2"></div></div>
+            </div>
+    <?php } }?>
 <?php echo form_close(); ?>
 
 <script src="<?php echo site_url(); ?>assets/js/jsform.js"></script>
+<!-- Include jQuery library -->
+
+<script>
+    $(document).ready(function(){
+        // Function to handle the click event of the "Add More Convert" button
+        $('#addMores').click(function(){
+            // Clone the first row
+            var newRow = $('.row.border').first().clone();
+            
+            // Clear input values in the cloned row
+            newRow.find('input[type="text"], input[type="email"], input[type="date"]').val('');
+            
+            // Append the cloned row after the last existing row
+            $('.row.border').last().after(newRow);
+            
+            // Add a delete button with icon to the cloned row
+            newRow.append('<button class="btn btn-danger deleteRow"> <em class="icon ni ni-trash"></em> <span>Remove</span></button>');
+            
+            // Center align the delete button
+            newRow.find('.deleteRow').addClass('d-flex justify-content-center align-items-center');
+        });
+
+        // Function to handle the click event of the delete button for dynamically added rows
+        $(document).on('click', '.deleteRow', function(){
+            // Remove the corresponding row when delete button is clicked
+            $(this).closest('.row.border').remove();
+        });
+    });
+</script>
+
