@@ -120,7 +120,7 @@
                                                     <div class="input-group">        
                                                         <input type="text" id="new_convert" class="form-control" oninput="this.value = this.value.replace(/[^\d.]/g,'');this.value = this.value.replace(/(\..*)\./g,'$1')" name="new_convert" placeholder="">        
                                                         <div class="input-group-append">            
-                                                            <button type="button"  class="btn btn-outline-primary btn-dim pop" pageTitle="Mark Meeting Attendance" pageSize="modal-lg" pageName="<?=site_url('accounts/creport/manage/new_convert'); ?>">ADD</button>        
+                                                            <button type="button"  class="btn btn-outline-primary btn-dim pop" pageTitle="Mark Meeting Attendance" pageSize="modal-xl" pageName="<?=site_url('accounts/creport/manage/new_convert'); ?>" id="convertBtn">ADD</button>        
                                                         </div>    
                                                     </div>
                                                 </div>
@@ -244,6 +244,10 @@
                 var url = site_url + 'accounts/creport/manage/attendance';
                 var updatedPageName = url + "/" + dt.e_id;
                 markButton.setAttribute("pageName", updatedPageName);
+
+                var urls = site_url + 'accounts/creport/manage/new_convert';
+                var updatedPageName = urls + "/" + dt.e_id;
+                convertBtn.setAttribute("pageName", updatedPageName);
                 $('#bb_ajax_msg').html('');
             }
         });
@@ -253,12 +257,19 @@
     function updatePageName() {
         var selectElement = document.getElementById("cells_id");
         var markButton = document.getElementById("markButton");
-
+        var convertBtn = document.getElementById("convertBtn");
+        
         var selectedValue = selectElement.value;
-        var pageName = markButton.getAttribute("pageName");
+       
         var url = site_url + 'accounts/creport/manage/attendance';
         var updatedPageName = url + "/" + selectedValue;
         markButton.setAttribute("pageName", updatedPageName);
+
+        var urls = site_url + 'accounts/creport/manage/new_convert';
+        var updatedPageName = urls + "/" + selectedValue;
+        convertBtn.setAttribute("pageName", updatedPageName);
+
+        
     }
 
     function load(x, y) {

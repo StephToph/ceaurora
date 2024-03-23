@@ -1094,6 +1094,49 @@ class Accounts extends BaseController {
 					}
 				}
 
+			} elseif($param2 == 'new_convert'){
+				
+				if($param3) {
+					$edit = $this->Crud->read2('type_id', $param3, 'type', 'cell', 'attendance');
+					if(!empty($edit)) {
+						foreach($edit as $e) {
+							$data['d_id'] = $e->id;
+							$data['d_attendant'] = $e->attendant;
+						}
+					}
+					//When Adding Save in Session
+					if($this->request->getMethod() == 'post'){
+						$first_name = $this->request->getPost('first_name');
+						$surname = $this->request->getPost('surname');
+						$email = $this->request->getPost('email');
+						$phone = $this->request->getPost('phone');
+						$dob = $this->request->getPost('dob');
+
+						$converts = [];
+						if(!empty($first_name) || !empty($surname)){
+							for($i=0;$i<count($first_name);$i++){
+								$converts['fullname'] = $first_name[$i].' '.$surname[$i];
+								$converts['email'] = $email[$i];
+								$converts['phone'] = $phone[$i];
+								$converts['dob'] = $dob[$i];
+								
+								$convert[] = $converts;
+							}
+						}
+						// echo json_encode($convert);
+						if(empty($convert)){
+							echo $this->Crud->msg('danger', 'Enter the New Convert Details');
+							
+						} else{
+							$this->session->set('cell_convert', json_encode($convert));
+							echo $this->Crud->msg('success', 'New Convert List Submitted');
+							// echo json_encode($mark);
+							echo '<script>$("#modal").modal("hide");</script>';
+						}
+						die;
+					}
+				}
+
 			} else {
 				// prepare for edit
 				if($param2 == 'edit') {
@@ -1138,6 +1181,7 @@ class Accounts extends BaseController {
 					$ins_data['offering'] = $offering;
 					$ins_data['note'] = $note;
 					$ins_data['attendant'] = $this->session->get('cell_attendance');
+					$ins_data['converts'] = $this->session->get('cell_convert');
 							
 					
 					// do create or update
@@ -1148,6 +1192,7 @@ class Accounts extends BaseController {
 							$at_id = $this->Crud->read_field2('type_id', $creport_id, 'type', 'cell', 'attendance', 'id');
 							$this->Crud->updates('id', $at_id, 'attendance', $at);
 							$this->session->set('cell_attendance', '');
+							$this->session->set('cell_convert', '');
 							///// store activities
 							$by = $this->Crud->read_field('id', $log_id, 'user', 'firstname');
 							$action = $by.' updated Cell Meeting Report';
@@ -1173,6 +1218,8 @@ class Accounts extends BaseController {
 								$at['reg_date'] = date(fdate);
 								$this->Crud->create('attendance', $at);
 								$this->session->set('cell_attendance', '');
+								$this->session->set('cell_convert', '');
+								
 								///// store activities
 								$by = $this->Crud->read_field('id', $log_id, 'user', 'firstname');
 								$action = $by.' created a Cell Meeting Report for ('.$date.')';
