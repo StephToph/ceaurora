@@ -60,7 +60,7 @@
                                         <div class="col-sm-4 mb-3">
                                             <div class="form-group">
                                                 <label for="name">*<?=translate_phrase('Cell'); ?></label>
-                                                <select data-search="on" class=" js-select2" id="cells_id" name="cell_id">
+                                                <select data-search="on" class=" js-select2" id="cells_id" name="cell_id" onchange="updatePageName()">
                                                     <option value="">Select</option>
                                                     <?php
                                                         $cell = $this->Crud->read_order('cells', 'name', 'asc');
@@ -107,7 +107,7 @@
                                                     <div class="input-group">        
                                                         <input type="text" name="attendance" id="attendance" oninput="this.value = this.value.replace(/[^\d.]/g,'');this.value = this.value.replace(/(\..*)\./g,'$1')" class="form-control" placeholder="">        
                                                         <div class="input-group-append">            
-                                                            <button type="button"  class="btn btn-outline-primary btn-dim pop" pageTitle="Mark Meeting Attendance" pageSize="modal-lg" pageName="<?php echo  site_url('accounts/creport/manage/attendance'); ?>">MARK</button>        
+                                                            <button type="button"  class="btn btn-outline-primary btn-dim pop" pageTitle="Mark Meeting Attendance" pageSize="modal-lg" pageName="<?php echo  site_url('accounts/creport/manage/attendance'); ?>" id="markButton">MARK</button>        
                                                         </div>    
                                                     </div>
                                                 </div>
@@ -231,9 +231,24 @@
                 $('#first_timer').val(dt.e_first_timer);
                 $('#offering').val(dt.e_offering);
                 $('#note').val(dt.e_note);
+                
+                var url = site_url + 'accounts/creport/manage/attendance';
+                var updatedPageName = url + "/" + dt.e_cell_id;
+                markButton.setAttribute("pageName", updatedPageName);
             }
         });
 
+    }
+
+    function updatePageName() {
+        var selectElement = document.getElementById("cells_id");
+        var markButton = document.getElementById("markButton");
+
+        var selectedValue = selectElement.value;
+        var pageName = markButton.getAttribute("pageName");
+        var url = site_url + 'accounts/creport/manage/attendance';
+        var updatedPageName = url + "/" + selectedValue;
+        markButton.setAttribute("pageName", updatedPageName);
     }
 
     function load(x, y) {
