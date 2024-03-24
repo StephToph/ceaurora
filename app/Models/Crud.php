@@ -1668,6 +1668,31 @@ class Crud extends Model {
         return $query->getResult();
         $db->close();
     }
+	public function filter_service_type($limit='', $offset='', $search='') {
+        $db = db_connect();
+        $builder = $db->table('service_type');
+
+        // build query
+		$builder->orderBy('name', 'asc');
+		
+        if(!empty($search)) {
+            $builder->like('name', $search);
+        }
+
+		
+        // limit query
+        if($limit && $offset) {
+			$query = $builder->get($limit, $offset);
+		} else if($limit) {
+			$query = $builder->get($limit);
+		} else {
+            $query = $builder->get();
+        }
+
+        // return query
+        return $query->getResult();
+        $db->close();
+    }
 
 	
 	public function filter_cell($limit='', $offset='', $search='') {
