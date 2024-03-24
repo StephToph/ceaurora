@@ -23,7 +23,228 @@ $this->Crud = new Crud();
             </div>
         </div>
     <?php } ?>
-
+        
+     <!-- delete view -->
+     <?php if($param2 == 'report') { ?>
+        <ul class="nav nav-tabs">    
+            <li class="nav-item">        
+                <a class="nav-link active" data-bs-toggle="tab" href="#tabItem1"><em class="icon ni ni-reports"></em><span>Overview</span></a>    
+            </li>    
+            <li class="nav-item">        
+                <a class="nav-link" data-bs-toggle="tab" href="#tabItem2"><em class="icon ni ni-users"></em><span>Attendance</span></a>    
+            </li>    
+            <li class="nav-item">        
+                <a class="nav-link" data-bs-toggle="tab" href="#tabItem3"><em class="icon ni ni-user-add"></em><span>First Timer</span></a>    
+            </li>    
+            <li class="nav-item">       
+                <a class="nav-link" data-bs-toggle="tab" href="#tabItem4"><em class="icon ni ni-repeat"></em><span>New Convert</span></a>    
+            </li>
+        </ul>
+        <div class="tab-content">    
+            <div class="tab-pane active" id="tabItem1">    
+                <?php 
+                    $r_id = $param3;
+                    $reports = $this->Crud->read_single('id', $r_id, 'cell_report');
+                    if(empty($reports)){
+                        echo '
+                            <div class="col-sm-12">No Record</div>
+                        ';
+                    } else{
+                        foreach($reports as $r){
+                            $types = '';
+                            if($r->type == 'wk1')$types = 'WK1 - Prayer and Planning';
+                            if($r->type == 'wk2')$types = 'Wk2 - Bible Study';
+                            if($r->type == 'wk3')$types = 'Wk3 - Bible Study';
+                            if($r->type == 'wk4')$types = 'Wk4 - Fellowship / Outreach';
+                ?>    
+                    <div class="row">
+                        <div class="col-sm-3 mb-3">
+                            <label class="fw-bold">Meeting Date</label>
+                        </div>
+                        <div class="col-sm-9 mb-3">
+                            <p><?=date('d F Y', strtotime($r->date)); ?></p>
+                        </div>
+                        <div class="col-sm-3 mb-3">
+                            <label class="fw-bold">Meeting</label>
+                        </div>
+                        <div class="col-sm-9 mb-3">
+                            <p><?=$types; ?></p>
+                        </div>
+                        <div class="col-sm-3 mb-3">
+                            <label class="fw-bold">Offering</label>
+                        </div>
+                        <div class="col-sm-9 mb-3">
+                            <p><?='$'.number_format($r->offering, 2); ?></p>
+                        </div>
+                        
+                        <div class="col-sm-3 mb-3">
+                            <label class="fw-bold">Attendance</label>
+                        </div>
+                        <div class="col-sm-9 mb-3">
+                            <p><?=$r->attendance; ?></p>
+                        </div>
+                        
+                        <div class="col-sm-3 mb-3">
+                            <label class="fw-bold">First Timer</label>
+                        </div>
+                        <div class="col-sm-9 mb-3">
+                            <p><?=$r->first_timer; ?></p>
+                        </div>
+                        
+                        <div class="col-sm-3 mb-3">
+                            <label class="fw-bold">New Converts</label>
+                        </div>
+                        <div class="col-sm-9 mb-3">
+                            <p><?=$r->new_convert; ?></p>
+                        </div>
+                        
+                        <div class="col-sm-3 mb-3">
+                            <label class="fw-bold">Note</label>
+                        </div>
+                        <div class="col-sm-9 mb-3">
+                            <p><?=ucwords($r->note); ?></p>
+                        </div>
+                        
+                    </div>
+                <?php } } ?>
+            </div>    
+            <div class="tab-pane" id="tabItem2">        
+                <?php if(empty($reports)){
+                    echo '
+                        <div class="col-sm-12">No Record</div>
+                    ';
+                } else {
+                    echo '<div class="row"> 
+                        <div class="col-sm-2 mb-3">
+                            <label class="fw-bold">Attendance</label>
+                        </div>
+                        <div class="col-sm-10 mb-3">
+                            <p>'.$r->attendance.'</p>
+                        </div>';
+                    $attendant = json_decode($r->attendant);
+                    if(!empty($attendant)){
+                       
+                        foreach($attendant as $at => $val){
+                            $name = $this->Crud->read_field('id', $val, 'user', 'firstname').' '.$this->Crud->read_field('id', $val, 'user', 'surname');
+                        ?>
+                        <div class="col-sm-4 mb-2 border"><?=ucwords($name); ?></div>
+                    <?php } echo '</div>';
+                    } else {
+                        echo '
+                            <div class="col-sm-12">No Attendance Record</div>
+                        ';
+                    }
+                }?>
+            </div>    
+            <div class="tab-pane" id="tabItem3">        
+                <?php if(empty($reports)){
+                    echo '
+                        <div class="col-sm-12">No Record</div>
+                    ';
+                } else {
+                    echo '<div class="row"> 
+                        <div class="col-sm-2 mb-3">
+                            <label class="fw-bold">First Timer</label>
+                        </div>
+                        <div class="col-sm-10 mb-3">
+                            <p>'.$r->first_timer.'</p>
+                        </div></div>';
+                    $timers = json_decode($r->timers);
+                    if(!empty($timers)){
+                        foreach($timers as $at => $val){
+                            $time = (array)$val;
+                           
+                        ?>
+                        <div class="row border mb-2 p-2"> 
+                            <div class="col-sm-4 mb-2 ">
+                                <label class="fw-bold">Name</label>
+                                <p><?=ucwords($time['fullname']); ?></p>
+                            </div>
+                            <div class="col-sm-4 mb-2 ">
+                                <label class="fw-bold">Email</label>
+                                <p><?=ucwords($time['email']); ?></p>
+                            </div>
+                            <div class="col-sm-4 mb-2 ">
+                                <label class="fw-bold">Phone</label>
+                                <p><?=ucwords($time['phone']); ?></p>
+                            </div>
+                            <div class="col-sm-4 mb-2 ">
+                                <label class="fw-bold">Birthday</label>
+                                <p><?=ucwords($time['dob']); ?></p>
+                            </div>
+                        </div>
+                    <?php }
+                    } else {
+                        echo '
+                            <div class="col-sm-12">No First Timer Record</div>
+                        ';
+                    }
+                }?>  
+            </div>    
+            <div class="tab-pane" id="tabItem4">        
+            <?php if(empty($reports)){
+                    echo '
+                        <div class="col-sm-12">No Record</div>
+                    ';
+                } else {
+                    echo '<div class="row"> 
+                        <div class="col-sm-3 mb-3">
+                            <label class="fw-bold">New Convert</label>
+                        </div>
+                        <div class="col-sm-9 mb-3">
+                            <p>'.$r->new_convert.'</p>
+                        </div></div>';
+                    $timers = json_decode($r->converts);
+                    if(!empty($timers)){
+                        foreach($timers as $at => $val){
+                            $time = (array)$val;
+                           
+                        ?>
+                        <div class="row border mb-2 p-2"> 
+                            <div class="col-sm-4 mb-2 ">
+                                <label class="fw-bold">Name</label>
+                                <p><?=ucwords($time['fullname']); ?></p>
+                            </div>
+                            <div class="col-sm-4 mb-2 ">
+                                <label class="fw-bold">Email</label>
+                                <p><?=ucwords($time['email']); ?></p>
+                            </div>
+                            <div class="col-sm-4 mb-2 ">
+                                <label class="fw-bold">Phone</label>
+                                <p><?=ucwords($time['phone']); ?></p>
+                            </div>
+                            <div class="col-sm-4 mb-2 ">
+                                <label class="fw-bold">Birthday</label>
+                                <p><?=ucwords($time['dob']); ?></p>
+                            </div>
+                            <div class="col-sm-4 mb-2 ">
+                                <label class="fw-bold">Invited By</label>
+                                <p><?=ucwords($time['invited_by']); ?></p>
+                            </div>
+                            <?php if($time['invited_by'] == 'Member'){?>
+                                <div class="col-sm-4 mb-2 ">
+                                    <label class="fw-bold">Channel</label>
+                                    <p><?=ucwords($this->Crud->read_field('id', $time['channel'], 'user', 'firstname').' '.$this->Crud->read_field('id', $time['channel'], 'user', 'surname')); ?></p>
+                                </div>
+                            <?php } else{?>
+                                <div class="col-sm-4 mb-2 ">
+                                    <label class="fw-bold">Channel</label>
+                                    <p><?=ucwords($time['channel']); ?></p>
+                                </div>
+                            <?php } ?>
+                            
+                        </div>
+                    <?php }
+                    } else {
+                        echo '
+                            <div class="col-sm-12">No New Convert Record</div>
+                        ';
+                    }
+                }?>     
+            </div>
+        </div>
+    <?php } ?>
+        
     
     <?php if($param2 == 'attendance'){?>
         <?php if(empty($param3)){?>
