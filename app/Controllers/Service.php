@@ -608,15 +608,71 @@ class Service extends BaseController {
 		
 		//Get Role
 		if($param1 == 'gets'){
-			$values = 0;
-			if($param2){
-				$values = 1;
+			$total = $this->request->getPost('total');
+			$member = $this->request->getPost('member');
+			$guest = $this->request->getPost('guest');
+			$male = $this->request->getPost('male');
+			$female = $this->request->getPost('female');
+			$children = $this->request->getPost('children');
+			$vals = $this->request->getPost('vals');
+			$applicants = $this->request->getPost('applicant');
+			
+			$applicant = json_decode($applicants);
+			print_r($applicant);
+			$service = [];
+			$service_total = [];
+			if($vals){
+				$total += 1;
+				$member += 1;
+				if($this->Crud->check2('id', $param2, 'gender', 'Male', 'user') > 0)$male += 1;
+				if($this->Crud->check2('id', $param2, 'gender', 'Female', 'user') > 0)$female += 1;
+				if($this->Crud->check2('id', $param2, 'family_position', 'Child', 'user') > 0)$children += 1;
+				
+				if(!empty($applicant)){
+					$applicant[] = $param2;
+				} else {
+					$applicant[] = $param2;
+				}
+				
+			} else {
+				$total -= 1;
+				$member -= 1;
+				if($this->Crud->check2('id', $param2, 'gender', 'Male', 'user') > 0)$male -= 1;
+				if($this->Crud->check2('id', $param2, 'gender', 'Female', 'user') > 0)$female -= 1;
+				if($this->Crud->check2('id', $param2, 'family_position', 'Child', 'user') > 0)$children -= 1;
+				
+				$key = array_search($param2, $service);
+				if ($key !== false) {
+					unset($service[$key]);
+				}
+
 			}
+
+			// print_r($applicant);
+			$service_total['total'] = $total;
+			$service_total['member'] = $member;
+			$service_total['male'] = $male;
+			$service_total['guest'] = $guest;
+			$service_total['children'] = $children;
+			$service_total['female'] = $female;
+			$service_total['attendant'] = $applicant;
 			
 
+			$total = $guest + $member;
+			$this->session->set('service_attendance', json_encode($service_total));
+			// print_r($service_total);
 			echo '
 				<script>
-					$("#total").val('.$values.')
+					$("#total").val('.$total.');
+					$("#member").val('.$member.');
+					$("#guest").val('.$guest.');
+					$("#male").val('.$male.');
+					$("#female").val('.$female.');
+					$("#children").val('.$children.');
+					var jsonData = ' . json_encode($applicant) . ';
+					var jsonString = JSON.stringify(jsonData);
+					$("#applicant").val(jsonString);
+					
 				</script>
 			';
 			die;
@@ -642,15 +698,25 @@ class Service extends BaseController {
 				$surname = $item->surname;
 				$img = $this->Crud->image($item->img_id, 'big');
 				// add manage buttons
+
+				$attend = $this->session->get('service_attendance');
+				$sel = '';
+				if(!empty($attend)){
+					$attends = json_decode($attend);
+					if(in_array($item->id, (array)$attends)){
+						$sel = 'checked';
+					}
+				}
 				$all_btn = '
 					<div class="text-center">
 						<div class="custom-control custom-switch">    
-							<input type="checkbox" name="mark[]" class="custom-control-input" id="customSwitch'.$item->id.'" onclick="marks('.$item->id.')"  value="'.$item->id.'">    
+							<input type="checkbox" name="mark[]" class="custom-control-input" id="customSwitch'.$item->id.'" '.$sel.' onclick="marks('.$item->id.')"  value="'.$item->id.'">    
 							<label class="custom-control-label" for="customSwitch'.$item->id.'">Mark</label>
 						</div>
 						
 					</div>
 				';
+				
 				
 				$row = array();
 				$row[] = '<div class="user-card">
