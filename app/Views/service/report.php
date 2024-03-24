@@ -50,47 +50,26 @@
                             <div class="card-inner" id="form" style="display:none;">
                                <div class="row">
                                     <div class="nk-block-head-sub mb-3" id="prev" style="display:none;">
-                                        <a class="back-to" id="back_btn" href="javascript:;"><em class="icon ni ni-arrow-left"></em><span>Cell Reports</span></a>
+                                        <a class="back-to" id="back_btn" href="javascript:;"><em class="icon ni ni-arrow-left"></em><span>Service Reports</span></a>
                                     </div>
-                                    <h5>Enter the Details for the Cell Meeting Below</h5>
+                                    <h5>Enter the Details for the Service Meeting Below</h5>
                                     <p class="text-danger">Always click the save record Button after update of attendance, first timers and new convert.</p>
-                                    <?php echo form_open_multipart('accounts/creport/manage', array('id'=>'bb_ajax_form', 'class'=>'row mt-4')); ?>
+                                    <?php echo form_open_multipart('service/report/manage', array('id'=>'bb_ajax_form', 'class'=>'row mt-4')); ?>
                                         <input type="hidden" name="creport_id" id="report_id" value="<?php if(!empty($e_id)){echo $e_id;}?>">
-                                        <?php 
-                                        $celss = $this->Crud->read_field('id', $log_id, 'user', 'cell_id');
-                                        if($role == 'developer' || $role == 'administrator'){?>
+                                        
                                         <div class="col-sm-4 mb-3">
                                             <div class="form-group">
-                                                <label for="name">*<?=translate_phrase('Cell'); ?></label>
-                                                <select data-search="on" class=" js-select2" id="cells_id" name="cell_id" onchange="updatePageName()">
-                                                    <option value="">Select</option>
+                                                <label for="name">*<?=translate_phrase('Service Type'); ?></label>
+                                                <select data-search="on" class=" js-select2" id="type" name="type" required>
+                                                    <option value="0">Select</option>
                                                     <?php
-                                                        $cell = $this->Crud->read_order('cells', 'name', 'asc');
-                                                        if(!empty($cell)){
-                                                            foreach($cell as $c){
-                                                                $sel = '';
-                                                                if(!empty($e_cell_id)){
-                                                                    if($e_cell_id == $c->id)$sel = 'selected';    
-                                                                }
-                                                                echo '<option value="'.$c->id.'" '.$sel.'>'.ucwords($c->name).'</option>';
+                                                        $type = $this->Crud->read_order('service_type', 'name', 'asc');
+                                                        if(!empty($type)){
+                                                            foreach($type as $t){
+                                                                echo '<option value="'.$t->id.'">'.ucwords($t->name).'</option>';
                                                             }
                                                         }
                                                     ?>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <?php } else{?>
-                                            <input type="hidden" name="cell_id" value="<?=$this->Crud->read_field('id', $log_id, 'user', 'cell_id'); ?>">
-                                        <?php } ?>
-                                        <div class="col-sm-4 mb-3">
-                                            <div class="form-group">
-                                                <label for="name">*<?=translate_phrase('Meeting Type'); ?></label>
-                                                <select data-search="on" class=" js-select2" id="type" name="type">
-                                                    <option value="">Select</option>
-                                                    <option value="wk1" >WK1 - Prayer and Planning</option>
-                                                    <option value="wk2" >WK2 - Bible Study</option>
-                                                    <option value="wk3" >WK3 - Bible Study</option>
-                                                    <option value="wk4" >WK4 - Fellowship / Outreach</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -107,11 +86,12 @@
                                                 <label for="name">*<?=translate_phrase('Attendance'); ?></label>
                                                 <div class="form-control-wrap">    
                                                     <div class="input-group">        
-                                                        <input type="text" name="attendance" id="attendance" oninput="this.value = this.value.replace(/[^\d.]/g,'');this.value = this.value.replace(/(\..*)\./g,'$1')" class="form-control" placeholder="">        
+                                                        <input type="text" readonly name="attendance" id="attendance" oninput="this.value = this.value.replace(/[^\d.]/g,'');this.value = this.value.replace(/(\..*)\./g,'$1')" class="form-control" placeholder="0">        
                                                         <div class="input-group-append">            
-                                                            <button type="button"  class="btn btn-outline-primary btn-dim pop" pageTitle="Mark Meeting Attendance" pageSize="modal-lg" pageName="<?php echo  site_url('accounts/creport/manage/attendance/'.$celss); ?>" id="markButton">MARK</button>        
+                                                            <button type="button"  class="btn btn-outline-primary btn-dim pop" pageTitle="Mark Meeting Attendance" pageSize="modal-lg" pageName="<?php echo  site_url('service/report/manage/attendance'); ?>" id="markButton">MARK</button>        
                                                         </div>    
                                                     </div>
+                                                    <span class="text-danger"></span>
                                                 </div>
                                             </div>
                                         </div>
@@ -122,7 +102,7 @@
                                                     <div class="input-group">        
                                                         <input type="text" id="new_convert" class="form-control" oninput="this.value = this.value.replace(/[^\d.]/g,'');this.value = this.value.replace(/(\..*)\./g,'$1')" name="new_convert" placeholder="">        
                                                         <div class="input-group-append">            
-                                                            <button type="button"  class="btn btn-outline-primary btn-dim pop" pageTitle="New Convert" pageSize="modal-xl" pageName="<?=site_url('accounts/creport/manage/new_convert/'.$celss); ?>" id="convertBtn">ADD</button>        
+                                                            <button type="button"  class="btn btn-outline-primary btn-dim pop" pageTitle="New Convert" pageSize="modal-xl" pageName="<?=site_url('service/report/manage/new_convert'); ?>" id="convertBtn">ADD</button>        
                                                         </div>    
                                                     </div>
                                                 </div>
@@ -135,7 +115,7 @@
                                                     <div class="input-group">        
                                                         <input type="text" id="first_timer" name="first_timer" oninput="this.value = this.value.replace(/[^\d.]/g,'');this.value = this.value.replace(/(\..*)\./g,'$1')" class="form-control" placeholder="">        
                                                         <div class="input-group-append">            
-                                                            <button type="button"  class="btn btn-outline-primary btn-dim pop" pageTitle="First Timer" pageSize="modal-xl" pageName="<?=site_url('accounts/creport/manage/first_timer/'.$celss); ?>" id="timerBtn">ADD</button>        
+                                                            <button type="button"  class="btn btn-outline-primary btn-dim pop" pageTitle="First Timer" pageSize="modal-xl" pageName="<?=site_url('service/report/manage/first_timer'); ?>" id="timerBtn">ADD</button>        
                                                         </div>    
                                                     </div>
                                                 </div>

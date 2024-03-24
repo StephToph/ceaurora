@@ -253,12 +253,34 @@ $this->Crud = new Crud();
         
     
     <?php if($param2 == 'attendance'){?>
-        <?php if(empty($param3)){?>
-            <div class="row">
-                <div class="col-sm-12 text-danger text-center">Select a Cell First</div>
+        <div class="row">
+            <div class="col-sm-4 mb-3">
+                <label>Total</label>
+                <input class="form-control" id="total" type="text" name="total"  readonly value="0">
             </div>
-        <?php }else{?>
-        <table id="dtable" class="table table-striped table-hover">
+            <div class="col-sm-4 mb-3">
+                <label>Member</label>
+                <input class="form-control" id="member" type="text" name="member"  readonly value="0">
+            </div>
+            <div class="col-sm-4 mb-3">
+                <label>Guest</label>
+                <input class="form-control" id="guest" type="text" name="guest"  value="0">
+            </div>
+            <div class="col-sm-4 mb-3">
+                <label>Male</label>
+                <input class="form-control" id="male" type="text" name="male"  readonly value="0">
+            </div>
+            <div class="col-sm-4 mb-3">
+                <label>Female</label>
+                <input class="form-control" id="female" type="text" name="female"  readonly value="0">
+            </div>
+            <div class="col-sm-4 mb-3">
+                <label>Children</label>
+                <input class="form-control" id="children" type="text" name="children"  readonly value="0">
+            </div>
+        </div>
+            
+        <table id="dtable" class="table table-striped table-hover mt-3">
             <thead>
                 <tr>
                     <th>Member</th>
@@ -267,11 +289,9 @@ $this->Crud = new Crud();
             </thead>
             <tbody>
                 <?php
-                    // $param3.' '.$param4;
-                    $cell_id = $this->Crud->read_field('id', $param4, 'cell_report', 'cell_id');
                     $roles = $this->Crud->read_field('name', 'Member', 'access_role', 'id');
 
-                    $user = $this->Crud->read2('cell_id', $param3,'role_id', $roles, 'user');
+                    $user = $this->Crud->read_single_order('role_id', $roles, 'user', 'surname', 'asc');
                     $attends = json_decode($this->Crud->read_field('id', $param4, 'cell_report', 'attendant'));
                     // print_r($attends);
                     if(!empty($user)){
@@ -324,7 +344,7 @@ $this->Crud = new Crud();
         <div class="row">
             <div class="col-sm-12"><div id="bb_ajax_msg2"></div></div>
         </div>
-    <?php }} ?>
+    <?php } ?>
     <!-- insert/edit view -->
     <?php if($param2 == 'new_convert') { ?>
         <?php if(empty($param3)){?>
