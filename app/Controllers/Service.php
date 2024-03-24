@@ -352,7 +352,10 @@ class Service extends BaseController {
 				}
 			
 			} elseif($param2 == 'attendance'){
-				
+				$data['table_rec'] = 'service/report/list'; // ajax table
+				$data['order_sort'] = '0, "asc"'; // default ordering (0, 'asc')
+				$data['no_sort'] = '1'; // sort disable columns (1,3,5)
+		
 				if($param3) {
 					$edit = $this->Crud->read2('type_id', $param3, 'type', 'cell', 'attendance');
 					if(!empty($edit)) {
@@ -602,7 +605,79 @@ class Service extends BaseController {
 
 
 		}
+		
+		//Get Role
+		if($param1 == 'gets'){
+			$values = 0;
+			if($param2){
+				$values = 1;
+			}
+			
 
+			echo '
+				<script>
+					$("#total").val('.$values.')
+				</script>
+			';
+			die;
+		}
+		// record listing
+		if($param1 == 'list') {
+			// DataTable parameters
+			$table = 'user';
+			$column_order = array('firstname', 'surname');
+			$column_search = array('firstname', 'surname');
+			$order = array('firstname' => 'asc');
+			$member_id = $this->Crud->read_field('name', 'Member', 'access_role', 'id');
+			$where = array('role_id' => $member_id);
+			
+			// load data into table
+			$list = $this->Crud->datatable_load($table, $column_order, $column_search, $order, $where);
+			$data = array();
+			// $no = $_POST['start'];
+			$count = 1;
+			foreach ($list as $item) {
+				$id = $item->id;
+				$name = $item->firstname;
+				$surname = $item->surname;
+				$img = $this->Crud->image($item->img_id, 'big');
+				// add manage buttons
+				$all_btn = '
+					<div class="text-center">
+						<div class="custom-control custom-switch">    
+							<input type="checkbox" name="mark[]" class="custom-control-input" id="customSwitch'.$item->id.'" onclick="marks('.$item->id.')"  value="'.$item->id.'">    
+							<label class="custom-control-label" for="customSwitch'.$item->id.'">Mark</label>
+						</div>
+						
+					</div>
+				';
+				
+				$row = array();
+				$row[] = '<div class="user-card">
+							<div class="user-avatar ">
+								<img alt="" src="'.site_url($img).'" height="40px"/>
+							</div>
+							<div class="user-info">
+								<span class="tb-lead">'.ucwords($item->firstname.' '.$item->surname).'</span>
+							</div>
+						</div>';
+				$row[] = $all_btn;
+	
+				$data[] = $row;
+				$count += 1;
+			}
+	
+			$output = array(
+				"draw" => intval($_POST['draw']),
+				"recordsTotal" => $this->Crud->datatable_count($table, $where),
+				"recordsFiltered" => $this->Crud->datatable_filtered($table, $column_order, $column_search, $order, $where),
+				"data" => $data,
+			);
+			
+			//output to json format
+			echo json_encode($output);
+			exit;
+		}
         // record listing
 		if($param1 == 'load') {
 			$limit = $param2;

@@ -254,7 +254,8 @@ $this->Crud = new Crud();
     
     <?php if($param2 == 'attendance'){?>
         <div class="row">
-            <div class="col-sm-4 mb-3">
+            <span class="text-danger">Mark Member's Attendance in the Table Below</span>
+            <div class="col-sm-4 mb-3 mt-2">
                 <label>Total</label>
                 <input class="form-control" id="total" type="text" name="total"  readonly value="0">
             </div>
@@ -279,68 +280,73 @@ $this->Crud = new Crud();
                 <input class="form-control" id="children" type="text" name="children"  readonly value="0">
             </div>
         </div>
-            
-        <table id="dtable" class="table table-striped table-hover mt-3">
-            <thead>
-                <tr>
-                    <th>Member</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                    $roles = $this->Crud->read_field('name', 'Member', 'access_role', 'id');
-
-                    $user = $this->Crud->read_single_order('role_id', $roles, 'user', 'surname', 'asc');
-                    $attends = json_decode($this->Crud->read_field('id', $param4, 'cell_report', 'attendant'));
-                    // print_r($attends);
-                    if(!empty($user)){
-                        foreach($user as $p){
-                            $sel = '';
-                            if(!empty($attends)){
-                                if(in_array($p->id, $attends)){
-                                    $sel = 'checked';
-                                }
-                            }
-                           
-                            $img = $this->Crud->image($p->img_id, 'big');
-                            ?>
-                            <tr>
-                                <td>
-                                    <div class="user-card">
-										<div class="user-avatar ">
-											<img alt="" src="<?=site_url($img); ?>" height="40px"/>
-										</div>
-										<div class="user-info">
-											<span class="tb-lead"><?=ucwords($p->firstname.' '.$p->surname); ?></span>
-										</div>
-									</div>
-                                </td>
-                                <td align="right"> 
-                                    <div class="custom-control custom-switch">    
-                                        <input type="checkbox" name="mark[]" class="custom-control-input" id="customSwitch<?=$p->id;?>" <?=$sel; ?> value="<?=$p->id;?>">    
-                                        <label class="custom-control-label" for="customSwitch<?=$p->id;?>">Mark</label>
-                                    </div>
-                                    
-                                </td>
-                            </tr>
-                        <?php } ?>
-                        <tr>
-                            <td colspan="2" class="text-center">
-                                <button class="btn btn-primary bb_fo_btn" type="submit">
-                                    <i class="icon ni ni-save"></i> <?=translate_phrase('Save Record');?>
-                                </button>
-                            </td>
-                        </tr> 
-                   <?php } else{ ?>
+        <hr>
+        <div class="table-responsive">
+            <table id="dtable" class="table table-striped table-hover mt-5">
+                <thead>
                     <tr>
-                        <td colspan="2">No Member in Cell</td>
+                        <th>Member</th>
+                        <th></th>
                     </tr>
-                  <?php  }
-                       
-                ?>
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    <?php
+                        $roles = $this->Crud->read_field('name', 'Member', 'access_role', 'id');
+
+                        $user = $this->Crud->read_single_order('role_id', $roles, 'user', 'surname', 'asc');
+                        $attends = json_decode($this->Crud->read_field('id', $param4, 'cell_report', 'attendant'));
+                        // print_r($attends);
+                        if(!empty($user)){
+                            foreach($user as $p){
+                                $sel = '';
+                                if(!empty($attends)){
+                                    if(in_array($p->id, $attends)){
+                                        $sel = 'checked';
+                                    }
+                                }
+                            
+                                $img = $this->Crud->image($p->img_id, 'big');
+                                ?>
+                                <tr>
+                                    <td>
+                                        <div class="user-card">
+                                            <div class="user-avatar ">
+                                                <img alt="" src="<?=site_url($img); ?>" height="40px"/>
+                                            </div>
+                                            <div class="user-info">
+                                                <span class="tb-lead"><?=ucwords($p->firstname.' '.$p->surname); ?></span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td align="right"> 
+                                        
+                                    </td>
+                                </tr>
+                            <?php } ?>
+                            <tr>
+                                <td colspan="2" class="text-center">
+                                    <button class="btn btn-primary bb_fo_btn" type="submit">
+                                        <i class="icon ni ni-save"></i> <?=translate_phrase('Save Record');?>
+                                    </button>
+                                </td>
+                            </tr> 
+                    <?php } else{ ?>
+                        <tr>
+                            <td colspan="2">No Member in Cell</td>
+                        </tr>
+                    <?php  }
+                        
+                    ?>
+                </tbody>
+            </table>
+        </div>
+        <div class="row" >
+            <div class="col-sm-12 text-center mt-3">
+                <button class="btn btn-primary bb_fo_btn" type="submit">
+                    <i class="icon ni ni-save"></i> <?=translate_phrase('Save Record');?>
+                </button>
+            </div>
+        </div>
         <div class="row">
             <div class="col-sm-12"><div id="bb_ajax_msg2"></div></div>
         </div>
@@ -454,7 +460,7 @@ $this->Crud = new Crud();
 
 
             <div class="row" >
-            <div class="col-sm-12 text-center mt-3">
+                <div class="col-sm-12 text-center mt-3">
                     <button class="btn btn-primary bb_fo_btn" type="submit">
                         <i class="icon ni ni-save"></i> <?=translate_phrase('Save Record');?>
                     </button>
@@ -667,7 +673,7 @@ $this->Crud = new Crud();
             </div>
     <?php } }?>
 <?php echo form_close(); ?>
-
+<input type="hidden" id="respo">
 <script src="<?php echo site_url(); ?>assets/js/jsform.js"></script>
 <!-- Include jQuery library -->
 
@@ -723,7 +729,56 @@ $this->Crud = new Crud();
 
     // Trigger the change event on page load
     $('select[name="invited_by[]"]').trigger('change');
-</script>
 
-</script>
+    function marks(id){
+        if($('#customSwitch'+id).prop('checked')){
+            var vals = 1;
+        } else{
+            var vals = 0;
+        }
 
+        $.ajax({
+            url: site_url + 'service/report/gets/' + vals,
+            type: 'get',
+            success: function (data) {
+                $('#respo').html(data);
+                
+            }
+        });
+    }
+</script>
+<?php if(!empty($table_rec)){ ?>
+    <!-- <script src="<?=site_url();?>assets/backend/vendors/datatables/jquery.dataTables.min.js"></script>
+        <script src="<?=site_url();?>assets/backend/vendors/datatables/dataTables.bootstrap.min.js"></script>
+        <script src="<?=site_url();?>assets/backend/js/pages/datatables.js"></script> -->
+    <script type="text/javascript">
+    $(document).ready(function() {
+        //datatables
+        var table = $('#dtable').DataTable({
+            "processing": true, //Feature control the processing indicator.
+            "serverSide": true, //Feature control DataTables' server-side processing mode.
+            "order": [<?php if(!empty($order_sort)){echo '['.$order_sort.']';} ?>], //Initial order.
+            "language": {
+                "processing": "<i class='icon ni ni-loader' aria-hidden='true'></i> <?=translate_phrase('Processing... please wait'); ?>"
+            },
+            // "pagingType": "full",
+
+            // Load data for the table's content from an Ajax source
+            "ajax": {
+                url: "<?php echo site_url($table_rec); ?>",
+                type: "POST",
+               
+            },
+
+            //Set column definition initialisation properties.
+            "columnDefs": [{
+                "targets": [
+                <?php if(!empty($no_sort)){echo $no_sort;} ?>], //columns not sortable
+                "orderable": false, //set not orderable
+            }, ],
+
+        });
+
+    });
+    </script>
+<?php } ?>

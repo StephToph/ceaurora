@@ -613,41 +613,41 @@
     
     </script>
     <?php if(!empty($table_rec)){ ?>
-    <!-- <script src="<?=site_url();?>assets/backend/vendors/datatables/jquery.dataTables.min.js"></script>
-        <script src="<?=site_url();?>assets/backend/vendors/datatables/dataTables.bootstrap.min.js"></script>
-        <script src="<?=site_url();?>assets/backend/js/pages/datatables.js"></script> -->
-    <script type="text/javascript">
-    $(document).ready(function() {
-        //datatables
-        var table = $('#dtable').DataTable({
-            "processing": true, //Feature control the processing indicator.
-            "serverSide": true, //Feature control DataTables' server-side processing mode.
-            "order": [<?php if(!empty($order_sort)){echo '['.$order_sort.']';} ?>], //Initial order.
-            "language": {
-                "processing": "<i class='anticon anticon-loading' aria-hidden='true'></i> <?=translate_phrase('Processing... please wait'); ?>"
-            },
-            // "pagingType": "full",
+        <!-- <script src="<?=site_url();?>assets/backend/vendors/datatables/jquery.dataTables.min.js"></script>
+            <script src="<?=site_url();?>assets/backend/vendors/datatables/dataTables.bootstrap.min.js"></script>
+            <script src="<?=site_url();?>assets/backend/js/pages/datatables.js"></script> -->
+        <script type="text/javascript">
+        $(document).ready(function() {
+            //datatables
+            var table = $('#dtable').DataTable({
+                "processing": true, //Feature control the processing indicator.
+                "serverSide": true, //Feature control DataTables' server-side processing mode.
+                "order": [<?php if(!empty($order_sort)){echo '['.$order_sort.']';} ?>], //Initial order.
+                "language": {
+                    "processing": "<i class='icon ni ni-loader' aria-hidden='true'></i> <?=translate_phrase('Processing... please wait'); ?>"
+                },
+                // "pagingType": "full",
 
-            // Load data for the table's content from an Ajax source
-            "ajax": {
-                url: "<?php echo site_url($table_rec); ?>",
-                type: "POST",
-                complete: function() {
-                    $.getScript('<?php echo site_url(); ?>assets/js/jsmodal.js');
-                }
-            },
+                // Load data for the table's content from an Ajax source
+                "ajax": {
+                    url: "<?php echo site_url($table_rec); ?>",
+                    type: "POST",
+                    complete: function() {
+                        $.getScript('<?php echo site_url(); ?>assets/js/jsmodal.js');
+                    }
+                },
 
-            //Set column definition initialisation properties.
-            "columnDefs": [{
-                "targets": [
-                <?php if(!empty($no_sort)){echo $no_sort;} ?>], //columns not sortable
-                "orderable": false, //set not orderable
-            }, ],
+                //Set column definition initialisation properties.
+                "columnDefs": [{
+                    "targets": [
+                    <?php if(!empty($no_sort)){echo $no_sort;} ?>], //columns not sortable
+                    "orderable": false, //set not orderable
+                }, ],
+
+            });
 
         });
-
-    });
-    </script>
+        </script>
     <?php } ?>
 
 
