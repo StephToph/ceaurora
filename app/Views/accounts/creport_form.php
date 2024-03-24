@@ -104,6 +104,12 @@ $this->Crud = new Crud();
                         <div class="col-sm-9 mb-3">
                             <p><?=ucwords($r->note); ?></p>
                         </div>
+                        <div class="col-sm-3 mb-3">
+                            <label class="fw-bold">Input Date</label>
+                        </div>
+                        <div class="col-sm-9 mb-3">
+                            <p><?=date('d M Y h:iA', strtotime($r->reg_date)); ?></p>
+                        </div>
                         
                     </div>
                 <?php } } ?>
@@ -115,10 +121,10 @@ $this->Crud = new Crud();
                     ';
                 } else {
                     echo '<div class="row"> 
-                        <div class="col-sm-2 mb-3">
+                        <div class="col-sm-3  mb-3">
                             <label class="fw-bold">Attendance</label>
                         </div>
-                        <div class="col-sm-10 mb-3">
+                        <div class="col-sm-9  mb-3">
                             <p>'.$r->attendance.'</p>
                         </div>';
                     $attendant = json_decode($r->attendant);
