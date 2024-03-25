@@ -352,6 +352,7 @@ class Service extends BaseController {
 				}
 			
 			} elseif($param2 == 'attendance'){
+				
 				$data['table_rec'] = 'service/report/list'; // ajax table
 				$data['order_sort'] = '0, "asc"'; // default ordering (0, 'asc')
 				$data['no_sort'] = '1'; // sort disable columns (1,3,5)
@@ -364,25 +365,26 @@ class Service extends BaseController {
 							$data['d_attendant'] = $e->attendant;
 						}
 					}
-					//When Adding Save in Session
-					if($this->request->getMethod() == 'post'){
-						$mark = $this->request->getPost('mark');
-						if(empty($mark)){
-							echo $this->Crud->msg('danger', 'Mark Meeting Attendance');
-							die;
-						} else{
-							$this->session->set('cell_attendance', json_encode($mark));
-							echo $this->Crud->msg('success', 'Meeting Attendance Submitted');
-							// echo json_encode($mark);
-							echo '<script> setTimeout(function() {
-								var jsonData = ' . json_encode($mark) . ';
-								var jsonString = JSON.stringify(jsonData);
-								$("#converts").val(jsonString);
-								$("#modal").modal("hide");
-							}, 2000); </script>';
-						}
-						die;
+					
+				}
+				//When Adding Save in Session
+				if($this->request->getMethod() == 'post'){
+					$mark = $this->session->get('service_attendance');
+					// echo $mark;
+					if(empty($mark)){
+						echo $this->Crud->msg('danger', 'Mark Service Attendance');
+					
+					} else{
+						echo $this->Crud->msg('success', 'Service Attendance Submitted');
+						// echo json_encode($mark);
+						echo '<script> setTimeout(function() {
+							var jsonData = ' . json_encode($mark) . ';
+							var jsonString = JSON.stringify(jsonData);
+							$("#attendant").val(jsonString);
+							$("#modal").modal("hide");
+						}, 2000); </script>';
 					}
+					die;
 				}
 
 			} elseif($param2 == 'new_convert'){
