@@ -389,7 +389,6 @@ class Service extends BaseController {
 
 			} elseif($param2 == 'new_convert'){
 				
-				if($param3) {
 					$edit = $this->Crud->read2('type_id', $param3, 'type', 'cell', 'attendance');
 					if(!empty($edit)) {
 						foreach($edit as $e) {
@@ -434,11 +433,10 @@ class Service extends BaseController {
 						}
 						die;
 					}
-				}
+				
 
 			}elseif($param2 == 'first_timer'){
 				
-				if($param3) {
 					
 					//When Adding Save in Session
 					if($this->request->getMethod() == 'post'){
@@ -488,7 +486,7 @@ class Service extends BaseController {
 						}
 						die;
 					}
-				}
+				
 
 			} else {
 				// prepare for edit
