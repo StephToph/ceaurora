@@ -854,7 +854,7 @@ class Service extends BaseController {
 				// }
 				$all_btn = '
 					<div class="text-center">
-						<input type="text" class="form-control" name="tithe[]" id="tithe_'.$item->id.'"> oninput="add_tithe('.$item->id.')"
+						<input type="text" class="form-control" name="tithe[]" id="tithe_'.$item->id.'" oninput="add_tithe('.$item->id.')"
 					</div>
 				';
 				

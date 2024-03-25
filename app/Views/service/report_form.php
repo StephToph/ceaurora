@@ -760,6 +760,14 @@ $this->Crud = new Crud();
         var member = $('#member').val();
         var tithe = $('#tithe_'+id).val();
         
+        if(tithe === ''){
+            tithe = 0;
+        }
+        var sub = parseFloat(member) + parseFloat(tithe);
+        var subs = parseFloat(sub) + parseFloat(guest);
+        $('#member').val(sub);
+        $('#total').val(subs);
+        
     }
 </script>
 <?php if(!empty($table_rec)){ ?>
