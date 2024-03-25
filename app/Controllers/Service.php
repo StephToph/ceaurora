@@ -618,7 +618,7 @@ class Service extends BaseController {
 			$applicants = $this->request->getPost('applicant');
 			
 			$applicant = json_decode($applicants);
-			print_r($applicant);
+			// print_r($applicant);
 			$service = [];
 			$service_total = [];
 			if($vals){
@@ -700,12 +700,21 @@ class Service extends BaseController {
 				// add manage buttons
 
 				$attend = $this->session->get('service_attendance');
+				// print_r($attend);
 				$sel = '';
 				if(!empty($attend)){
 					$attends = json_decode($attend);
-					if(in_array($item->id, (array)$attends)){
-						$sel = 'checked';
+					$ats = (array)$attends;
+					foreach($ats as $a => $val){
+						if($a == 'attendant'){
+							// $vall = json_decode($val);
+							if(in_array($item->id, (array)$val)){
+								$sel = 'checked';
+							}
+						}
 					}
+					
+					
 				}
 				$all_btn = '
 					<div class="text-center">
