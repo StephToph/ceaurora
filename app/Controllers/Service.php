@@ -352,6 +352,7 @@ class Service extends BaseController {
 				}
 			
 			} elseif($param2 == 'attendance'){
+				
 				$data['table_rec'] = 'service/report/list'; // ajax table
 				$data['order_sort'] = '0, "asc"'; // default ordering (0, 'asc')
 				$data['no_sort'] = '1'; // sort disable columns (1,3,5)
@@ -364,30 +365,30 @@ class Service extends BaseController {
 							$data['d_attendant'] = $e->attendant;
 						}
 					}
-					//When Adding Save in Session
-					if($this->request->getMethod() == 'post'){
-						$mark = $this->request->getPost('mark');
-						if(empty($mark)){
-							echo $this->Crud->msg('danger', 'Mark Meeting Attendance');
-							die;
-						} else{
-							$this->session->set('cell_attendance', json_encode($mark));
-							echo $this->Crud->msg('success', 'Meeting Attendance Submitted');
-							// echo json_encode($mark);
-							echo '<script> setTimeout(function() {
-								var jsonData = ' . json_encode($mark) . ';
-								var jsonString = JSON.stringify(jsonData);
-								$("#converts").val(jsonString);
-								$("#modal").modal("hide");
-							}, 2000); </script>';
-						}
-						die;
+					
+				}
+				//When Adding Save in Session
+				if($this->request->getMethod() == 'post'){
+					$mark = $this->session->get('service_attendance');
+					// echo $mark;
+					if(empty($mark)){
+						echo $this->Crud->msg('danger', 'Mark Service Attendance');
+					
+					} else{
+						echo $this->Crud->msg('success', 'Service Attendance Submitted');
+						// echo json_encode($mark);
+						echo '<script> setTimeout(function() {
+							var jsonData = ' . json_encode($mark) . ';
+							var jsonString = JSON.stringify(jsonData);
+							$("#attendant").val(jsonString);
+							$("#modal").modal("hide");
+						}, 2000); </script>';
 					}
+					die;
 				}
 
 			} elseif($param2 == 'new_convert'){
 				
-				if($param3) {
 					$edit = $this->Crud->read2('type_id', $param3, 'type', 'cell', 'attendance');
 					if(!empty($edit)) {
 						foreach($edit as $e) {
@@ -432,11 +433,10 @@ class Service extends BaseController {
 						}
 						die;
 					}
-				}
+				
 
 			}elseif($param2 == 'first_timer'){
 				
-				if($param3) {
 					
 					//When Adding Save in Session
 					if($this->request->getMethod() == 'post'){
@@ -486,7 +486,7 @@ class Service extends BaseController {
 						}
 						die;
 					}
-				}
+				
 
 			} else {
 				// prepare for edit
@@ -618,7 +618,7 @@ class Service extends BaseController {
 			$applicants = $this->request->getPost('applicant');
 			
 			$applicant = json_decode($applicants);
-			print_r($applicant);
+			// print_r($applicant);
 			$service = [];
 			$service_total = [];
 			if($vals){
@@ -700,12 +700,21 @@ class Service extends BaseController {
 				// add manage buttons
 
 				$attend = $this->session->get('service_attendance');
+				// print_r($attend);
 				$sel = '';
 				if(!empty($attend)){
 					$attends = json_decode($attend);
-					if(in_array($item->id, (array)$attends)){
-						$sel = 'checked';
+					$ats = (array)$attends;
+					foreach($ats as $a => $val){
+						if($a == 'attendant'){
+							// $vall = json_decode($val);
+							if(in_array($item->id, (array)$val)){
+								$sel = 'checked';
+							}
+						}
 					}
+					
+					
 				}
 				$all_btn = '
 					<div class="text-center">

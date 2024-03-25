@@ -354,11 +354,7 @@ $this->Crud = new Crud();
     <?php } ?>
     <!-- insert/edit view -->
     <?php if($param2 == 'new_convert') { ?>
-        <?php if(empty($param3)){?>
-            <div class="row">
-                <div class="col-sm-12 text-danger text-center">Select a Cell First</div>
-            </div>
-        <?php }else{?>
+        
             <?php 
                 $cell_id = $this->Crud->read_field('id', $param4, 'cell_report', 'cell_id');
                 $roles = $this->Crud->read_field('name', 'Member', 'access_role', 'id');
@@ -470,15 +466,11 @@ $this->Crud = new Crud();
             <div class="row">
                 <div class="col-sm-12"><div id="bb_ajax_msg2"></div></div>
             </div>
-    <?php } }?>
+    <?php } ?>
 
      <!-- insert/edit view -->
      <?php if($param2 == 'first_timer') { ?>
-        <?php if(empty($param3)){?>
-            <div class="row">
-                <div class="col-sm-12 text-danger text-center">Select a Cell First</div>
-            </div>
-        <?php }else{?>
+        
             <?php 
                 $cell_id = $this->Crud->read_field('id', $param4, 'cell_report', 'cell_id');
                 $roles = $this->Crud->read_field('name', 'Member', 'access_role', 'id');
@@ -672,7 +664,7 @@ $this->Crud = new Crud();
             <div class="row">
                 <div class="col-sm-12"><div id="bb_ajax_msg2"></div></div>
             </div>
-    <?php } }?>
+    <?php }?>
 <?php echo form_close(); ?>
 <input type="hidden" id="respo">
 <input type="hidden" id="applicant">
