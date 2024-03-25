@@ -289,7 +289,7 @@
         //alert(status);
 
         $.ajax({
-            url: site_url + 'accounts/creport/load' + methods,
+            url: site_url + 'service/report/load' + methods,
             type: 'post',
             data: { search: search },
             success: function (data) {

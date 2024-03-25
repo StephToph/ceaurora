@@ -254,8 +254,8 @@ $this->Crud = new Crud();
     
     <?php if($param2 == 'attendance'){?>
         <div class="row">
-            <span class="text-danger">Mark Member's Attendance in the Table Below</span>
-            <div class="col-sm-4 mb-3 mt-2">
+            <span class="text-danger mb-2">Mark Member's Attendance in the Table Below</span>
+            <div class="col-sm-4 mb-3 ">
                 <label>Total</label>
                 <input class="form-control" id="total" type="text" name="total"  readonly value="0">
             </div>
@@ -340,8 +340,9 @@ $this->Crud = new Crud();
                 </tbody>
             </table>
         </div>
-        <div class="row" >
-            <div class="col-sm-12 text-center mt-3">
+        <hr>
+        <div class="row mt-5" >
+            <div class="col-sm-12 text-center mt-5">
                 <button class="btn btn-primary bb_fo_btn" type="submit">
                     <i class="icon ni ni-save"></i> <?=translate_phrase('Save Record');?>
                 </button>
@@ -674,6 +675,7 @@ $this->Crud = new Crud();
     <?php } }?>
 <?php echo form_close(); ?>
 <input type="hidden" id="respo">
+<input type="hidden" id="applicant">
 <script src="<?php echo site_url(); ?>assets/js/jsform.js"></script>
 <!-- Include jQuery library -->
 
@@ -731,6 +733,15 @@ $this->Crud = new Crud();
     $('select[name="invited_by[]"]').trigger('change');
 
     function marks(id){
+        // console.log(id);
+        var total = $('#total').val();
+        var member = $('#member').val();
+        var male = $('#male').val();
+        var female = $('#female').val();
+        var children = $('#children').val();
+        var guest = $('#guest').val();
+        var applicant = $('#applicant').val();
+        
         if($('#customSwitch'+id).prop('checked')){
             var vals = 1;
         } else{
@@ -738,8 +749,9 @@ $this->Crud = new Crud();
         }
 
         $.ajax({
-            url: site_url + 'service/report/gets/' + vals,
-            type: 'get',
+            url: site_url + 'service/report/gets/' + id,
+            type: 'post',
+            data: {total:total,member:member,male:male,female:female,children:children,guest:guest, vals:vals, applicant:applicant},
             success: function (data) {
                 $('#respo').html(data);
                 
