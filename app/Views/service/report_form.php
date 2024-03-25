@@ -265,7 +265,7 @@ $this->Crud = new Crud();
             </div>
             <div class="col-sm-4 mb-3">
                 <label>Guest</label>
-                <input class="form-control" id="guest" type="text" name="guest"  value="0">
+                <input class="form-control" id="guest" type="text" name="guest" oninput="get_total();" value="0">
             </div>
             <div class="col-sm-4 mb-3">
                 <label>Male</label>
@@ -750,6 +750,15 @@ $this->Crud = new Crud();
             }
         });
     }
+
+    function get_total(){
+        var member = $('#member').val();
+        var guest = $('#guest').val();
+        
+        var total = parseInt(member) + parseInt(guest);
+        $('#total').val(total);
+    }
+
 </script>
 <?php if(!empty($table_rec)){ ?>
     <!-- <script src="<?=site_url();?>assets/backend/vendors/datatables/jquery.dataTables.min.js"></script>

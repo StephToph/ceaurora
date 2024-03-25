@@ -369,18 +369,30 @@ class Service extends BaseController {
 				}
 				//When Adding Save in Session
 				if($this->request->getMethod() == 'post'){
+					$guest = $this->request->getPost('guest');
+					$total = $this->request->getPost('total');
+					
 					$mark = $this->session->get('service_attendance');
-					// echo $mark;
-					if(empty($mark)){
+
+					
+					// Decode the JSON string
+					$data = json_decode($mark, true);
+
+					// Change the values of "total" and "guest"
+					$data['total'] = $total; // Change the value of "total"
+					$data['guest'] = $guest; // Change the value of "guest"
+					
+					if(empty($data)){
 						echo $this->Crud->msg('danger', 'Mark Service Attendance');
 					
 					} else{
 						echo $this->Crud->msg('success', 'Service Attendance Submitted');
 						// echo json_encode($mark);
 						echo '<script> setTimeout(function() {
-							var jsonData = ' . json_encode($mark) . ';
+							var jsonData = ' . json_encode($data) . ';
 							var jsonString = JSON.stringify(jsonData);
 							$("#attendant").val(jsonString);
+							$("#attendance").val('.$total.');
 							$("#modal").modal("hide");
 						}, 2000); </script>';
 					}
@@ -913,7 +925,7 @@ class Service extends BaseController {
 		if($param1 == 'manage') { // view for form data posting
 			return view($mod.'_form', $data);
 		} else { // view for main page
-			
+			$this->session->set('service_attendance', '');
 			$data['title'] = translate_phrase('Service Report').' - '.app_name;
 			$data['page_active'] = $mod;
 			return view($mod, $data);
