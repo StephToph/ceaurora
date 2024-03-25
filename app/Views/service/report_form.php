@@ -265,7 +265,7 @@ $this->Crud = new Crud();
             </div>
             <div class="col-sm-4 mb-3">
                 <label>Guest</label>
-                <input class="form-control" id="guest" type="text" name="guest"  value="0">
+                <input class="form-control" id="guest" type="text" name="guest" oninput="get_total();" value="0">
             </div>
             <div class="col-sm-4 mb-3">
                 <label>Male</label>
@@ -290,53 +290,48 @@ $this->Crud = new Crud();
                     </tr>
                 </thead>
                 <tbody>
-                    <?php
-                        $roles = $this->Crud->read_field('name', 'Member', 'access_role', 'id');
-
-                        $user = $this->Crud->read_single_order('role_id', $roles, 'user', 'surname', 'asc');
-                        $attends = json_decode($this->Crud->read_field('id', $param4, 'cell_report', 'attendant'));
-                        // print_r($attends);
-                        if(!empty($user)){
-                            foreach($user as $p){
-                                $sel = '';
-                                if(!empty($attends)){
-                                    if(in_array($p->id, $attends)){
-                                        $sel = 'checked';
-                                    }
-                                }
-                            
-                                $img = $this->Crud->image($p->img_id, 'big');
-                                ?>
-                                <tr>
-                                    <td>
-                                        <div class="user-card">
-                                            <div class="user-avatar ">
-                                                <img alt="" src="<?=site_url($img); ?>" height="40px"/>
-                                            </div>
-                                            <div class="user-info">
-                                                <span class="tb-lead"><?=ucwords($p->firstname.' '.$p->surname); ?></span>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td align="right"> 
-                                        
-                                    </td>
-                                </tr>
-                            <?php } ?>
-                            <tr>
-                                <td colspan="2" class="text-center">
-                                    <button class="btn btn-primary bb_fo_btn" type="submit">
-                                        <i class="icon ni ni-save"></i> <?=translate_phrase('Save Record');?>
-                                    </button>
-                                </td>
-                            </tr> 
-                    <?php } else{ ?>
-                        <tr>
-                            <td colspan="2">No Member in Cell</td>
-                        </tr>
-                    <?php  }
-                        
-                    ?>
+                </tbody>
+            </table>
+        </div>
+        <hr>
+        <div class="row mt-5" >
+            <div class="col-sm-12 text-center mt-5">
+                <button class="btn btn-primary bb_fo_btn" type="submit">
+                    <i class="icon ni ni-save"></i> <?=translate_phrase('Save Record');?>
+                </button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12"><div id="bb_ajax_msg2"></div></div>
+        </div>
+    <?php } ?>
+     
+    <?php if($param2 == 'tithe'){?>
+        <div class="row">
+            <span class="text-danger mb-2">Enter Member's Tithe in the Table Below</span>
+            <div class="col-sm-4 mb-3 ">
+                <label>Total</label>
+                <input class="form-control" id="total" type="text" name="total"  readonly value="0">
+            </div>
+            <div class="col-sm-4 mb-3">
+                <label>Member</label>
+                <input class="form-control" id="member" type="text" name="member"  readonly value="0">
+            </div>
+            <div class="col-sm-4 mb-3">
+                <label>Guest</label>
+                <input class="form-control" id="guest" type="text" name="guest" oninput="get_tithe();" value="0">
+            </div>
+        </div>
+        <hr>
+        <div class="table-responsive">
+            <table id="dtable" class="table table-striped table-hover mt-5">
+                <thead>
+                    <tr>
+                        <th>Member</th>
+                        <th width="200px">Tithe</th>
+                    </tr>
+                </thead>
+                <tbody>
                 </tbody>
             </table>
         </div>
@@ -749,6 +744,30 @@ $this->Crud = new Crud();
                 
             }
         });
+    }
+
+    function get_total(){
+        var member = $('#member').val();
+        var guest = $('#guest').val();
+        
+        var total = parseInt(member) + parseInt(guest);
+        $('#total').val(total);
+    }
+
+    function add_tithe(id){
+        var total = $('#total').val();
+        var guest = $('#guest').val();
+        var member = $('#member').val();
+        var tithe = $('#tithe_'+id).val();
+        
+        if(tithe === ''){
+            tithe = 0;
+        }
+        var sub = parseFloat(member) + parseFloat(tithe);
+        var subs = parseFloat(sub) + parseFloat(guest);
+        $('#member').val(sub);
+        $('#total').val(subs);
+        
     }
 </script>
 <?php if(!empty($table_rec)){ ?>

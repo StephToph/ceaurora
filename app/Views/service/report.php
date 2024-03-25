@@ -115,7 +115,7 @@
                                                     <div class="input-group">        
                                                         <input type="text" id="first_timer" name="first_timer" oninput="this.value = this.value.replace(/[^\d.]/g,'');this.value = this.value.replace(/(\..*)\./g,'$1')" class="form-control" placeholder="">        
                                                         <div class="input-group-append">            
-                                                            <button type="button"  class="btn btn-outline-primary btn-dim pop" pageTitle="First Timer" pageSize="modal-xl" pageName="<?=site_url('service/report/manage/first_timer'); ?>" id="timerBtn">ADD</button>        
+                                                            <button type="button"  class="btn btn-outline-primary btn-dim pop" pageTitle="First Timer" pageSize="modal-xl" pageName="<?=site_url('accounts/creport/manage/first_timer'); ?>" id="timerBtn">ADD</button>        
                                                         </div>    
                                                     </div>
                                                 </div>
@@ -127,6 +127,36 @@
                                                 <input class="form-control" id="offering" type="text" id="offering" oninput="this.value = this.value.replace(/[^\d.]/g,'');this.value = this.value.replace(/(\..*)\./g,'$1')" name="offering"  required>
                                             </div>
                                         </div>
+                                        
+                                        <div class="col-sm-4 mb-3">
+                                            <div class="form-group">
+                                                <label for="name">*<?=translate_phrase('Tithe'); ?></label>
+                                                <div class="form-control-wrap">    
+                                                    <div class="input-group">        
+                                                        <input type="text" readonly name="tithe" id="tithe" oninput="this.value = this.value.replace(/[^\d.]/g,'');this.value = this.value.replace(/(\..*)\./g,'$1')" class="form-control" placeholder="0">        
+                                                        <div class="input-group-append">            
+                                                            <button type="button"  class="btn btn-outline-primary btn-dim pop" pageTitle="Enter Tithe" pageSize="modal-lg" pageName="<?php echo  site_url('service/report/manage/tithe'); ?>" id="markButton">ADD</button>        
+                                                        </div>    
+                                                    </div>
+                                                    <span class="text-danger"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4 mb-3">
+                                            <div class="form-group">
+                                                <label for="name">*<?=translate_phrase('Partnership'); ?></label>
+                                                <div class="form-control-wrap">    
+                                                    <div class="input-group">        
+                                                        <input type="text" readonly name="partnership" id="partnership" oninput="this.value = this.value.replace(/[^\d.]/g,'');this.value = this.value.replace(/(\..*)\./g,'$1')" class="form-control" placeholder="0">        
+                                                        <div class="input-group-append">            
+                                                            <button type="button"  class="btn btn-outline-primary btn-dim pop" pageTitle="Add Partnership" pageSize="modal-lg" pageName="<?php echo  site_url('service/report/manage/partnership'); ?>" id="markButton">ADD</button>        
+                                                        </div>    
+                                                    </div>
+                                                    <span class="text-danger"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
                                         <div class="col-sm-12 mb-3">
                                             <div class="form-group">
                                                 <label for="name"><?=translate_phrase('Note'); ?></label>
@@ -136,6 +166,8 @@
                                         <input type="hidden" name="attendant" id="attendant">
                                         <input type="hidden" name="converts" id="converts">
                                         <input type="hidden" name="timers" id="timers">
+                                        <input type="hidden" name="tither" id="tither">
+                                        <input type="hidden" name="partners" id="partners">
                                         
                                         <div class="col-sm-12 text-center mt-3">
                                             <button class="btn btn-primary bb_fo_btn" type="submit">

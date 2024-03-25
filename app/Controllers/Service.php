@@ -369,18 +369,78 @@ class Service extends BaseController {
 				}
 				//When Adding Save in Session
 				if($this->request->getMethod() == 'post'){
+					$guest = $this->request->getPost('guest');
+					$total = $this->request->getPost('total');
+					
 					$mark = $this->session->get('service_attendance');
-					// echo $mark;
-					if(empty($mark)){
+
+					
+					// Decode the JSON string
+					$data = json_decode($mark, true);
+
+					// Change the values of "total" and "guest"
+					$data['total'] = $total; // Change the value of "total"
+					$data['guest'] = $guest; // Change the value of "guest"
+					
+					if(empty($data)){
 						echo $this->Crud->msg('danger', 'Mark Service Attendance');
 					
 					} else{
 						echo $this->Crud->msg('success', 'Service Attendance Submitted');
 						// echo json_encode($mark);
 						echo '<script> setTimeout(function() {
-							var jsonData = ' . json_encode($mark) . ';
+							var jsonData = ' . json_encode($data) . ';
 							var jsonString = JSON.stringify(jsonData);
 							$("#attendant").val(jsonString);
+							$("#attendance").val('.$total.');
+							$("#modal").modal("hide");
+						}, 2000); </script>';
+					}
+					die;
+				}
+
+			} elseif($param2 == 'tithe'){
+				
+				$data['table_rec'] = 'service/report/tithe_list'; // ajax table
+				$data['order_sort'] = '0, "asc"'; // default ordering (0, 'asc')
+				$data['no_sort'] = '1'; // sort disable columns (1,3,5)
+		
+				if($param3) {
+					$edit = $this->Crud->read2('type_id', $param3, 'type', 'cell', 'attendance');
+					if(!empty($edit)) {
+						foreach($edit as $e) {
+							$data['d_id'] = $e->id;
+							$data['d_attendant'] = $e->attendant;
+						}
+					}
+					
+				}
+				//When Adding Save in Session
+				if($this->request->getMethod() == 'post'){
+					$guest = $this->request->getPost('guest');
+					$total = $this->request->getPost('total');
+					
+					$mark = $this->session->get('service_attendance');
+
+					
+					// Decode the JSON string
+					$data = json_decode($mark, true);
+
+					// Change the values of "total" and "guest"
+					$data['total'] = $total; // Change the value of "total"
+					$data['guest'] = $guest; // Change the value of "guest"
+					
+					if(empty($data)){
+						echo $this->Crud->msg('danger', 'Mark Service Attendance');
+					
+					} else{
+						echo $this->Crud->msg('success', 'Service Attendance Submitted');
+						// echo json_encode($mark);
+						echo '<script> setTimeout(function() {
+							var jsonData = ' . json_encode($data) . ';
+							var jsonString = JSON.stringify(jsonData);
+							$("#attendant").val(jsonString);
+							$("#attendance").val('.$total.');
 							$("#modal").modal("hide");
 						}, 2000); </script>';
 					}
@@ -753,6 +813,78 @@ class Service extends BaseController {
 			echo json_encode($output);
 			exit;
 		}
+		
+		if($param1 == 'tithe_list') {
+			// DataTable parameters
+			$table = 'user';
+			$column_order = array('firstname', 'surname');
+			$column_search = array('firstname', 'surname');
+			$order = array('firstname' => 'asc');
+			$member_id = $this->Crud->read_field('name', 'Member', 'access_role', 'id');
+			$where = array('role_id' => $member_id);
+			
+			// load data into table
+			$list = $this->Crud->datatable_load($table, $column_order, $column_search, $order, $where);
+			$data = array();
+			// $no = $_POST['start'];
+			$count = 1;
+			foreach ($list as $item) {
+				$id = $item->id;
+				$name = $item->firstname;
+				$surname = $item->surname;
+				$img = $this->Crud->image($item->img_id, 'big');
+				// add manage buttons
+
+				$attend = $this->session->get('service_attendance');
+				// print_r($attend);
+				$sel = '';
+				// if(!empty($attend)){
+				// 	$attends = json_decode($attend);
+				// 	$ats = (array)$attends;
+				// 	foreach($ats as $a => $val){
+				// 		if($a == 'attendant'){
+				// 			// $vall = json_decode($val);
+				// 			if(in_array($item->id, (array)$val)){
+				// 				$sel = 'checked';
+				// 			}
+				// 		}
+				// 	}
+					
+					
+				// }
+				$all_btn = '
+					<div class="text-center">
+						<input type="text" class="form-control tithes" name="tithe[]" id="tithe_'.$item->id.'" oninput="add_tithe('.$item->id.')" value="0">
+					</div>
+				';
+				
+				
+				$row = array();
+				$row[] = '<div class="user-card">
+							<div class="user-avatar ">
+								<img alt="" src="'.site_url($img).'" height="40px"/>
+							</div>
+							<div class="user-info">
+								<span class="tb-lead">'.ucwords($item->firstname.' '.$item->surname).'</span>
+							</div>
+						</div>';
+				$row[] = $all_btn;
+	
+				$data[] = $row;
+				$count += 1;
+			}
+	
+			$output = array(
+				"draw" => intval($_POST['draw']),
+				"recordsTotal" => $this->Crud->datatable_count($table, $where),
+				"recordsFiltered" => $this->Crud->datatable_filtered($table, $column_order, $column_search, $order, $where),
+				"data" => $data,
+			);
+			
+			//output to json format
+			echo json_encode($output);
+			exit;
+		}
         // record listing
 		if($param1 == 'load') {
 			$limit = $param2;
@@ -913,7 +1045,7 @@ class Service extends BaseController {
 		if($param1 == 'manage') { // view for form data posting
 			return view($mod.'_form', $data);
 		} else { // view for main page
-			
+			$this->session->set('service_attendance', '');
 			$data['title'] = translate_phrase('Service Report').' - '.app_name;
 			$data['page_active'] = $mod;
 			return view($mod, $data);
