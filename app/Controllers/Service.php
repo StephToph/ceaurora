@@ -922,11 +922,11 @@ class Service extends BaseController {
 				$item = '<div class="text-center text-muted">'.translate_phrase('Session Timeout! - Please login again').'</div>';
 			} else {
 				
-				$all_rec = $this->Crud->filter_cell_report('', '', $search);
+				$all_rec = $this->Crud->filter_service_report('', '', $search);
                 // $all_rec = json_decode($all_rec);
 				if(!empty($all_rec)) { $counts = count($all_rec); } else { $counts = 0; }
 
-				$query = $this->Crud->filter_cell_report($limit, $offset, $search);
+				$query = $this->Crud->filter_service_report($limit, $offset, $search);
 				$data['count'] = $counts;
 				
 
