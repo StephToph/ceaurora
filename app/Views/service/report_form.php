@@ -351,25 +351,60 @@ $this->Crud = new Crud();
     <?php if($param2 == 'partnership'){?>
         <div class="row">
             <span class="text-danger mb-2">Enter Member's Partnership in the Table Below</span>
-            <div class="col-sm-8 mb-3">
-                
-            </div>
             <div class="col-sm-4 mb-3 ">
                 <label>Total</label>
-                <input class="form-control" id="total_tithe" type="text" name="total_tithe"  readonly value="0">
+                <input class="form-control" id="total_part" type="text" name="total_part"  readonly value="0">
             </div>
-           
+            <div class="col-sm-4 mb-3">
+                <label>Member</label>
+                <input class="form-control" id="member_part" type="text" name="member_part"  readonly value="0">
+            </div>
+            <div class="col-sm-4 mb-3">
+                <label>Guest</label>
+                <input class="form-control" id="guest_part" type="text" name="guest_part" oninput="get_part();this.value = this.value.replace(/[^\d.]/g,'');this.value = this.value.replace(/(\..*)\./g,'$1')" value="0">
+            </div>
         </div>
         <hr>
         <div class="table-responsive">
-            <table id="dtable" class="table table-striped table-hover mt-5">
+            <table class="table table-striped table-hover mt-5">
                 <thead>
                     <tr>
                         <th>Member</th>
-                        <th width="200px">Tithe</th>
+                        <?php 
+                            $parts = $this->Crud->read_order('partnership', 'name', 'asc');
+                            if(!empty($parts)){
+                                foreach($parts as $pp){
+                                    echo ' <th width="200px">'.strtoupper($pp->name).'</th>';
+                                }
+                            }
+                        ?>
+                       
                     </tr>
                 </thead>
                 <tbody>
+                    <tr>
+                        <td>
+                            <select class="js-select2" name="member[]" id="member" required>
+                                <option value="">Select Member</option>
+                                <?php 
+                                    $mem_id = $this->Crud->read_field('name', 'Member', 'access_role', 'id');
+                                    $mem = $this->Crud->read_single_order('role_id', $mem_id, 'user', 'firstname', 'asc');
+                                    if(!empty($mem)){
+                                        foreach($mem as $mm){
+                                            echo '<option value="'.$mm->id.'">'.strtoupper($mm->firstname.' '.$mm->surname).'</option>';
+                                        }
+                                    } 
+                                ?>
+                            </select>
+                        </td>
+                        <?php 
+                           if(!empty($parts)){
+                                foreach($parts as $pp){
+                                    echo ' <td width="200px"><input type="text" class="form-control" name="amount"></td>';
+                                }
+                            }
+                        ?>
+                    </tr>
                 </tbody>
             </table>
         </div>
