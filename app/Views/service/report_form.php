@@ -360,16 +360,73 @@ $this->Crud = new Crud();
                 <input class="form-control" id="member_part" type="text" name="member_part"  readonly value="0">
             </div>
             <div class="col-sm-4 mb-3">
-                <label>Guest</label>
-                <input class="form-control" id="guest_part" type="text" name="guest_part" oninput="get_part();this.value = this.value.replace(/[^\d.]/g,'');this.value = this.value.replace(/(\..*)\./g,'$1')" value="0">
+                <label>First Timer</label>
+                <input class="form-control" id="guest_part" type="text" name="guest_part" oninput="get_part();this.value = this.value.replace(/[^\d.]/g,'');this.value = this.value.replace(/(\..*)\./g,'$1')" readonly value="0">
             </div>
         </div>
         <hr>
         <div class="table-responsive">
-            <table class="table table-striped table-hover mt-5" id="titheTable">
+            <?php
+                $first = json_decode($first);
+                if(!empty($first)){
+            ?>
+                <table class="table table-striped table-hover mt-5" id="dataTable">
+                    <thead>
+                        <tr>
+                            <th >First Timer</th>
+                            <?php  
+                                $parts = $this->Crud->read_order('partnership', 'name', 'asc');
+                                if(!empty($parts)){
+                                    foreach($parts as $pp){
+                                        $name = $pp->name;
+                                        if(strtoupper($pp->name) == 'BIBLE SPONSOR')$name = 'Bible';
+                                        if(strtoupper($pp->name) == 'CHILDREN MINISTRY')$name = 'Children';
+                                        if(strtoupper($pp->name) == 'HEALING SCHOOL MAGAZINE')$name = 'H.S.M';
+                                        if(strtoupper($pp->name) == 'HEALING STREAM')$name = 'H.S';
+                                        if(strtoupper($pp->name) == 'LOVEWORLD LWUSA')$name = 'lwusa';
+                                        if(strtoupper($pp->name) == 'MINISTRY PROGRAM')$name = 'Ministry';
+                                        // if($pp->name == 'BIBLE SPONSOR')$name = 'Bible';
+                                        
+                                        echo ' <th >'.strtoupper($name).'</th>';
+                                    }
+                                }
+                            ?>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="original-row">
+                            <td>
+                                <select class="js-select2" name="first_timer[]" required>
+                                    <option value="">Select First Timer</option>
+                                    <?php 
+                                        if(!empty((array)$first)){
+                                            foreach($first as $mm => $val){
+                                                echo '<option value="'.$val->fullname.'">'.strtoupper($val->fullname).'</option>';
+                                            }
+                                        } 
+                                    ?>
+                                </select>
+                            </td>
+                            <?php 
+                                if(!empty($parts)){
+                                    foreach($parts as $pp){
+                                        echo '<td><input type="text" style="width:100px;" class="form-control amountInput" name="amount[]" value="0" oninput="updateTotal()"></td>';
+                                    }
+                                }
+                            ?>
+                            <td></td> <!-- Empty cell for Action -->
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="col-12 my-3 text-center">
+                <button type="button" class="btn btn-info" onclick="addRows()">Add More</button>
+            </div>
+            <?php } ?>
+            <table class="table table-striped table-hover mt-5" id="">
                 <thead>
                     <tr>
-                        <th >Member</th>
+                        <th >First Timer</th>
                         <?php 
                             $parts = $this->Crud->read_order('partnership', 'name', 'asc');
                             if(!empty($parts)){
@@ -393,8 +450,8 @@ $this->Crud = new Crud();
                 <tbody>
                     <tr>
                         <td>
-                            <select class="js-select2" name="member[]" id="member" required>
-                                <option value="">Select Member</option>
+                            <select class="js-select2" name="member[]" id="members" required>
+                                <option value="">Select First Timer</option>
                                 <?php 
                                     $mem_id = $this->Crud->read_field('name', 'Member', 'access_role', 'id');
                                     $mem = $this->Crud->read_single_order('role_id', $mem_id, 'user', 'firstname', 'asc');
@@ -807,6 +864,67 @@ $this->Crud = new Crud();
 <!-- Include jQuery library -->
 
 <script>
+     var rowIndex = 1;
+    var selectedValues = []; // Array to store selected values
+
+    function addRows() {
+        var originalSelect = document.querySelector('.original-row select');
+        var selectedValue = originalSelect.value;
+
+        if (selectedValue === '') {
+            alert('Please select a value from the dropdown.');
+            return;
+        }
+
+        var newRow = '<tr>';
+        newRow += '<td>';
+        newRow += '<select class="js-select2" name="first_timer[]" required>';
+        newRow += '<option value="">' + originalSelect.options[0].text + '</option>';
+        newRow += '</select>';
+        newRow += '</td>';
+
+        <?php 
+            if(!empty($parts)){
+                foreach($parts as $pp){
+                    echo 'newRow += \'<td><input type="text" style="width:100px;" class="form-control amountInput" name="amount[]" value="0" oninput="updateTotal()"></td>\';';
+                }
+            }
+        ?>
+
+        newRow += '<td><button type="button" class="btn btn-danger" onclick="deleteRow(this)">Delete</button></td>';
+        newRow += '</tr>';
+
+        $('#dataTable tbody').append(newRow);
+
+        // Remove the selected option from subsequent select dropdowns
+        $('.js-select2 option[value="' + selectedValue + '"]').remove();
+
+        // Add selected value to the array
+        selectedValues.push(selectedValue);
+
+        // Increment the rowIndex for unique IDs
+        rowIndex++;
+    }
+
+    function deleteRow(btn) {
+        var row = btn.parentNode.parentNode;
+        var selectValue = row.querySelector('select').value;
+        row.parentNode.removeChild(row);
+
+        // Remove the deleted value from the array
+        var index = selectedValues.indexOf(selectValue);
+        if (index > -1) {
+            selectedValues.splice(index, 1);
+        }
+
+        // Add the deleted value back to the select dropdown
+        $('.js-select2').append('<option value="' + selectValue + '">' + selectValue + '</option>');
+
+        updateTotal();
+    }
+
+
+
     function updateTotal() {
         var inputs = document.getElementsByClassName('amountInput');
         var total = 0;
