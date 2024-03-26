@@ -884,14 +884,21 @@ $this->Crud = new Crud();
         }
     }
 
-    // Show the delete button
-    var deleteButton = newRow.querySelector('button');
-    deleteButton.style.display = 'inline-block';
-
     table.appendChild(newRow);
 
-    // Reinitialize Select2 on cloned select elements
-    $('.js-select2').select2();
+    // Show delete button only in cloned rows
+    var deleteButton = newRow.querySelector('.delete-row');
+    if (deleteButton) {
+        deleteButton.style.display = 'inline-block';
+    }
+
+    // Reinitialize Select2 only on the cloned row
+    $(newRow).find('.js-select2').select2();
+
+    // Attach delete button event handler to the new row
+    $(newRow).find('.delete-row').click(function() {
+        $(this).closest('tr').remove();
+    });
 }
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -912,8 +919,8 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
-    // Initialize Select2 on page load
-    $('.js-select2').select2();
+    // Initialize Select2 only on the original select element
+    $('.js-select2').first().select2();
 });
 
    
