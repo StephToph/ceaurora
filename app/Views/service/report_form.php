@@ -811,7 +811,7 @@ $this->Crud = new Crud();
         // Set value to 0 if the textbox is empty
         tithesInputs.forEach(function(input) {
             if (input.value === '') {
-                input.value = '0';
+                input.value = '';
             }
         });
     }
