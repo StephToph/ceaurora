@@ -149,7 +149,7 @@
                                                     <div class="input-group">        
                                                         <input type="text" readonly name="partnership" id="partnership" oninput="this.value = this.value.replace(/[^\d.]/g,'');this.value = this.value.replace(/(\..*)\./g,'$1')" class="form-control" placeholder="0">        
                                                         <div class="input-group-append">            
-                                                            <button type="button"  class="btn btn-outline-primary btn-dim pop" pageTitle="Add Partnership" pageSize="modal-lg" pageName="<?php echo  site_url('service/report/manage/partnership'); ?>" id="markButton">ADD</button>        
+                                                            <button type="button"  class="btn btn-outline-primary btn-dim pop" pageTitle="Add Partnership" pageSize="modal-xl" pageName="<?php echo  site_url('service/report/manage/partnership'); ?>" id="markButton">ADD</button>        
                                                         </div>    
                                                     </div>
                                                     <span class="text-danger"></span>
