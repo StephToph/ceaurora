@@ -366,15 +366,15 @@ $this->Crud = new Crud();
         </div>
         <hr>
         <div class="table-responsive">
-            <table class="table table-striped table-hover mt-5">
+            <table class="table table-striped table-hover mt-5" id="titheTable">
                 <thead>
                     <tr>
-                        <th>Member</th>
+                        <th >Member</th>
                         <?php 
                             $parts = $this->Crud->read_order('partnership', 'name', 'asc');
                             if(!empty($parts)){
                                 foreach($parts as $pp){
-                                    echo ' <th width="200px">'.strtoupper($pp->name).'</th>';
+                                    echo ' <th >'.strtoupper($pp->name).'</th>';
                                 }
                             }
                         ?>
@@ -400,13 +400,16 @@ $this->Crud = new Crud();
                         <?php 
                            if(!empty($parts)){
                                 foreach($parts as $pp){
-                                    echo ' <td class="mx-3" width="200px"><input type="text" class="form-control" name="amount"></td>';
+                                    echo ' <td ><input type="text" style="width:100px;" class="form-control" name="amount[]"></td>';
                                 }
                             }
                         ?>
                     </tr>
                 </tbody>
             </table>
+            <div class="col-12 my-3">
+                <button type="button" class="btn btn-primary" onclick="addRow()">Add More</button>
+            </div>
         </div>
         <hr>
         <div class="row mt-5" >
@@ -859,6 +862,60 @@ $this->Crud = new Crud();
         $('#total_tithe').val(total);
     }
 
+    function addRow() {
+    var table = document.getElementById("titheTable").getElementsByTagName('tbody')[0];
+    var lastRow = table.rows[table.rows.length - 1];
+    var newRow = lastRow.cloneNode(true);
+
+    // Reset cloned select value
+    var selects = newRow.getElementsByTagName('select');
+    for (var i = 0; i < selects.length; i++) {
+        selects[i].value = "";
+    }
+
+    // Disable selected option in other selects
+    var selectedOptions = lastRow.getElementsByTagName('select')[0].value;
+    for (var i = 0; i < selects.length; i++) {
+        var options = selects[i].getElementsByTagName('option');
+        for (var j = 0; j < options.length; j++) {
+            if (options[j].value === selectedOptions) {
+                options[j].disabled = true;
+            }
+        }
+    }
+
+    // Show the delete button
+    var deleteButton = newRow.querySelector('button');
+    deleteButton.style.display = 'inline-block';
+
+    table.appendChild(newRow);
+
+    // Reinitialize Select2 on cloned select elements
+    $('.js-select2').select2();
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    var select = document.querySelector('select[name="member[]"]');
+    select.addEventListener("change", function() {
+        var selectedOption = this.value;
+        var selects = document.querySelectorAll('select[name="member[]"]');
+        for (var i = 0; i < selects.length; i++) {
+            if (selects[i] !== this) {
+                var options = selects[i].options;
+                for (var j = 0; j < options.length; j++) {
+                    options[j].disabled = false;
+                    if (options[j].value === selectedOption) {
+                        options[j].disabled = true;
+                    }
+                }
+            }
+        }
+    });
+
+    // Initialize Select2 on page load
+    $('.js-select2').select2();
+});
+
    
 </script>
 <?php if(!empty($table_rec)){ ?>
@@ -894,5 +951,6 @@ $this->Crud = new Crud();
         });
 
     });
+    
     </script>
 <?php } ?>
