@@ -66,13 +66,15 @@
                                 </div>
                                <div class="col-md-6 col-lg-4 col-xxl-3">
                                     <div class="form-group"><label class="form-label">Gender</label>
-                                        <div class="form-control-wrap"><select
+                                        <div class="form-control-wrap">
+                                            <select
                                                 class="form-select js-select2" name="gender" required
                                                 data-placeholder="Select Gender">
                                                 <option value="">Select Gender</option>
                                                 <option value="Male" <?php if(!empty($e_gender)){if($e_gender == 'Male'){echo 'selected';}}?>>Male</option>
                                                 <option value="Female" <?php if(!empty($e_gender)){if($e_gender == 'Female'){echo 'selected';}}?>>Female</option>
-                                            </select></div>
+                                            </select>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-md-6 col-lg-4 col-xxl-3">

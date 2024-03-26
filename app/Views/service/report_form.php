@@ -264,20 +264,20 @@ $this->Crud = new Crud();
                 <input class="form-control" id="member" type="text" name="member"  readonly value="0">
             </div>
             <div class="col-sm-4 mb-3">
-                <label>Guest</label>
-                <input class="form-control" id="guest" type="text" name="guest" oninput="get_total();" value="0">
+                <label>First Timer</label>
+                <input class="form-control" id="guest" type="text" name="guest" readonly value="<?=$timer_count; ?>">
             </div>
             <div class="col-sm-4 mb-3">
                 <label>Male</label>
-                <input class="form-control" id="male" type="text" name="male"  readonly value="0">
+                <input class="form-control" id="male" type="text" name="male"  readonly value="<?=$timer_male; ?>">
             </div>
             <div class="col-sm-4 mb-3">
                 <label>Female</label>
-                <input class="form-control" id="female" type="text" name="female"  readonly value="0">
+                <input class="form-control" id="female" type="text" name="female"  readonly value="<?=$timer_female; ?>">
             </div>
             <div class="col-sm-4 mb-3">
                 <label>Children</label>
-                <input class="form-control" id="children" type="text" name="children"  readonly value="0">
+                <input class="form-control" id="children" type="text" name="children"  readonly value="<?=$timer_child; ?>">
             </div>
         </div>
         <hr>
@@ -374,7 +374,16 @@ $this->Crud = new Crud();
                             $parts = $this->Crud->read_order('partnership', 'name', 'asc');
                             if(!empty($parts)){
                                 foreach($parts as $pp){
-                                    echo ' <th >'.strtoupper($pp->name).'</th>';
+                                    $name = $pp->name;
+                                    if(strtoupper($pp->name) == 'BIBLE SPONSOR')$name = 'Bible';
+                                    if(strtoupper($pp->name) == 'CHILDREN MINISTRY')$name = 'Children';
+                                    if(strtoupper($pp->name) == 'HEALING SCHOOL MAGAZINE')$name = 'H.S.M';
+                                    if(strtoupper($pp->name) == 'HEALING STREAM')$name = 'H.S';
+                                    if(strtoupper($pp->name) == 'LOVEWORLD LWUSA')$name = 'lwusa';
+                                    if(strtoupper($pp->name) == 'MINISTRY PROGRAM')$name = 'Ministry';
+                                    // if($pp->name == 'BIBLE SPONSOR')$name = 'Bible';
+                                    
+                                    echo ' <th >'.strtoupper($name).'</th>';
                                 }
                             }
                         ?>
@@ -578,28 +587,56 @@ $this->Crud = new Crud();
             ?>
             
                 <div class="row border mb-3">
-                    <div class="col-sm-6 mb-3">
+                    <div class="col-sm-4 mb-3">
                         <div class="form-group">
                             <label for="name">*<?=translate_phrase('First Name'); ?></label>
                             <input class="form-control" value="<?php if(!empty($first_name)){echo $first_name; }?>"  type="text" id="first_name" name="first_name[]" required>
                         </div>
                     </div>
-                    <div class="col-sm-6 mb-3">
+                    <div class="col-sm-4 mb-3">
                         <div class="form-group">
                             <label for="name">*<?=translate_phrase('Surname'); ?></label>
                             <input class="form-control" value="<?php if(!empty($surname)){echo $surname; }?>"  type="text" id="surname" name="surname[]"  required>
                         </div>
                     </div>
-                    <div class="col-sm-6 mb-3">
+                    <div class="col-sm-4 mb-3">
                         <div class="form-group">
                             <label for="name"><?=translate_phrase('Email'); ?></label>
                             <input class="form-control" value="<?php if(!empty($email)){echo $email; }?>"  type="email" id="email" name="email[]"  >
                         </div>
                     </div>
-                    <div class="col-sm-6 mb-3">
+                    <div class="col-sm-4 mb-3">
                         <div class="form-group">
                             <label for="name">*<?=translate_phrase('Phone'); ?></label>
                             <input class="form-control" value="<?php if(!empty($phone)){echo $phone; }?>"  type="text" id="phone" name="phone[]"  required>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 mb-3">
+                        <div class="form-group">
+                            <label for="name"><?=translate_phrase('Gender'); ?></label>
+                            <div class="form-control-wrap">
+                                <select
+                                    class="form-select js-select2" name="gender" required
+                                    data-placeholder="Select Gender">
+                                    <option value="">Select Gender</option>
+                                    <option value="Male" <?php if(!empty($e_gender)){if($e_gender == 'Male'){echo 'selected';}}?>>Male</option>
+                                    <option value="Female" <?php if(!empty($e_gender)){if($e_gender == 'Female'){echo 'selected';}}?>>Female</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 mb-3">
+                        <div class="form-group">
+                            <label for="name"><?=translate_phrase('Family Position'); ?></label>
+                            <div class="form-control-wrap">
+                                <select class="form-select js-select2" id="family_position" name="family_position"
+                                    data-placeholder="Select Position" onchange="posit();">
+                                    <option value="">Select</option>
+                                    <option value="Child" <?php if(!empty($e_family_position)){if($e_family_position == 'Child'){echo 'selected';}} ?>>Child </option>
+                                    <option value="Parent" <?php if(!empty($e_family_position)){if($e_family_position == 'Parent'){echo 'selected';}} ?>>Parent </option>
+                                    <option value="Other" <?php if(!empty($e_family_position)){if($e_family_position == 'Other'){echo 'selected';}} ?>>Other </option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                     <div class="col-sm-4 mb-3">
@@ -650,29 +687,56 @@ $this->Crud = new Crud();
                 </div>
 
             <?php } }else{ ?>
-                <div class="row border mb-3">
-                    <div class="col-sm-6 mb-3">
+                <div class="row border mb-3 p-2">
+                    <div class="col-sm-4 mb-3">
                         <div class="form-group">
                             <label for="name">*<?=translate_phrase('First Name'); ?></label>
                             <input class="form-control" type="text" id="first_name" name="first_name[]" required>
                         </div>
                     </div>
-                    <div class="col-sm-6 mb-3">
+                    <div class="col-sm-4 mb-3">
                         <div class="form-group">
                             <label for="name">*<?=translate_phrase('Surname'); ?></label>
                             <input class="form-control" type="text" id="surname" name="surname[]"  required>
                         </div>
                     </div>
-                    <div class="col-sm-6 mb-3">
+                    <div class="col-sm-4 mb-3">
                         <div class="form-group">
                             <label for="name"><?=translate_phrase('Email'); ?></label>
                             <input class="form-control" type="email" id="email" name="email[]"  >
                         </div>
                     </div>
-                    <div class="col-sm-6 mb-3">
+                    <div class="col-sm-4 mb-3">
                         <div class="form-group">
                             <label for="name">*<?=translate_phrase('Phone'); ?></label>
                             <input class="form-control" type="text" id="phone" name="phone[]"  required>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 mb-3">
+                        <div class="form-group">
+                            <label for="name"><?=translate_phrase('Gender'); ?></label>
+                            <div class="form-control-wrap">
+                                <select
+                                    class="form-select js-select2" name="gender[]" required
+                                    data-placeholder="Select Gender">
+                                    <option value="">Select Gender</option>
+                                    <option value="Male" <?php if(!empty($e_gender)){if($e_gender == 'Male'){echo 'selected';}}?>>Male</option>
+                                    <option value="Female" <?php if(!empty($e_gender)){if($e_gender == 'Female'){echo 'selected';}}?>>Female</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 mb-3">
+                        <div class="form-group">
+                            <label for="name"><?=translate_phrase('Family Position'); ?></label>
+                            <div class="form-control-wrap">
+                                <select class="form-select js-select2" id="family_position" name="family_position[]" data-placeholder="Select Position">
+                                    <option value="">Select</option>
+                                    <option value="Child" <?php if(!empty($e_family_position)){if($e_family_position == 'Child'){echo 'selected';}} ?>>Child </option>
+                                    <option value="Parent" <?php if(!empty($e_family_position)){if($e_family_position == 'Parent'){echo 'selected';}} ?>>Parent </option>
+                                    <option value="Other" <?php if(!empty($e_family_position)){if($e_family_position == 'Other'){echo 'selected';}} ?>>Other </option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                     <div class="col-sm-4 mb-3">
@@ -864,7 +928,7 @@ $this->Crud = new Crud();
         var total = parseInt(member) + parseInt(guest);
         $('#total').val(total);
     }
-
+    get_total();
     function get_tithe(){
         var member = $('#member_tithe').val();
         var guest = $('#guest_tithe').val();
