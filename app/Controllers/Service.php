@@ -352,7 +352,22 @@ class Service extends BaseController {
 				}
 			
 			} elseif($param2 == 'attendance'){
-				
+				$timer_count = $this->session->get('service_timer_count');
+
+				$timer_total = 0;$timer_male = 0;$timer_female =0;$timer_child = 0;
+				$timer_counts = json_decode($timer_count);
+				$counts = (array)$timer_counts;
+				if(!empty($counts)){
+					$timer_total = $counts['total'];
+					$timer_male = $counts['male'];
+					$timer_child = $counts['child'];
+					$timer_female = $counts['female'];
+				}
+
+				$data['timer_count'] = $timer_total;
+				$data['timer_male'] = $timer_male;
+				$data['timer_female'] = $timer_female;
+				$data['timer_child'] = $timer_child;
 				$data['table_rec'] = 'service/report/list'; // ajax table
 				$data['order_sort'] = '0, "asc"'; // default ordering (0, 'asc')
 				$data['no_sort'] = '1'; // sort disable columns (1,3,5)
@@ -387,14 +402,14 @@ class Service extends BaseController {
 					
 					} else{
 						echo $this->Crud->msg('success', 'Service Attendance Submitted');
-						// echo json_encode($mark);
-						echo '<script> setTimeout(function() {
-							var jsonData = ' . json_encode($data) . ';
-							var jsonString = JSON.stringify(jsonData);
-							$("#attendant").val(jsonString);
-							$("#attendance").val('.$total.');
-							$("#modal").modal("hide");
-						}, 2000); </script>';
+						echo json_encode($data);
+						// echo '<script> setTimeout(function() {
+						// 	var jsonData = ' . json_encode($data) . ';
+						// 	var jsonString = JSON.stringify(jsonData);
+						// 	$("#attendant").val(jsonString);
+						// 	$("#attendance").val('.$total.');
+						// 	$("#modal").modal("hide");
+						// }, 2000); </script>';
 					}
 					die;
 				}
@@ -510,57 +525,70 @@ class Service extends BaseController {
 				
 
 			}elseif($param2 == 'first_timer'){
-				
-					
-					//When Adding Save in Session
-					if($this->request->getMethod() == 'post'){
-						$first_name = $this->request->getPost('first_name');
-						$surname = $this->request->getPost('surname');
-						$email = $this->request->getPost('email');
-						$phone = $this->request->getPost('phone');
-						$dob = $this->request->getPost('dob');
-						$invited_by = $this->request->getPost('invited_by');
-						$channel = $this->request->getPost('channel');
-						$member_id = $this->request->getPost('member_id');
+				//When Adding Save in Session
+				if($this->request->getMethod() == 'post'){
+					$first_name = $this->request->getPost('first_name');
+					$surname = $this->request->getPost('surname');
+					$email = $this->request->getPost('email');
+					$phone = $this->request->getPost('phone');
+					$dob = $this->request->getPost('dob');
+					$gender = $this->request->getPost('gender');
+					$family_position = $this->request->getPost('family_position');
+					$invited_by = $this->request->getPost('invited_by');
+					$channel = $this->request->getPost('channel');
+					$member_id = $this->request->getPost('member_id');
 
-						
-
-						$converts = [];
-						if(!empty($first_name) || !empty($surname)){
-							for($i=0;$i<count($first_name);$i++){
-								$invites = $member_id[$i];
-								if($invited_by[$i] != 'Member'){
-									$invites = $channel[$i];
-								}
-								$converts['fullname'] = $first_name[$i].' '.$surname[$i];
-								$converts['email'] = $email[$i];
-								$converts['phone'] = $phone[$i];
-								$converts['dob'] = $dob[$i];
-								$converts['invited_by'] = $invited_by[$i];
-								$converts['channel'] = $invites;
-								
-								$convert[] = $converts;
+					$converts = [];
+					$timers = [];
+					$male = 0;$female = 0;$children = 0;
+					if(!empty($first_name) || !empty($surname)){
+						for($i=0;$i<count($first_name);$i++){
+							$invites = $member_id[$i];
+							if($invited_by[$i] != 'Member'){
+								$invites = $channel[$i];
 							}
-						}
-						// echo json_encode($convert);
-						// die;
-						if(empty($convert)){
-							echo $this->Crud->msg('danger', 'Enter the First Timer Details');
+
+							if($gender[$i] == 'Male')$male++;
+							if($gender[$i] == 'Female')$female++;
+							if($family_position[$i] == 'Child')$children++;
 							
-						} else{
-							$this->session->set('cell_timers', json_encode($convert));
-							echo $this->Crud->msg('success', 'First Timer List Submitted');
-							// echo json_encode($mark);
-							echo '<script> setTimeout(function() {
-								var jsonData = ' . json_encode($convert) . ';
-								var jsonString = JSON.stringify(jsonData);
-								$("#converts").val(jsonString);
-								$("#modal").modal("hide");
-							}, 2000); </script>';
+							$converts['fullname'] = $first_name[$i].' '.$surname[$i];
+							$converts['email'] = $email[$i];
+							$converts['phone'] = $phone[$i];
+							$converts['gender'] = $gender[$i];
+							$converts['family_position'] = $family_position[$i];
+							$converts['dob'] = $dob[$i];
+							$converts['invited_by'] = $invited_by[$i];
+							$converts['channel'] = $invites;
+							
+							$convert[] = $converts;
 						}
-						die;
 					}
-				
+					
+					$timers['male'] = $male;
+					$timers['female'] = $female;
+					$timers['child'] = $children;
+					$timers['total'] = count($first_name);
+					
+					if(empty($convert)){
+						echo $this->Crud->msg('danger', 'Enter the First Timer Details');
+						
+					} else{
+						$this->session->set('service_timers', json_encode($convert));
+						$this->session->set('service_timer_count', json_encode($timers));
+						
+						echo $this->Crud->msg('success', 'First Timer List Submitted');
+						// echo json_encode($convert);
+						echo '<script> setTimeout(function() {
+							var jsonData = ' . json_encode($convert) . ';
+							var jsonString = JSON.stringify(jsonData);
+							$("#converts").val(jsonString);
+							$("#first_timer").val('.count($first_name).');
+							$("#modal").modal("hide");
+						}, 2000); </script>';
+					}
+					die;
+				}
 
 			} else {
 				// prepare for edit

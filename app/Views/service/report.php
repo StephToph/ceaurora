@@ -83,6 +83,20 @@
                                         </div>
                                         <div class="col-sm-4 mb-3">
                                             <div class="form-group">
+                                                <label for="name"><?=translate_phrase('First Timer'); ?></label>
+                                                <div class="form-control-wrap">    
+                                                    <div class="input-group">        
+                                                        <input type="text" id="first_timer" name="first_timer" oninput="this.value = this.value.replace(/[^\d.]/g,'');this.value = this.value.replace(/(\..*)\./g,'$1')" class="form-control" readonly value="0">        
+                                                        <div class="input-group-append">            
+                                                            <button type="button"  class="btn btn-outline-primary btn-dim pop" pageTitle="First Timer" pageSize="modal-xl" pageName="<?=site_url('service/report/manage/first_timer'); ?>" id="timerBtn">ADD</button>        
+                                                        </div>    
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                       
+                                        <div class="col-sm-4 mb-3">
+                                            <div class="form-group">
                                                 <label for="name">*<?=translate_phrase('Attendance'); ?></label>
                                                 <div class="form-control-wrap">    
                                                     <div class="input-group">        
@@ -103,19 +117,6 @@
                                                         <input type="text" id="new_convert" class="form-control" oninput="this.value = this.value.replace(/[^\d.]/g,'');this.value = this.value.replace(/(\..*)\./g,'$1')" name="new_convert" placeholder="">        
                                                         <div class="input-group-append">            
                                                             <button type="button"  class="btn btn-outline-primary btn-dim pop" pageTitle="New Convert" pageSize="modal-xl" pageName="<?=site_url('service/report/manage/new_convert'); ?>" id="convertBtn">ADD</button>        
-                                                        </div>    
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-4 mb-3">
-                                            <div class="form-group">
-                                                <label for="name"><?=translate_phrase('First Timer'); ?></label>
-                                                <div class="form-control-wrap">    
-                                                    <div class="input-group">        
-                                                        <input type="text" id="first_timer" name="first_timer" oninput="this.value = this.value.replace(/[^\d.]/g,'');this.value = this.value.replace(/(\..*)\./g,'$1')" class="form-control" placeholder="">        
-                                                        <div class="input-group-append">            
-                                                            <button type="button"  class="btn btn-outline-primary btn-dim pop" pageTitle="First Timer" pageSize="modal-xl" pageName="<?=site_url('accounts/creport/manage/first_timer'); ?>" id="timerBtn">ADD</button>        
                                                         </div>    
                                                     </div>
                                                 </div>
