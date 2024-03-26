@@ -347,6 +347,44 @@ $this->Crud = new Crud();
             <div class="col-sm-12"><div id="bb_ajax_msg2"></div></div>
         </div>
     <?php } ?>
+    
+    <?php if($param2 == 'partnership'){?>
+        <div class="row">
+            <span class="text-danger mb-2">Enter Member's Partnership in the Table Below</span>
+            <div class="col-sm-8 mb-3">
+                
+            </div>
+            <div class="col-sm-4 mb-3 ">
+                <label>Total</label>
+                <input class="form-control" id="total_tithe" type="text" name="total_tithe"  readonly value="0">
+            </div>
+           
+        </div>
+        <hr>
+        <div class="table-responsive">
+            <table id="dtable" class="table table-striped table-hover mt-5">
+                <thead>
+                    <tr>
+                        <th>Member</th>
+                        <th width="200px">Tithe</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+        <hr>
+        <div class="row mt-5" >
+            <div class="col-sm-12 text-center mt-5">
+                <button class="btn btn-primary bb_fo_btn" type="submit">
+                    <i class="icon ni ni-save"></i> <?=translate_phrase('Save Record');?>
+                </button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12"><div id="bb_ajax_msg2"></div></div>
+        </div>
+    <?php } ?>
     <!-- insert/edit view -->
     <?php if($param2 == 'new_convert') { ?>
         
