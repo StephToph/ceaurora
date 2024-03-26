@@ -353,7 +353,7 @@ class Service extends BaseController {
 			
 			} elseif($param2 == 'attendance'){
 				$timer_count = $this->session->get('service_timer_count');
-
+				
 				$timer_total = 0;$timer_male = 0;$timer_female =0;$timer_child = 0;
 				$timer_counts = json_decode($timer_count);
 				$counts = (array)$timer_counts;
@@ -402,14 +402,60 @@ class Service extends BaseController {
 					
 					} else{
 						echo $this->Crud->msg('success', 'Service Attendance Submitted');
-						echo json_encode($data);
-						// echo '<script> setTimeout(function() {
-						// 	var jsonData = ' . json_encode($data) . ';
-						// 	var jsonString = JSON.stringify(jsonData);
-						// 	$("#attendant").val(jsonString);
-						// 	$("#attendance").val('.$total.');
-						// 	$("#modal").modal("hide");
-						// }, 2000); </script>';
+						// echo json_encode($data);
+						echo '<script> setTimeout(function() {
+							var jsonData = ' . json_encode($data) . ';
+							var jsonString = JSON.stringify(jsonData);
+							$("#attendant").val(jsonString);
+							$("#attendance").val('.$total.');
+							$("#modal").modal("hide");
+						}, 2000); </script>';
+					}
+					die;
+				}
+
+			}  elseif($param2 == 'partnership'){
+				$timer_count = $this->session->get('service_timers');
+				// $first = json_decode($timer_count);
+				$data['first'] = $timer_count;
+				if($param3) {
+					$edit = $this->Crud->read2('type_id', $param3, 'type', 'cell', 'attendance');
+					if(!empty($edit)) {
+						foreach($edit as $e) {
+							$data['d_id'] = $e->id;
+							$data['d_attendant'] = $e->attendant;
+						}
+					}
+					
+				}
+				//When Adding Save in Session
+				if($this->request->getMethod() == 'post'){
+					$guest = $this->request->getPost('guest');
+					$total = $this->request->getPost('total');
+					
+					$mark = $this->session->get('service_attendance');
+
+					
+					// Decode the JSON string
+					$data = json_decode($mark, true);
+
+					// Change the values of "total" and "guest"
+					$data['total'] = $total; // Change the value of "total"
+					$data['guest'] = $guest; // Change the value of "guest"
+					
+					if(empty($data)){
+						echo $this->Crud->msg('danger', 'Mark Service Attendance');
+					
+					} else{
+						echo $this->Crud->msg('success', 'Service Attendance Submitted');
+						// echo json_encode($data);
+						echo '<script> setTimeout(function() {
+							var jsonData = ' . json_encode($data) . ';
+							var jsonString = JSON.stringify(jsonData);
+							$("#attendant").val(jsonString);
+							$("#attendance").val('.$total.');
+							$("#modal").modal("hide");
+						}, 2000); </script>';
 					}
 					die;
 				}
