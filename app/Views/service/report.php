@@ -115,7 +115,7 @@
                                                     <div class="input-group">        
                                                         <input type="text" id="first_timer" name="first_timer" oninput="this.value = this.value.replace(/[^\d.]/g,'');this.value = this.value.replace(/(\..*)\./g,'$1')" class="form-control" placeholder="">        
                                                         <div class="input-group-append">            
-                                                            <button type="button"  class="btn btn-outline-primary btn-dim pop" pageTitle="First Timer" pageSize="modal-xl" pageName="<?=site_url('accounts/creport/manage/first_timer'); ?>" id="timerBtn">ADD</button>        
+                                                            <button type="button"  class="btn btn-outline-primary btn-dim pop" pageTitle="First Timer" pageSize="modal-xl" pageName="<?=site_url('service/report/manage/first_timer'); ?>" id="timerBtn">ADD</button>        
                                                         </div>    
                                                     </div>
                                                 </div>

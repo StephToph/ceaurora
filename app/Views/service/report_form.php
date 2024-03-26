@@ -400,7 +400,7 @@ $this->Crud = new Crud();
                         <?php 
                            if(!empty($parts)){
                                 foreach($parts as $pp){
-                                    echo ' <td ><input type="text" style="width:100px;" class="form-control" name="amount[]"></td>';
+                                    echo ' <td ><input type="text" style="width:100px;" class="form-control  amountInput" name="amount[]" value="0" oninput="updateTotal()"></td>';
                                 }
                             }
                         ?>
@@ -743,6 +743,18 @@ $this->Crud = new Crud();
 <!-- Include jQuery library -->
 
 <script>
+    function updateTotal() {
+        var inputs = document.getElementsByClassName('amountInput');
+        var total = 0;
+        for (var i = 0; i < inputs.length; i++) {
+            if (!isNaN(inputs[i].value) && inputs[i].value !== '') {
+                total += parseFloat(inputs[i].value);
+            }
+        }
+        console.log(total);
+        document.getElementById('total_part').value = total;
+    }
+
     $(document).ready(function(){
         // Initialize Select2 for the original select dropdown
         $('.js-select2').each(function() {
