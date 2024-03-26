@@ -400,7 +400,7 @@ $this->Crud = new Crud();
                         <?php 
                            if(!empty($parts)){
                                 foreach($parts as $pp){
-                                    echo ' <td width="200px"><input type="text" class="form-control" name="amount"></td>';
+                                    echo ' <td class="mx-3" width="200px"><input type="text" class="form-control" name="amount"></td>';
                                 }
                             }
                         ?>
