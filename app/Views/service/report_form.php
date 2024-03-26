@@ -397,8 +397,7 @@ $this->Crud = new Crud();
                     <tbody>
                         <tr class="original-row">
                             <td>
-                                <select class="js-select2" name="first_timer[]" required>
-                                    <option value="">Select First Timer</option>
+                                <select class="js-select2" name="first_timer[]" id="firsts" data-placeholder="Select First Timer" required>
                                     <?php 
                                         if(!empty((array)$first)){
                                             foreach($first as $mm => $val){
@@ -420,13 +419,14 @@ $this->Crud = new Crud();
                     </tbody>
                 </table>
                 <div class="col-12 my-3 text-center">
-                <button type="button" class="btn btn-info" onclick="addRows()">Add More</button>
-            </div>
+                    <p id="first_resp"></p>
+                    <button type="button" class="btn btn-info" onclick="addRows()">Add More</button>
+                </div>
             <?php } ?>
             <table class="table table-striped table-hover mt-5" id="">
                 <thead>
                     <tr>
-                        <th >First Timer</th>
+                        <th >Member</th>
                         <?php 
                             $parts = $this->Crud->read_order('partnership', 'name', 'asc');
                             if(!empty($parts)){
@@ -872,13 +872,14 @@ $this->Crud = new Crud();
         var selectedValue = originalSelect.value;
 
         if (selectedValue === '') {
-            alert('Please select a value from the dropdown.');
+            $('#first_resp').html('<span class="text-danger">Please select a value from the First Timer.</span>');
             return;
         }
 
+        var selectId = 'select' + rowIndex;
         var newRow = '<tr>';
         newRow += '<td>';
-        newRow += '<select class="js-select2" name="first_timer[]" required>';
+        newRow += '<select class="js-select2" name="first_timer[]" id="'+selectId+'" required>';
         newRow += '<option value="">' + originalSelect.options[0].text + '</option>';
         newRow += '</select>';
         newRow += '</td>';
@@ -893,7 +894,7 @@ $this->Crud = new Crud();
 
         newRow += '<td><button type="button" class="btn btn-danger" onclick="deleteRow(this)">Delete</button></td>';
         newRow += '</tr>';
-
+            
         $('#dataTable tbody').append(newRow);
 
         // Remove the selected option from subsequent select dropdowns
@@ -901,7 +902,7 @@ $this->Crud = new Crud();
 
         // Add selected value to the array
         selectedValues.push(selectedValue);
-
+        $('#' + selectId).select2();
         // Increment the rowIndex for unique IDs
         rowIndex++;
     }
@@ -919,7 +920,7 @@ $this->Crud = new Crud();
 
         // Add the deleted value back to the select dropdown
         $('.js-select2').append('<option value="' + selectValue + '">' + selectValue + '</option>');
-
+        
         updateTotal();
     }
 
