@@ -311,16 +311,54 @@ $this->Crud = new Crud();
             <span class="text-danger mb-2">Enter Member's Tithe in the Table Below</span>
             <div class="col-sm-4 mb-3 ">
                 <label>Total</label>
-                <input class="form-control" id="total" type="text" name="total"  readonly value="0">
+                <input class="form-control" id="total_tithe" type="text" name="total_tithe"  readonly value="0">
             </div>
             <div class="col-sm-4 mb-3">
                 <label>Member</label>
-                <input class="form-control" id="member" type="text" name="member"  readonly value="0">
+                <input class="form-control" id="member_tithe" type="text" name="member_tithe"  readonly value="0">
             </div>
             <div class="col-sm-4 mb-3">
                 <label>Guest</label>
-                <input class="form-control" id="guest" type="text" name="guest" oninput="get_tithe();" value="0">
+                <input class="form-control" id="guest_tithe" type="text" name="guest_tithe" oninput="get_tithe();this.value = this.value.replace(/[^\d.]/g,'');this.value = this.value.replace(/(\..*)\./g,'$1')" value="0">
             </div>
+        </div>
+        <hr>
+        <div class="table-responsive">
+            <table id="dtable" class="table table-striped table-hover mt-5">
+                <thead>
+                    <tr>
+                        <th>Member</th>
+                        <th width="200px">Tithe</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+        <hr>
+        <div class="row mt-5" >
+            <div class="col-sm-12 text-center mt-5">
+                <button class="btn btn-primary bb_fo_btn" type="submit">
+                    <i class="icon ni ni-save"></i> <?=translate_phrase('Save Record');?>
+                </button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12"><div id="bb_ajax_msg2"></div></div>
+        </div>
+    <?php } ?>
+    
+    <?php if($param2 == 'partnership'){?>
+        <div class="row">
+            <span class="text-danger mb-2">Enter Member's Partnership in the Table Below</span>
+            <div class="col-sm-8 mb-3">
+                
+            </div>
+            <div class="col-sm-4 mb-3 ">
+                <label>Total</label>
+                <input class="form-control" id="total_tithe" type="text" name="total_tithe"  readonly value="0">
+            </div>
+           
         </div>
         <hr>
         <div class="table-responsive">
@@ -716,6 +754,29 @@ $this->Crud = new Crud();
         }
     });
 
+    function calculateTotal() {
+        
+        var tithesInputs = document.querySelectorAll('.tithes');
+        var total = 0;
+        tithesInputs.forEach(function(input) {
+            var value = parseFloat(input.value);
+            total += isNaN(value) ? 0 : value;
+        });
+        console.log(total);
+        var guest = $('#guest_tithe').val();
+        
+        $('#member_tithe').val(total.toFixed(2));
+        total += parseFloat(guest);
+        total = total.toFixed(2);
+        $('#total_tithe').val(total);
+
+        // Set value to 0 if the textbox is empty
+        tithesInputs.forEach(function(input) {
+            if (input.value === '') {
+                input.value = '0';
+            }
+        });
+    }
     // Trigger the change event on page load
     $('select[name="invited_by[]"]').trigger('change');
 
@@ -754,21 +815,16 @@ $this->Crud = new Crud();
         $('#total').val(total);
     }
 
-    function add_tithe(id){
-        var total = $('#total').val();
-        var guest = $('#guest').val();
-        var member = $('#member').val();
-        var tithe = $('#tithe_'+id).val();
+    function get_tithe(){
+        var member = $('#member_tithe').val();
+        var guest = $('#guest_tithe').val();
         
-        if(tithe === ''){
-            tithe = 0;
-        }
-        var sub = parseFloat(member) + parseFloat(tithe);
-        var subs = parseFloat(sub) + parseFloat(guest);
-        $('#member').val(sub);
-        $('#total').val(subs);
-        
+        var total = parseFloat(member) + parseFloat(guest);
+        total = total.toFixed(2);
+        $('#total_tithe').val(total);
     }
+
+   
 </script>
 <?php if(!empty($table_rec)){ ?>
     <!-- <script src="<?=site_url();?>assets/backend/vendors/datatables/jquery.dataTables.min.js"></script>
