@@ -417,33 +417,47 @@ class Service extends BaseController {
 				}
 				//When Adding Save in Session
 				if($this->request->getMethod() == 'post'){
-					$guest = $this->request->getPost('guest');
-					$total = $this->request->getPost('total');
-					
-					$mark = $this->session->get('service_attendance');
+					$guest_tithe = $this->request->getPost('guest_tithe');
+					$total_tithe = $this->request->getPost('total_tithe');
+					$member_tithe = $this->request->getPost('member_tithe');
 
+					$member = $this->request->getPost('members');
+					$tithe = $this->request->getPost('tithe');
 					
-					// Decode the JSON string
-					$data = json_decode($mark, true);
 
-					// Change the values of "total" and "guest"
-					$data['total'] = $total; // Change the value of "total"
-					$data['guest'] = $guest; // Change the value of "guest"
-					
-					if(empty($data)){
-						echo $this->Crud->msg('danger', 'Mark Service Attendance');
-					
-					} else{
-						echo $this->Crud->msg('success', 'Service Attendance Submitted');
-						// echo json_encode($mark);
-						echo '<script> setTimeout(function() {
-							var jsonData = ' . json_encode($data) . ';
-							var jsonString = JSON.stringify(jsonData);
-							$("#attendant").val(jsonString);
-							$("#attendance").val('.$total.');
-							$("#modal").modal("hide");
-						}, 2000); </script>';
+					$tither = [];
+					if (!empty($member) && !empty($tithe)) {
+						$count = count($tithe); 
+						for ($i = 0; $i < $count; $i++) {
+							if ($tithe[$i] <= 0) {
+								continue; 
+							}
+							
+							if (!isset($tither[$member[$i]])) {
+								$tither[$member[$i]] = $tithe[$i];
+							}
+							
+						}
 					}
+
+					$tithe_list['total'] = $total_tithe;
+					$tithe_list['member'] = $member_tithe;
+					$tithe_list['guest'] = $guest_tithe;
+					$tithe_list['list'] = $tither;
+					 
+					// print_r($tithe_list);
+					
+					
+					echo $this->Crud->msg('success', 'Service Tithe Report Submitted');
+					// echo json_encode($mark);
+					echo '<script> setTimeout(function() {
+						var jsonData = ' . json_encode($tithe_list) . ';
+						var jsonString = JSON.stringify(jsonData);
+						$("#tither").val(jsonString);
+						$("#tithe").val('.$total_tithe.');
+						$("#modal").modal("hide");
+					}, 2000); </script>';
+					
 					die;
 				}
 
@@ -854,9 +868,10 @@ class Service extends BaseController {
 				// }
 				$all_btn = '
 					<div class="text-center">
-						<input type="text" class="form-control tithes" name="tithe[]" id="tithe_'.$item->id.'" oninput="add_tithe('.$item->id.')" value="0">
+						<input type="text" class="form-control tithes" name="tithe[]" id="tithe_'.$item->id.'" value="0" oninput="calculateTotal();this.value = this.value.replace(/[^\d.]/g,\'\');this.value = this.value.replace(/(\..*)\./g,\'$1\')">
 					</div>
 				';
+
 				
 				
 				$row = array();
@@ -867,6 +882,7 @@ class Service extends BaseController {
 							<div class="user-info">
 								<span class="tb-lead">'.ucwords($item->firstname.' '.$item->surname).'</span>
 							</div>
+							<input type="hidden" name="members[]" value="'.$item->id.'">
 						</div>';
 				$row[] = $all_btn;
 	
