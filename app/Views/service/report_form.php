@@ -377,7 +377,7 @@ $this->Crud = new Crud();
                             <?php  
                                 $parts = $this->Crud->read_order('partnership', 'name', 'asc');
                                 if(!empty($parts)){
-                                    foreach($parts as $pp){
+                                    foreach($parts as $index => $pp){
                                         $name = $pp->name;
                                         if(strtoupper($pp->name) == 'BIBLE SPONSOR')$name = 'Bible';
                                         if(strtoupper($pp->name) == 'CHILDREN MINISTRY')$name = 'Children';
@@ -388,6 +388,8 @@ $this->Crud = new Crud();
                                         // if($pp->name == 'BIBLE SPONSOR')$name = 'Bible';
                                         
                                         echo ' <th >'.strtoupper($name).'</th>';
+                                        echo '<input type="hidden" name="'.$index.'_parts[]" value="'.$pp->id.'">';
+
                                     }
                                 }
                             ?>
@@ -410,8 +412,8 @@ $this->Crud = new Crud();
                             </td>
                             <?php 
                                 if(!empty($parts)){
-                                    foreach($parts as $pp){
-                                        echo '<td><input type="text" style="width:100px;" class="form-control firsts_amount" name="'.$pp->name.'_first[]" value="0"></td>';
+                                    foreach($parts as $pp => $val){
+                                        echo '<td><input type="text" style="width:100px;" class="form-control firsts_amount" name="'.$pp.'_first[]" value="0"></td>';
                                     }
                                 }
                             ?>
@@ -466,8 +468,9 @@ $this->Crud = new Crud();
                         </td>
                         <?php 
                            if(!empty($parts)){
-                                foreach($parts as $pp){
-                                    echo ' <td ><input type="text" style="width:100px;" class="form-control  members_amount" name="'.$pp->name.'_member[]" value="0" ></td>';
+                                foreach($parts as $pp => $val){
+                                    echo ' <td ><input type="text" style="width:100px;" class="form-control  members_amount" name="'.$pp
+                                    .'_member[]" value="0" ></td>';
                                 }
                             }
                         ?>
@@ -936,9 +939,8 @@ $this->Crud = new Crud();
 
             // Add input fields for each partnership
             $('#dataTable th').each(function (index) {
-                
                 if (index > 1) {
-                    var partName = index + "_first[]"; // Adjust the prefix as needed
+                    var partName = (index-2) + "_first[]"; // Adjust the prefix as needed
                     newRow.append('<td><input type="text" style="width:100px;" class="form-control firsts_amount" name="' + partName + '" value="0"></td>');
                 }
             });
@@ -1081,11 +1083,8 @@ $this->Crud = new Crud();
             // Add input fields for each partnership
             $('#member_table th').each(function (index) {
                 if (index > 1) {
-                    var partName = index + "_member"; // Adjust the prefix as needed
+                    var partName = (index-2) + "_member"; // Adjust the prefix as needed
                     newRow.append('<td><input type="text" style="width:100px;" class="form-control members_amount" name="' + partName + '" value="0"></td>');
-                }
-                if (index > 1) {
-                    newRow.append('<td><input type="text" style="width:100px;" class="form-control members_amount" name="amount[]" value="0"></td>');
                 }
             });
 
