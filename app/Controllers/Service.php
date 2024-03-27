@@ -323,6 +323,8 @@ class Service extends BaseController {
 		} 
 		// manage record
 		if($param1 == 'manage') {
+			$data['first'] = [];
+				
 			// prepare for delete
 			if($param2 == 'delete') {
 				if($param3) {
