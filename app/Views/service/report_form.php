@@ -420,7 +420,7 @@ $this->Crud = new Crud();
                 </table>
                 <div class="col-12 my-3 text-center">
                     <p id="first_resp"></p>
-                    <button type="button" class="btn btn-info" id="more_btn" onclick="addRows()">Add More</button>
+                    <button type="button" class="btn btn-info" id="more_btn">Add More</button>
                 </div>
             <?php } ?>
             <table class="table table-striped table-hover mt-5" id="member_table">
@@ -869,79 +869,61 @@ $this->Crud = new Crud();
      var rowIndex = 1;
     var selectedValues = []; // Array to store selected values
 
-    function addRows() {
-        var originalSelect = document.querySelector('.original-row select');
-        var selectedValue = originalSelect.value;
-
-        if (selectedValue === '') {
-            $('#first_resp').html('<span class="text-danger">Please select a value from the First Timer.</span>');
-            return; // Exit the function if no value is selected
+    $(document).ready(function() {
+        var selectCounter = 1;
+        // Function to add a new row with a fresh select element
+         // Function to initialize select2 plugin for the given select element
+         function initializeSelect2(selectElement) {
+            $('#firsts').select2();
+            selectElement.select2();
         }
-
-        var selectedOptions = $('.js-select2').map(function() {
-            return $(this).val();
-        }).get();
-
-        if (selectedOptions.includes(selectedValue)) {
-            $('#first_resp').html('<span class="text-danger">This value has already been selected.</span>');
-            // xit the function if the value is already selected in another row
-        }
-
-        console.log(selectedOptions);
-
-        var selectId = 'select' + rowIndex;
-        var newRow = '<tr>' +
-            '<td>' +
-            '<select class="js-select2" id="'+selectId+'" data-search="on" name="first_timer[]" required>' +
-            '' +
-            '<?php 
-                $fir = (array)$first;
-                if(!empty($fir) && is_array($fir)){
-                    foreach($fir as $mm => $val){
-                        echo '<option value="'.$val->fullname.'">'.strtoupper($val->fullname).'</option>';
-                    }
-                } 
-            ?>' +
-            '</select>' +
-            '</td>';
-
-        <?php 
-            if(!empty($parts)){
-                foreach($parts as $pp){
-                    echo 'newRow += \'<td><input type="text" style="width:100px;" class="form-control amountInput" name="amount[]" value="0" oninput="updateTotal()"></td>\';';
-                }
+        function addNewRow() {
+            var remainingOptions = $('.original-row select option:not(:selected)');
+            if (remainingOptions.length === 0) {
+                $('#first_resp').html("<span class='text-danger'>No more options available.</span>");
+                return;
             }
-        ?>
-        
-        newRow += '<td><button type="button" class="btn btn-danger" onclick="deleteRow(this)">Delete</button></td>';
-        newRow += '</tr>';
-
-        // Append the new row
-        $('#dataTable tbody').append(newRow);
-
-        // Initialize select2 for the new select element
-        $('#' + selectId).select2();
-
-        // Remove selected options from all select elements
-        $('.js-select2').each(function() {
-            var value = $(this).val();
-            $(this).find('option').each(function() {
-                if (selectedOptions.includes($(this).val()) && $(this).val() !== value) {
-                    $(this).remove();
+           
+           
+            var newRow = $('<tr class="new-row"></tr>');
+            
+            // Clone the select element and remove options that are already selected
+            var firstTimerSelect = $('.original-row select').clone();
+            firstTimerSelect.find('option:selected').remove();
+           // Assign a new unique id to the cloned select element
+           var newSelectId = 'firsts_' + selectCounter;
+            firstTimerSelect.attr('id', newSelectId);
+            
+            newRow.append('<td>' + firstTimerSelect.prop('outerHTML') + '</td>');
+            // Initialize select2 plugin for the new select element
+            initializeSelect2(firstTimerSelect);
+            
+            // Add input fields for each partnership
+            $('#dataTable th').each(function(index) {
+                if (index > 1) {
+                    newRow.append('<td><input type="text" style="width:100px;" class="form-control amountInput" name="amount[]" value="0" oninput="updateTotal()"></td>');
                 }
             });
+            
+             // Add delete button in the action cell
+             newRow.append('<td><button class="btn btn-danger btn-sm delete-row">Delete</button></td>');
+            $('#dataTable tbody').append(newRow);
+
+            // Increment the counter
+            selectCounter++;
+        }
+
+        // Event listener for the Add More button
+        $('#more_btn').click(function() {
+            // Add a new row with a fresh select element
+            addNewRow();
         });
 
-        // Increment the rowIndex for unique IDs
-        rowIndex++;
-        
-        // Disable "Add More" button if all options are selected
-        var remainingOptions = $('select.js-select2 option:not([value=""])').length;
-        if (remainingOptions === 0) {
-            $('#more_btn').prop('disabled', true);
-        }
-    }
-
+        // Event listener for dynamically added delete buttons
+        $('#dataTable').on('click', '.delete-row', function() {
+            $(this).closest('tr').remove();
+        });
+    });
     var rowIndex = 1; // Initialize row index
 
     function addRow() {
