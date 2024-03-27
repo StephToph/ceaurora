@@ -434,19 +434,41 @@ class Service extends BaseController {
 				}
 				//When Adding Save in Session
 				if($this->request->getMethod() == 'post'){
-					die;
-					$guest = $this->request->getPost('guest');
-					$total = $this->request->getPost('total');
+					
+					$first_timer = $this->request->getPost('first_timer');
+					$member = $this->request->getPost('members');
+					$partner = [];
+					$partss = $this->Crud->read_order('partnership', 'name', 'asc');
+					for($i=0;$i<count($first_timer);$i++){
+						$name = $first_timer[$i];
+						
+						if(!empty($partss)){
+							foreach($partss as $index => $pp){
+								$par = (array)$pp;
+								$amount = $this->request->getPost($index.'_first');
+								if($amount[$i] <= 0)continue;
+								$parts[$pp->id] = $amount[$i];
+								
+							}
+						}
+						
+						$partner[$name] = $parts;
+					}
+					print_r($partner);
+					$guest_part = $this->request->getPost('guest_part');
+					$total_part = $this->request->getPost('total_part');
+					$member_part = $this->request->getPost('member_part');
 					
 					$mark = $this->session->get('service_attendance');
 
-					
+					die;
 					// Decode the JSON string
 					$data = json_decode($mark, true);
 
 					// Change the values of "total" and "guest"
-					$data['total'] = $total; // Change the value of "total"
-					$data['guest'] = $guest; // Change the value of "guest"
+					$data['total'] = $total_part; // Change the value of "total"
+					$data['guest'] = $guest_part; // Change the value of "total"
+					$data['member'] = $member_part; // Change the value of "guest"
 					
 					if(empty($data)){
 						echo $this->Crud->msg('danger', 'Mark Service Attendance');
@@ -458,7 +480,7 @@ class Service extends BaseController {
 							var jsonData = ' . json_encode($data) . ';
 							var jsonString = JSON.stringify(jsonData);
 							$("#attendant").val(jsonString);
-							$("#attendance").val('.$total.');
+							$("#attendance").val('.$total_part.');
 							$("#modal").modal("hide");
 						}, 2000); </script>';
 					}

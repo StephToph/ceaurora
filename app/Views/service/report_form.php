@@ -453,7 +453,7 @@ $this->Crud = new Crud();
                 <tbody>
                     <tr class="original-rows">
                         <td>
-                            <select class="js-select2 members" name="member[]" id="members" required>
+                            <select class="js-select2 members" name="members[]" id="members" required>
                                
                                 <?php 
                                     $mem_id = $this->Crud->read_field('name', 'Member', 'access_role', 'id');
