@@ -434,30 +434,78 @@ class Service extends BaseController {
 				}
 				//When Adding Save in Session
 				if($this->request->getMethod() == 'post'){
-					$guest = $this->request->getPost('guest');
-					$total = $this->request->getPost('total');
+					
+					$first_timer = $this->request->getPost('first_timer');
+					$member = $this->request->getPost('members');
+					$partner = [];
+					$partss = $this->Crud->read_order('partnership', 'name', 'asc');
+					for($i=0;$i<count($first_timer);$i++){
+						$name = $first_timer[$i];
+						
+						if(!empty($partss)){
+							foreach($partss as $index => $pp){
+								
+								$amount = $this->request->getPost($index.'_first'); //Guest Partners
+								if($amount[$i] <= 0)continue;
+								$parts[$pp->id] = $amount[$i];
+								
+								
+							}
+						}
+						
+						$partner[$name] = $parts;
+					}
+
+					$pmember = [];
+					for($i=0;$i<count($member);$i++){
+						$name = $member[$i];
+						$par = [];
+						if(!empty($partss)){
+							foreach($partss as $index => $pp){
+								
+								$member_amount = $this->request->getPost($index.'_member'); //Guest Partners
+								
+								if($member_amount[$i] <= 0)continue;
+								$par[$pp->id] = $member_amount[$i];
+								
+							}
+						}
+						// 
+						$partner[$name] = $par;
+					}
+					
+					$partnership = json_encode($partner);
+					$guest_part = $this->request->getPost('guest_part');
+					$total_part = $this->request->getPost('total_part');
+					$member_part = $this->request->getPost('member_part');
+
+					$partners['partnership'] = $partnership;
+					$partners['guest_part'] = $guest_part;
+					$partners['total_part'] = $total_part;
+					$partners['member_part'] = $member_part;
+					
 					
 					$mark = $this->session->get('service_attendance');
 
-					
 					// Decode the JSON string
 					$data = json_decode($mark, true);
 
 					// Change the values of "total" and "guest"
-					$data['total'] = $total; // Change the value of "total"
-					$data['guest'] = $guest; // Change the value of "guest"
+					$data['total'] = $total_part; // Change the value of "total"
+					$data['guest'] = $guest_part; // Change the value of "total"
+					$data['member'] = $member_part; // Change the value of "guest"
 					
-					if(empty($data)){
-						echo $this->Crud->msg('danger', 'Mark Service Attendance');
+					if(empty($partnership)){
+						echo $this->Crud->msg('danger', 'Enter Partnerships');
 					
 					} else{
-						echo $this->Crud->msg('success', 'Service Attendance Submitted');
+						echo $this->Crud->msg('success', 'Partnership List Submitted');
 						// echo json_encode($data);
 						echo '<script> setTimeout(function() {
-							var jsonData = ' . json_encode($data) . ';
+							var jsonData = ' . json_encode($partners) . ';
 							var jsonString = JSON.stringify(jsonData);
-							$("#attendant").val(jsonString);
-							$("#attendance").val('.$total.');
+							$("#partners").val(jsonString);
+							$("#partnership").val('.$total_part.');
 							$("#modal").modal("hide");
 						}, 2000); </script>';
 					}
@@ -567,6 +615,7 @@ class Service extends BaseController {
 								var jsonData = ' . json_encode($convert) . ';
 								var jsonString = JSON.stringify(jsonData);
 								$("#converts").val(jsonString);
+								$("#new_convert").val('.count($first_name).');
 								$("#modal").modal("hide");
 							}, 2000); </script>';
 						}
@@ -632,7 +681,7 @@ class Service extends BaseController {
 						echo '<script> setTimeout(function() {
 							var jsonData = ' . json_encode($convert) . ';
 							var jsonString = JSON.stringify(jsonData);
-							$("#converts").val(jsonString);
+							$("#timers").val(jsonString);
 							$("#first_timer").val('.count($first_name).');
 							$("#modal").modal("hide");
 						}, 2000); </script>';
@@ -662,12 +711,15 @@ class Service extends BaseController {
 				} 
 
 				if($this->request->getMethod() == 'post'){
-					$creport_id = $this->request->getVar('creport_id');
-					$cell_id = $this->request->getVar('cell_id');
+					$report_id = $this->request->getVar('report_id');
 					$type = $this->request->getVar('type');
 					$attendance = $this->request->getVar('attendance');
 					$new_convert = $this->request->getVar('new_convert');
 					$first_timer = $this->request->getVar('first_timer');
+					$tithe = $this->request->getVar('tithe');
+					$partnership = $this->request->getVar('partnership');
+					$tither = $this->request->getVar('tither');
+					$partners = $this->request->getVar('partners');
 					$offering = $this->request->getVar('offering');
 					$note = $this->request->getVar('note');
 					$date = $this->request->getVar('dates');
@@ -679,7 +731,7 @@ class Service extends BaseController {
 					$dates = date('y-m-d', strtotime($date));
 
 					
-					$ins_data['cell_id'] = $cell_id;
+					$ins_data['tithers'] = $tither;
 					$ins_data['type'] = $type;
 					$ins_data['date'] = $dates;
 					$ins_data['attendance'] = $attendance;
@@ -687,12 +739,15 @@ class Service extends BaseController {
 					$ins_data['first_timer'] = $first_timer;
 					$ins_data['offering'] = $offering;
 					$ins_data['note'] = $note;
+					$ins_data['partnership'] = $partnership;
+					$ins_data['attendant'] = $attendant;
+					$ins_data['converts'] = $converts;
+					$ins_data['timers'] = $timers;
+					$ins_data['tithe'] = $tithe;
+					$ins_data['partners'] = $partners;
 					
-					if(!empty($attendant)){$attend = $attendant;}else{$attend = $this->session->get('cell_attendance');}
-					if(!empty($converts)){$conv = $converts;}else{$conv = $this->session->get('cell_convert');}
-					if(!empty($timers)){$times = $timers;}else{$times = $this->session->get('cell_timers');}
 					// do create or update
-					if($creport_id) {
+					if($report_id) {
 						
 						$ins_data['attendant'] = $attend;
 						$ins_data['converts'] = $conv;
@@ -720,27 +775,19 @@ class Service extends BaseController {
 					} else {
 						// echo $date;
 						if($this->Crud->check('date', $dates, $table) > 0) {
-							echo $this->Crud->msg('warning', 'Record Already Exist');
+							echo $this->Crud->msg('warning', 'Report Already Exist');
 						} else {
-							$ins_data['attendant'] = $this->session->get('cell_attendance');
-							$ins_data['converts'] = $this->session->get('cell_convert');
-							$ins_data['timers'] = $this->session->get('cell_timers');
+							// $ins_data['attendant'] = $this->session->get('cell_attendance');
+							// $ins_data['converts'] = $this->session->get('cell_convert');
+							// $ins_data['timers'] = $this->session->get('cell_timers');
 							
 							$ins_data['reg_date'] = date(fdate);
 							$ins_rec = $this->Crud->create($table, $ins_data);
 							if($ins_rec > 0) {
-								$at['type'] = 'cell';
-								$at['type_id'] = $ins_rec;
-								$at['attendant'] = $this->session->get('cell_attendance');
-								$at['reg_date'] = date(fdate);
-								$this->Crud->create('attendance', $at);
-								$this->session->set('cell_attendance', '');
-								$this->session->set('cell_convert', '');
-								$this->session->set('cell_timers', '');
 								
 								///// store activities
 								$by = $this->Crud->read_field('id', $log_id, 'user', 'firstname');
-								$action = $by.' created a Cell Meeting Report for ('.$date.')';
+								$action = $by.' created a Service Report for ('.$date.')';
 								$this->Crud->activity('user', $ins_rec, $action);
 
 								echo $this->Crud->msg('success', 'Report Created');
@@ -994,8 +1041,10 @@ class Service extends BaseController {
 			$items = '
 				<div class="nk-tb-item nk-tb-head">
 					<div class="nk-tb-col"><span class="sub-text text-dark">'.translate_phrase('Date').'</span></div>
-					<div class="nk-tb-col"><span class="sub-text text-dark">'.translate_phrase('Meeting').'</span></div>
+					<div class="nk-tb-col"><span class="sub-text text-dark">'.translate_phrase('Service').'</span></div>
 					<div class="nk-tb-col"><span class="sub-text text-dark">'.translate_phrase('Offering').'</span></div>
+					<div class="nk-tb-col"><span class="sub-text text-dark">'.translate_phrase('Tithe').'</span></div>
+					<div class="nk-tb-col"><span class="sub-text text-dark">'.translate_phrase('Partnership').'</span></div>
 					<div class="nk-tb-col nk-tb-col-md"><span class="sub-text text-dark">'.translate_phrase('Attendance').'</span></div>
 					<div class="nk-tb-col nk-tb-col-md"><span class="sub-text text-dark">'.('FT').'</span></div>
 					<div class="nk-tb-col nk-tb-col-md"><span class="sub-text text-dark">'.('NC').'</span></div>
@@ -1028,7 +1077,8 @@ class Service extends BaseController {
 					foreach ($query as $q) {
 						$id = $q->id;
 						$type = $q->type;
-						$cell_id = $q->cell_id;
+						$tithe = $q->tithe;
+						$partnership = $q->partnership;
 						$attendance = $q->attendance;
 						$offering = $q->offering;
 						$new_convert = $q->new_convert;
@@ -1036,16 +1086,10 @@ class Service extends BaseController {
 						$date = date('d M Y', strtotime($q->date));
 						$reg_date = $q->reg_date;
 
-						$types = '';
-						if($type == 'wk1')$types = 'WK1 - Prayer and Planning';
-						if($type == 'wk2')$types = 'Wk2 - Bible Study';
-						if($type == 'wk3')$types = 'Wk3 - Bible Study';
-						if($type == 'wk4')$types = 'Wk4 - Fellowship / Outreach';
+						$types = $this->Crud->read_field('id', $type, 'service_type', 'name');
 						
 						$cell='';
-						if($role == 'developer' || $role == 'administrator'){
-							$cell = '<span class="text-info"><em class="icon ni ni-curve-down-right"></em> <span>'.strtoupper($this->Crud->read_field('id', $cell_id, 'cells', 'name')).'</span></span>';
-						}
+						
 						// add manage buttons
 						if ($role_u != 1) {
 							$all_btn = '';
@@ -1064,7 +1108,7 @@ class Service extends BaseController {
 								<div class="nk-tb-col">
 									<div class="user-info">
 										<span class="tb-lead">' . ucwords($date) . ' </span>
-										'.$cell.'
+										
 									</div>
 								</div>
 								<div class="nk-tb-col">
@@ -1072,6 +1116,12 @@ class Service extends BaseController {
 								</div>
 								<div class="nk-tb-col">
 									<span class="text-dark">$' . number_format($offering,2) . '</span>
+								</div>
+								<div class="nk-tb-col">
+									<span class="text-dark">$' . number_format($tithe,2) . '</span>
+								</div>
+								<div class="nk-tb-col">
+									<span class="text-dark">$' . number_format($partnership,2) . '</span>
 								</div>
 								<div class="nk-tb-col tb-col">
 									<span class="text-dark"><span>' . ucwords($attendance) . '</b></span>

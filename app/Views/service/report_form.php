@@ -377,7 +377,7 @@ $this->Crud = new Crud();
                             <?php  
                                 $parts = $this->Crud->read_order('partnership', 'name', 'asc');
                                 if(!empty($parts)){
-                                    foreach($parts as $pp){
+                                    foreach($parts as $index => $pp){
                                         $name = $pp->name;
                                         if(strtoupper($pp->name) == 'BIBLE SPONSOR')$name = 'Bible';
                                         if(strtoupper($pp->name) == 'CHILDREN MINISTRY')$name = 'Children';
@@ -388,6 +388,8 @@ $this->Crud = new Crud();
                                         // if($pp->name == 'BIBLE SPONSOR')$name = 'Bible';
                                         
                                         echo ' <th >'.strtoupper($name).'</th>';
+                                        echo '<input type="hidden" name="'.$index.'_parts[]" value="'.$pp->id.'">';
+
                                     }
                                 }
                             ?>
@@ -410,8 +412,8 @@ $this->Crud = new Crud();
                             </td>
                             <?php 
                                 if(!empty($parts)){
-                                    foreach($parts as $pp){
-                                        echo '<td><input type="text" style="width:100px;" class="form-control amountInput" name="amount[]" value="0" oninput="updateTotal()"></td>';
+                                    foreach($parts as $pp => $val){
+                                        echo '<td><input type="text" style="width:100px;" class="form-control firsts_amount" name="'.$pp.'_first[]" value="0"></td>';
                                     }
                                 }
                             ?>
@@ -451,7 +453,7 @@ $this->Crud = new Crud();
                 <tbody>
                     <tr class="original-rows">
                         <td>
-                            <select class="js-select2 members" name="member[]" id="members" required>
+                            <select class="js-select2 members" name="members[]" id="members" required>
                                
                                 <?php 
                                     $mem_id = $this->Crud->read_field('name', 'Member', 'access_role', 'id');
@@ -466,8 +468,9 @@ $this->Crud = new Crud();
                         </td>
                         <?php 
                            if(!empty($parts)){
-                                foreach($parts as $pp){
-                                    echo ' <td ><input type="text" style="width:100px;" class="form-control  amountInput" name="amount[]" value="0" oninput="updateTotal()"></td>';
+                                foreach($parts as $pp => $val){
+                                    echo ' <td ><input type="text" style="width:100px;" class="form-control  members_amount" name="'.$pp
+                                    .'_member[]" value="0" ></td>';
                                 }
                             }
                         ?>
@@ -937,7 +940,8 @@ $this->Crud = new Crud();
             // Add input fields for each partnership
             $('#dataTable th').each(function (index) {
                 if (index > 1) {
-                    newRow.append('<td><input type="text" style="width:100px;" class="form-control amountInput" name="amount[]" value="0" oninput="updateTotal()"></td>');
+                    var partName = (index-2) + "_first[]"; // Adjust the prefix as needed
+                    newRow.append('<td><input type="text" style="width:100px;" class="form-control firsts_amount" name="' + partName + '" value="0"></td>');
                 }
             });
 
@@ -1079,7 +1083,8 @@ $this->Crud = new Crud();
             // Add input fields for each partnership
             $('#member_table th').each(function (index) {
                 if (index > 1) {
-                    newRow.append('<td><input type="text" style="width:100px;" class="form-control amountInput" name="amount[]" value="0" oninput="updateTotal()"></td>');
+                    var partName = (index-2) + "_member[]"; // Adjust the prefix as needed
+                    newRow.append('<td><input type="text" style="width:100px;" class="form-control members_amount" name="' + partName + '" value="0"></td>');
                 }
             });
 
@@ -1287,6 +1292,14 @@ $this->Crud = new Crud();
         var total = parseInt(member) + parseInt(guest);
         $('#total').val(total);
     }
+    function total_part(){
+        var member = $('#member_part').val();
+        var guest = $('#guest_part').val();
+        
+        var total = parseInt(member) + parseInt(guest);
+        $('#total_part').val(total.toFixed(2));
+    }
+    
     get_total();
     function get_tithe(){
         var member = $('#member_tithe').val();
@@ -1297,7 +1310,73 @@ $this->Crud = new Crud();
         $('#total_tithe').val(total);
     }
 
-   
+    function calculateSum() {
+        var sum = 0;
+        // Loop through all elements with the class 'members'
+        $('.members_amount').each(function() {
+            // Parse the value as a float and add it to the sum
+            sum += parseFloat($(this).val()) || 0; // If parsing fails, default to 0
+        });
+
+        // Round the sum to 2 decimal places
+        var roundedSum = Math.round(sum * 100) / 100;
+
+        // Display the rounded sum in the 'member_part' text box
+        $('#member_part').val(roundedSum.toFixed(2));
+        total_part();
+    }
+
+    // Bind the calculateSum function to the input event of elements with class 'members'
+    $('.members_amount').on('input', calculateSum);
+
+    // Allow only numeric input with up to two decimal places
+    $('.members_amount').on('input', function() {
+        // Replace any non-numeric characters (except decimal point) with an empty string
+        $(this).val($(this).val().replace(/[^0-9.]/g, ''));
+
+        // Allow only one decimal point
+        var val = $(this).val();
+        var parts = val.split('.');
+        if (parts.length > 2) {
+            parts.pop();
+            $(this).val(parts.join('.'));
+        }
+    });
+
+
+    function calculateFirst() {
+        var sum = 0;
+        // Loop through all elements with the class 'members'
+        $('.firsts_amount').each(function() {
+            // Parse the value as a float and add it to the sum
+            sum += parseFloat($(this).val()) || 0; // If parsing fails, default to 0
+        });
+
+        // Round the sum to 2 decimal places
+        var roundedSum = Math.round(sum * 100) / 100;
+
+        // Display the rounded sum in the 'member_part' text box
+        $('#guest_part').val(roundedSum.toFixed(2));
+        total_part();
+    }
+
+    // Bind the calculateSum function to the input event of elements with class 'members'
+    $('.firsts_amount').on('input', calculateFirst);
+
+    // Allow only numeric input with up to two decimal places
+    $('.firsts_amount').on('input', function() {
+        // Replace any non-numeric characters (except decimal point) with an empty string
+        $(this).val($(this).val().replace(/[^0-9.]/g, ''));
+
+        // Allow only one decimal point
+        var val = $(this).val();
+        var parts = val.split('.');
+        if (parts.length > 2) {
+            parts.pop();
+            $(this).val(parts.join('.'));
+        }
+    });
+
 </script>
 <?php if(!empty($table_rec)){ ?>
     <!-- <script src="<?=site_url();?>assets/backend/vendors/datatables/jquery.dataTables.min.js"></script>
