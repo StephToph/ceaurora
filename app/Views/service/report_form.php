@@ -397,7 +397,7 @@ $this->Crud = new Crud();
                     <tbody>
                         <tr class="original-row">
                             <td>
-                                <select class="js-select2 firsts" name="first_timer[]" id="firsts" data-placeholder="Select First Timer" required>
+                                <select class="js-select2 firsts"  data-search="on" name="first_timer[]" id="firsts" data-placeholder="Select First Timer" required>
                                     <?php 
                                         if(!empty((array)$first)){
                                             foreach($first as $mm => $val){
@@ -870,13 +870,23 @@ $this->Crud = new Crud();
     var selectedValues = []; // Array to store selected values
 
     $(document).ready(function() {
-        var selectCounter = 1;
-        // Function to add a new row with a fresh select element
-         // Function to initialize select2 plugin for the given select element
-         function initializeSelect2(selectElement) {
-            $('#firsts').select2();
-            selectElement.select2();
+        var selectCounter = 1; 
+        $('#dataTable select option:selected').prop('selected', false);
+        function initializeSelect2(selectElement) {
+            selectElement.select2( );
+            selectElement.attr('data-search', 'true'); // Add data-search attribute
         }
+        // Function to create and return a new select element
+        function createSelectElement() {
+            var select = $('<select class="js-select2 firsts" data-search="on" name="first_timer[]" data-placeholder="Select First Timer" required></select>');
+            <?php if(!empty((array)$first)) { ?>
+                <?php foreach($first as $mm => $val) { ?>
+                    select.append('<option value="<?php echo $val->fullname; ?>"><?php echo strtoupper($val->fullname); ?></option>');
+                <?php } ?>
+            <?php } ?>
+            return select;
+        }
+
         function addNewRow() {
             var remainingOptions = $('.original-row select option:not(:selected)');
             if (remainingOptions.length === 0) {
@@ -884,20 +894,17 @@ $this->Crud = new Crud();
                 return;
             }
            
-           
             var newRow = $('<tr class="new-row"></tr>');
+             
+            var firstTimerSelect = createSelectElement();
             
-            // Clone the select element and remove options that are already selected
-            var firstTimerSelect = $('.original-row select').clone();
             firstTimerSelect.find('option:selected').remove();
-           // Assign a new unique id to the cloned select element
-           var newSelectId = 'firsts_' + selectCounter;
+            // Assign a new unique id to the cloned select element
+            var newSelectId = 'firsts_' + selectCounter;
             firstTimerSelect.attr('id', newSelectId);
             
             newRow.append('<td>' + firstTimerSelect.prop('outerHTML') + '</td>');
-            // Initialize select2 plugin for the new select element
-            initializeSelect2(firstTimerSelect);
-            
+           
             // Add input fields for each partnership
             $('#dataTable th').each(function(index) {
                 if (index > 1) {
@@ -908,9 +915,15 @@ $this->Crud = new Crud();
              // Add delete button in the action cell
              newRow.append('<td><button class="btn btn-danger btn-sm delete-row">Delete</button></td>');
             $('#dataTable tbody').append(newRow);
+             // Initialize select2 plugin for the new select element
+             initializeSelect2(newRow.find('select'));
 
             // Increment the counter
             selectCounter++;
+            // Disable "Add More" button if no more options available
+            if (remainingOptions.length === 1) {
+                $('#more_btn').prop('disabled', true);
+            }
         }
 
         // Event listener for the Add More button
@@ -922,6 +935,8 @@ $this->Crud = new Crud();
         // Event listener for dynamically added delete buttons
         $('#dataTable').on('click', '.delete-row', function() {
             $(this).closest('tr').remove();
+             // Enable "Add More" button after deleting a row
+             $('#more_btn').prop('disabled', false);
         });
     });
     var rowIndex = 1; // Initialize row index
