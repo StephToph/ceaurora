@@ -1041,8 +1041,10 @@ class Service extends BaseController {
 			$items = '
 				<div class="nk-tb-item nk-tb-head">
 					<div class="nk-tb-col"><span class="sub-text text-dark">'.translate_phrase('Date').'</span></div>
-					<div class="nk-tb-col"><span class="sub-text text-dark">'.translate_phrase('Meeting').'</span></div>
+					<div class="nk-tb-col"><span class="sub-text text-dark">'.translate_phrase('Service').'</span></div>
 					<div class="nk-tb-col"><span class="sub-text text-dark">'.translate_phrase('Offering').'</span></div>
+					<div class="nk-tb-col"><span class="sub-text text-dark">'.translate_phrase('Tithe').'</span></div>
+					<div class="nk-tb-col"><span class="sub-text text-dark">'.translate_phrase('Partnership').'</span></div>
 					<div class="nk-tb-col nk-tb-col-md"><span class="sub-text text-dark">'.translate_phrase('Attendance').'</span></div>
 					<div class="nk-tb-col nk-tb-col-md"><span class="sub-text text-dark">'.('FT').'</span></div>
 					<div class="nk-tb-col nk-tb-col-md"><span class="sub-text text-dark">'.('NC').'</span></div>
@@ -1075,7 +1077,8 @@ class Service extends BaseController {
 					foreach ($query as $q) {
 						$id = $q->id;
 						$type = $q->type;
-						$cell_id = $q->cell_id;
+						$tithe = $q->tithe;
+						$partnership = $q->partnership;
 						$attendance = $q->attendance;
 						$offering = $q->offering;
 						$new_convert = $q->new_convert;
@@ -1083,16 +1086,10 @@ class Service extends BaseController {
 						$date = date('d M Y', strtotime($q->date));
 						$reg_date = $q->reg_date;
 
-						$types = '';
-						if($type == 'wk1')$types = 'WK1 - Prayer and Planning';
-						if($type == 'wk2')$types = 'Wk2 - Bible Study';
-						if($type == 'wk3')$types = 'Wk3 - Bible Study';
-						if($type == 'wk4')$types = 'Wk4 - Fellowship / Outreach';
+						$types = $this->Crud->read_field('id', $type, 'service_type', 'name');
 						
 						$cell='';
-						if($role == 'developer' || $role == 'administrator'){
-							$cell = '<span class="text-info"><em class="icon ni ni-curve-down-right"></em> <span>'.strtoupper($this->Crud->read_field('id', $cell_id, 'cells', 'name')).'</span></span>';
-						}
+						
 						// add manage buttons
 						if ($role_u != 1) {
 							$all_btn = '';
@@ -1111,7 +1108,7 @@ class Service extends BaseController {
 								<div class="nk-tb-col">
 									<div class="user-info">
 										<span class="tb-lead">' . ucwords($date) . ' </span>
-										'.$cell.'
+										
 									</div>
 								</div>
 								<div class="nk-tb-col">
@@ -1119,6 +1116,12 @@ class Service extends BaseController {
 								</div>
 								<div class="nk-tb-col">
 									<span class="text-dark">$' . number_format($offering,2) . '</span>
+								</div>
+								<div class="nk-tb-col">
+									<span class="text-dark">$' . number_format($tithe,2) . '</span>
+								</div>
+								<div class="nk-tb-col">
+									<span class="text-dark">$' . number_format($partnership,2) . '</span>
 								</div>
 								<div class="nk-tb-col tb-col">
 									<span class="text-dark"><span>' . ucwords($attendance) . '</b></span>
