@@ -955,25 +955,39 @@ $this->Crud = new Crud();
             updateAddMoreButtonState();
         }
 
+       // Function to update the state of the Add More button
         function updateAddMoreButtonState() {
-            // Count the number of selected values except when value is 0
-            var selectedCount = selectedValues.filter(function(value) {
-                return value !== "0";
-            }).length;
+            // Check if there are any new rows
+            var hasNewRows = $('.new-row').length > 0;
 
-            // Get the number of options in the last select element
-            var lastSelectOptionsCount = $('.new-row:last .firsts option').length;
+            // If there are no new rows, check the original row's select element
+            if (!hasNewRows) {
+                var originalSelectOptionsCount = $('.original-row select option').length;
+                var selectedValue = $('.original-row select').val();
 
-            // Disable "Add More" button if the number of selected values matches the number of original options minus 1
-            // or if the number of options in the last select element is 1
-            if (lastSelectOptionsCount === 1 || selectedCount === lastSelectOptionsCount - 1) {
-                $('#more_btn').prop('disabled', true);
+                if (selectedValue === "1" || originalSelectOptionsCount === 1) {
+                    $('#more_btn').prop('disabled', true);
+                } else {
+                    $('#more_btn').prop('disabled', false);
+                }
             } else {
-                $('#more_btn').prop('disabled', false);
+                // Count the number of selected values except when value is 0
+                var selectedCount = selectedValues.filter(function(value) {
+                    return value !== "0";
+                }).length;
+
+                // Get the number of options in the last select element
+                var lastSelectOptionsCount = $('#dataTable .new-row:last .js-select2 option').length;
+
+                // Disable "Add More" button if the number of selected values matches the number of original options minus 1
+                // or if the number of options in the last select element is 1
+                if (lastSelectOptionsCount === 1 || selectedCount === lastSelectOptionsCount - 1) {
+                    $('#more_btn').prop('disabled', true);
+                } else {
+                    $('#more_btn').prop('disabled', false);
+                }
             }
         }
-
-
 
         // Event listener for the Add More button
         $('#more_btn').click(function() {
@@ -991,7 +1005,6 @@ $this->Crud = new Crud();
             }
         });
 
-        // Event listener for dynamically added delete buttons
         $('#dataTable').on('click', '.delete-row', function() {
             var selectedValue = $(this).closest('tr').find('.firsts').val();
             if (selectedValue) {
@@ -1001,10 +1014,13 @@ $this->Crud = new Crud();
                     selectedValues.splice(index, 1);
                 }
             }
+            
+            // Remove the closest tr
+            $(this).closest('tr').remove();
             // Update Add More button state
             updateAddMoreButtonState();
 
-            $(this).closest('tr').remove();
+
         });
     });
     var rowIndex = 1; // Initialize row index
