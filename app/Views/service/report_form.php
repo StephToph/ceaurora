@@ -398,6 +398,7 @@ $this->Crud = new Crud();
                         <tr class="original-row">
                             <td>
                                 <select class="js-select2 firsts"  data-search="on" name="first_timer[]" id="firsts" data-placeholder="Select First Timer" required>
+                                    <option value="0">Select</option>
                                     <?php 
                                         if(!empty((array)$first)){
                                             foreach($first as $mm => $val){
@@ -867,76 +868,143 @@ $this->Crud = new Crud();
 
 <script>
      var rowIndex = 1;
-    var selectedValues = []; // Array to store selected values
+    // Array to store selected values
+    var selectedValues = [];
 
+    function clearSelectedValues() {
+        selectedValues = [];
+    }
+    $(function() {
+        clearSelectedValues();
+    });
     $(document).ready(function() {
+        
         var selectCounter = 1; 
-        $('#dataTable select option:selected').prop('selected', false);
+       
         function initializeSelect2(selectElement) {
             selectElement.select2( );
             selectElement.attr('data-search', 'true'); // Add data-search attribute
         }
+
         // Function to create and return a new select element
         function createSelectElement() {
             var select = $('<select class="js-select2 firsts" data-search="on" name="first_timer[]" data-placeholder="Select First Timer" required></select>');
+
             <?php if(!empty((array)$first)) { ?>
                 <?php foreach($first as $mm => $val) { ?>
-                    select.append('<option value="<?php echo $val->fullname; ?>"><?php echo strtoupper($val->fullname); ?></option>');
+                    var optionValue = '<?php echo htmlspecialchars($val->fullname); ?>';
+                    var optionText = '<?php echo strtoupper(htmlspecialchars($val->fullname)); ?>';
+
+                    // Check if this option is selected in any existing row
+                    var isSelected = selectedValues.includes(optionValue);
+
+                    // If the option is not selected in any existing row, add it to the new select element
+                    if (!isSelected) {
+                        select.append('<option value="' + optionValue + '">' + optionText + '</option>');
+                    }
                 <?php } ?>
             <?php } ?>
+
+          
             return select;
+
         }
+        
 
         function addNewRow() {
+            
             var remainingOptions = $('.original-row select option:not(:selected)');
             if (remainingOptions.length === 0) {
                 $('#first_resp').html("<span class='text-danger'>No more options available.</span>");
                 return;
             }
-           
+            var selectedValue = $('.original-row select').val();
+            if (selectedValue === "0") {
+                $('#first_resp').html("<span class='text-danger'>Select a First Time.</span>");
+                return; // Stop further execution
+            } 
+            $('#first_resp').html('')
             var newRow = $('<tr class="new-row"></tr>');
-             
+
             var firstTimerSelect = createSelectElement();
-            
-            firstTimerSelect.find('option:selected').remove();
+
             // Assign a new unique id to the cloned select element
             var newSelectId = 'firsts_' + selectCounter;
             firstTimerSelect.attr('id', newSelectId);
-            
+
             newRow.append('<td>' + firstTimerSelect.prop('outerHTML') + '</td>');
-           
+
             // Add input fields for each partnership
-            $('#dataTable th').each(function(index) {
+            $('#dataTable th').each(function (index) {
                 if (index > 1) {
                     newRow.append('<td><input type="text" style="width:100px;" class="form-control amountInput" name="amount[]" value="0" oninput="updateTotal()"></td>');
                 }
             });
-            
-             // Add delete button in the action cell
-             newRow.append('<td><button class="btn btn-danger btn-sm delete-row">Delete</button></td>');
+
+            // Add delete button in the action cell
+            newRow.append('<td><button class="btn btn-danger btn-sm delete-row">Delete</button></td>');
             $('#dataTable tbody').append(newRow);
-             // Initialize select2 plugin for the new select element
-             initializeSelect2(newRow.find('select'));
+
+            // Initialize select2 plugin for the new select element
+            initializeSelect2(newRow.find('select'));
 
             // Increment the counter
             selectCounter++;
-            // Disable "Add More" button if no more options available
-            if (remainingOptions.length === 1) {
+
+              // Update Add More button state
+            updateAddMoreButtonState();
+        }
+
+        function updateAddMoreButtonState() {
+            // Count the number of selected values except when value is 0
+            var selectedCount = selectedValues.filter(function(value) {
+                return value !== "0";
+            }).length;
+
+            // Get the number of options in the last select element
+            var lastSelectOptionsCount = $('.new-row:last .firsts option').length;
+
+            // Disable "Add More" button if the number of selected values matches the number of original options minus 1
+            // or if the number of options in the last select element is 1
+            if (lastSelectOptionsCount === 1 || selectedCount === lastSelectOptionsCount - 1) {
                 $('#more_btn').prop('disabled', true);
+            } else {
+                $('#more_btn').prop('disabled', false);
             }
         }
 
+
+
         // Event listener for the Add More button
         $('#more_btn').click(function() {
+           
             // Add a new row with a fresh select element
             addNewRow();
         });
 
+        
+        // Event listener for selecting an option
+        $(document).on('change', '.firsts', function() {
+            var selectedValue = $(this).val();
+            if (selectedValue) {
+                selectedValues.push(selectedValue);
+            }
+        });
+
         // Event listener for dynamically added delete buttons
         $('#dataTable').on('click', '.delete-row', function() {
+            var selectedValue = $(this).closest('tr').find('.firsts').val();
+            if (selectedValue) {
+                // Remove the selected value from the array
+                var index = selectedValues.indexOf(selectedValue);
+                if (index !== -1) {
+                    selectedValues.splice(index, 1);
+                }
+            }
+            // Update Add More button state
+            updateAddMoreButtonState();
+
             $(this).closest('tr').remove();
-             // Enable "Add More" button after deleting a row
-             $('#more_btn').prop('disabled', false);
         });
     });
     var rowIndex = 1; // Initialize row index
