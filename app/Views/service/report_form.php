@@ -1083,7 +1083,7 @@ $this->Crud = new Crud();
             // Add input fields for each partnership
             $('#member_table th').each(function (index) {
                 if (index > 1) {
-                    var partName = (index-2) + "_member"; // Adjust the prefix as needed
+                    var partName = (index-2) + "_member[]"; // Adjust the prefix as needed
                     newRow.append('<td><input type="text" style="width:100px;" class="form-control members_amount" name="' + partName + '" value="0"></td>');
                 }
             });

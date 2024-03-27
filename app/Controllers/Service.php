@@ -444,24 +444,49 @@ class Service extends BaseController {
 						
 						if(!empty($partss)){
 							foreach($partss as $index => $pp){
-								$par = (array)$pp;
-								$amount = $this->request->getPost($index.'_first');
+								
+								$amount = $this->request->getPost($index.'_first'); //Guest Partners
 								if($amount[$i] <= 0)continue;
 								$parts[$pp->id] = $amount[$i];
+								
 								
 							}
 						}
 						
 						$partner[$name] = $parts;
 					}
-					print_r($partner);
+
+					$pmember = [];
+					for($i=0;$i<count($member);$i++){
+						$name = $member[$i];
+						$par = [];
+						if(!empty($partss)){
+							foreach($partss as $index => $pp){
+								
+								$member_amount = $this->request->getPost($index.'_member'); //Guest Partners
+								
+								if($member_amount[$i] <= 0)continue;
+								$par[$pp->id] = $member_amount[$i];
+								
+							}
+						}
+						// 
+						$partner[$name] = $par;
+					}
+					
+					$partnership = json_encode($partner);
 					$guest_part = $this->request->getPost('guest_part');
 					$total_part = $this->request->getPost('total_part');
 					$member_part = $this->request->getPost('member_part');
+
+					$partners['partnership'] = $partnership;
+					$partners['guest_part'] = $guest_part;
+					$partners['total_part'] = $total_part;
+					$partners['member_part'] = $member_part;
+					
 					
 					$mark = $this->session->get('service_attendance');
 
-					die;
 					// Decode the JSON string
 					$data = json_decode($mark, true);
 
@@ -470,17 +495,17 @@ class Service extends BaseController {
 					$data['guest'] = $guest_part; // Change the value of "total"
 					$data['member'] = $member_part; // Change the value of "guest"
 					
-					if(empty($data)){
-						echo $this->Crud->msg('danger', 'Mark Service Attendance');
+					if(empty($partnership)){
+						echo $this->Crud->msg('danger', 'Enter Partnerships');
 					
 					} else{
-						echo $this->Crud->msg('success', 'Service Attendance Submitted');
+						echo $this->Crud->msg('success', 'Partnership List Submitted');
 						// echo json_encode($data);
 						echo '<script> setTimeout(function() {
-							var jsonData = ' . json_encode($data) . ';
+							var jsonData = ' . json_encode($partners) . ';
 							var jsonString = JSON.stringify(jsonData);
-							$("#attendant").val(jsonString);
-							$("#attendance").val('.$total_part.');
+							$("#partners").val(jsonString);
+							$("#partnership").val('.$total_part.');
 							$("#modal").modal("hide");
 						}, 2000); </script>';
 					}
