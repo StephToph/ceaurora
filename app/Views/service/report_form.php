@@ -397,8 +397,8 @@ $this->Crud = new Crud();
                     <tbody>
                         <tr class="original-row">
                             <td>
-                                <select class="js-select2" name="first_timer[]" required>
-                                    <option value="">Select First Timer</option>
+                                <select class="js-select2 firsts"  data-search="on" name="first_timer[]" id="firsts" data-placeholder="Select First Timer" required>
+                                    <option value="0">Select</option>
                                     <?php 
                                         if(!empty((array)$first)){
                                             foreach($first as $mm => $val){
@@ -420,13 +420,14 @@ $this->Crud = new Crud();
                     </tbody>
                 </table>
                 <div class="col-12 my-3 text-center">
-                <button type="button" class="btn btn-info" onclick="addRows()">Add More</button>
-            </div>
+                    <p id="first_resp"></p>
+                    <button type="button" class="btn btn-info" id="more_btn">Add More</button>
+                </div>
             <?php } ?>
-            <table class="table table-striped table-hover mt-5" id="">
+            <table class="table table-striped table-hover mt-5" id="member_table">
                 <thead>
                     <tr>
-                        <th >First Timer</th>
+                        <th >Member</th>
                         <?php 
                             $parts = $this->Crud->read_order('partnership', 'name', 'asc');
                             if(!empty($parts)){
@@ -444,14 +445,14 @@ $this->Crud = new Crud();
                                 }
                             }
                         ?>
-                       
+                       <th></th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
+                    <tr class="original-rows">
                         <td>
-                            <select class="js-select2" name="member[]" id="members" required>
-                                <option value="">Select First Timer</option>
+                            <select class="js-select2 members" name="member[]" id="members" required>
+                               
                                 <?php 
                                     $mem_id = $this->Crud->read_field('name', 'Member', 'access_role', 'id');
                                     $mem = $this->Crud->read_single_order('role_id', $mem_id, 'user', 'firstname', 'asc');
@@ -470,11 +471,13 @@ $this->Crud = new Crud();
                                 }
                             }
                         ?>
+                        <td></td>
                     </tr>
                 </tbody>
             </table>
-            <div class="col-12 my-3">
-                <button type="button" class="btn btn-primary" onclick="addRow()">Add More</button>
+            <div class="col-12 my-3 text-center">
+                <p id="mem_resp"></p>
+                <button type="button" class="btn btn-primary" id="mem_btn" onclick="addRow()">Add More</button>
             </div>
         </div>
         <hr>
@@ -865,23 +868,189 @@ $this->Crud = new Crud();
 
 <script>
      var rowIndex = 1;
-    var selectedValues = []; // Array to store selected values
+    // Array to store selected values
+    var selectedValues = [];
 
-    function addRows() {
-        var originalSelect = document.querySelector('.original-row select');
+    function clearSelectedValues() {
+        selectedValues = [];
+    }
+    $(function() {
+        clearSelectedValues();
+    });
+    $(document).ready(function() {
+        
+        var selectCounter = 1; 
+       
+        function initializeSelect2(selectElement) {
+            selectElement.select2( );
+            selectElement.attr('data-search', 'true'); // Add data-search attribute
+        }
+
+        // Function to create and return a new select element
+        function createSelectElement() {
+            var select = $('<select class="js-select2 firsts" data-search="on" name="first_timer[]" data-placeholder="Select First Timer" required></select>');
+
+            <?php if(!empty((array)$first)) { ?>
+                <?php foreach($first as $mm => $val) { ?>
+                    var optionValue = '<?php echo htmlspecialchars($val->fullname); ?>';
+                    var optionText = '<?php echo strtoupper(htmlspecialchars($val->fullname)); ?>';
+
+                    // Check if this option is selected in any existing row
+                    var isSelected = selectedValues.includes(optionValue);
+
+                    // If the option is not selected in any existing row, add it to the new select element
+                    if (!isSelected) {
+                        select.append('<option value="' + optionValue + '">' + optionText + '</option>');
+                    }
+                <?php } ?>
+            <?php } ?>
+
+          
+            return select;
+
+        }
+        
+
+        function addNewRow() {
+            
+            var remainingOptions = $('.original-row select option:not(:selected)');
+            if (remainingOptions.length === 0) {
+                $('#first_resp').html("<span class='text-danger'>No more options available.</span>");
+                return;
+            }
+            var selectedValue = $('.original-row select').val();
+            if (selectedValue === "0") {
+                $('#first_resp').html("<span class='text-danger'>Select a First Time.</span>");
+                return; // Stop further execution
+            } 
+            $('#first_resp').html('')
+            var newRow = $('<tr class="new-row"></tr>');
+
+            var firstTimerSelect = createSelectElement();
+
+            // Assign a new unique id to the cloned select element
+            var newSelectId = 'firsts_' + selectCounter;
+            firstTimerSelect.attr('id', newSelectId);
+
+            newRow.append('<td>' + firstTimerSelect.prop('outerHTML') + '</td>');
+
+            // Add input fields for each partnership
+            $('#dataTable th').each(function (index) {
+                if (index > 1) {
+                    newRow.append('<td><input type="text" style="width:100px;" class="form-control amountInput" name="amount[]" value="0" oninput="updateTotal()"></td>');
+                }
+            });
+
+            // Add delete button in the action cell
+            newRow.append('<td><button class="btn btn-danger btn-sm delete-row">Delete</button></td>');
+            $('#dataTable tbody').append(newRow);
+
+            // Initialize select2 plugin for the new select element
+            initializeSelect2(newRow.find('select'));
+
+            // Increment the counter
+            selectCounter++;
+
+              // Update Add More button state
+            updateAddMoreButtonState();
+        }
+
+       // Function to update the state of the Add More button
+        function updateAddMoreButtonState() {
+            // Check if there are any new rows
+            var hasNewRows = $('.new-row').length > 0;
+
+            // If there are no new rows, check the original row's select element
+            if (!hasNewRows) {
+                var originalSelectOptionsCount = $('.original-row select option').length;
+                var selectedValue = $('.original-row select').val();
+
+                if (selectedValue === "1" || originalSelectOptionsCount === 1) {
+                    $('#more_btn').prop('disabled', true);
+                } else {
+                    $('#more_btn').prop('disabled', false);
+                }
+            } else {
+                // Count the number of selected values except when value is 0
+                var selectedCount = selectedValues.filter(function(value) {
+                    return value !== "0";
+                }).length;
+
+                // Get the number of options in the last select element
+                var lastSelectOptionsCount = $('#dataTable .new-row:last .js-select2 option').length;
+
+                // Disable "Add More" button if the number of selected values matches the number of original options minus 1
+                // or if the number of options in the last select element is 1
+                if (lastSelectOptionsCount === 1 || selectedCount === lastSelectOptionsCount - 1) {
+                    $('#more_btn').prop('disabled', true);
+                } else {
+                    $('#more_btn').prop('disabled', false);
+                }
+            }
+        }
+
+        // Event listener for the Add More button
+        $('#more_btn').click(function() {
+           
+            // Add a new row with a fresh select element
+            addNewRow();
+        });
+
+        
+        // Event listener for selecting an option
+        $(document).on('change', '.firsts', function() {
+            var selectedValue = $(this).val();
+            if (selectedValue) {
+                selectedValues.push(selectedValue);
+            }
+        });
+
+        $('#dataTable').on('click', '.delete-row', function() {
+            var selectedValue = $(this).closest('tr').find('.firsts').val();
+            if (selectedValue) {
+                // Remove the selected value from the array
+                var index = selectedValues.indexOf(selectedValue);
+                if (index !== -1) {
+                    selectedValues.splice(index, 1);
+                }
+            }
+            
+            // Remove the closest tr
+            $(this).closest('tr').remove();
+            // Update Add More button state
+            updateAddMoreButtonState();
+
+
+        });
+    });
+    var rowIndex = 1; // Initialize row index
+
+    function addRow() {
+        var originalSelect = document.querySelector('.original-rows select');
         var selectedValue = originalSelect.value;
 
         if (selectedValue === '') {
-            alert('Please select a value from the dropdown.');
-            return;
+            $('#mem_resp').html('<span class="text-danger">Please select a value from the Member.</span>');
+            return; // Exit the function if no value is selected
         }
 
-        var newRow = '<tr>';
-        newRow += '<td>';
-        newRow += '<select class="js-select2" name="first_timer[]" required>';
-        newRow += '<option value="">' + originalSelect.options[0].text + '</option>';
-        newRow += '</select>';
-        newRow += '</td>';
+        var selectedOptions = $('.members').map(function() {
+            return $(this).val();
+        }).get();
+
+        if (selectedOptions.includes(selectedValue)) {
+            $('#mem_resp').html('<span class="text-danger">This value has already been selected.</span>');
+            // xit the function if the value is already selected in another row
+        }
+
+        var selectId = 'member' + rowIndex;
+        var newRow = '<tr>' +
+            '<td>' +
+            '<select class="js-select2 members" id="'+selectId+'" data-search="on" name="member[]" required>' +
+            '' +
+            $('#members').html() + // Clone options from original select
+            '</select>' +
+            '</td>';
 
         <?php 
             if(!empty($parts)){
@@ -891,34 +1060,67 @@ $this->Crud = new Crud();
             }
         ?>
 
+       
         newRow += '<td><button type="button" class="btn btn-danger" onclick="deleteRow(this)">Delete</button></td>';
         newRow += '</tr>';
 
-        $('#dataTable tbody').append(newRow);
+        // Append the new row
+        $('#member_table tbody').append(newRow);
 
-        // Remove the selected option from subsequent select dropdowns
-        $('.js-select2 option[value="' + selectedValue + '"]').remove();
+        // Initialize select2 for the new select element
+        $('#' + selectId).select2();
 
-        // Add selected value to the array
-        selectedValues.push(selectedValue);
+        // Remove selected options from all select elements
+        $('.member').each(function() {
+            var value = $(this).val();
+            $(this).find('option').each(function() {
+                if (selectedOptions.includes($(this).val()) && $(this).val() !== value) {
+                    $(this).remove();
+                }
+            });
+        });
 
         // Increment the rowIndex for unique IDs
         rowIndex++;
+        
+        // Disable "Add More" button if all options are selected
+        var remainingOptions = $('select.js-select2 option:not([value=""])').length;
+        if (remainingOptions === 0) {
+            $('#mem_btn').prop('disabled', true);
+        }
+    }
+
+    function deleteRow(btn) {
+        var row = $(btn).closest('tr');
+        var selectValue = row.find('select').val();
+
+        row.remove();
+
+        // Add the deleted value back to the select dropdown
+        $('#members').append('<option value="' + selectValue + '">' + selectValue + '</option>');
+
+        // Update select2
+        $('.js-select2').select2();
+
+        // Update total if needed
+        updateTotal();
     }
 
     function deleteRow(btn) {
         var row = btn.parentNode.parentNode;
         var selectValue = row.querySelector('select').value;
+
+        // Find the closest previous row
+        var closestRow = $(row).prev('tr');
+        var closestSelect = closestRow.find('select.js-select2');
+
         row.parentNode.removeChild(row);
 
-        // Remove the deleted value from the array
-        var index = selectedValues.indexOf(selectValue);
-        if (index > -1) {
-            selectedValues.splice(index, 1);
-        }
+        // Add the deleted value back to the closest select dropdown
+        closestSelect.append('<option value="' + selectValue + '">' + selectValue.toUpperCase() + '</option>');
 
-        // Add the deleted value back to the select dropdown
-        $('.js-select2').append('<option value="' + selectValue + '">' + selectValue + '</option>');
+        // Update select2
+        closestSelect.select2();
 
         updateTotal();
     }
@@ -1055,67 +1257,6 @@ $this->Crud = new Crud();
         total = total.toFixed(2);
         $('#total_tithe').val(total);
     }
-
-    function addRow() {
-    var table = document.getElementById("titheTable").getElementsByTagName('tbody')[0];
-    var lastRow = table.rows[table.rows.length - 1];
-    var newRow = lastRow.cloneNode(true);
-
-    // Reset cloned select value
-    var selects = newRow.getElementsByTagName('select');
-    for (var i = 0; i < selects.length; i++) {
-        selects[i].value = "";
-    }
-
-    // Disable selected option in other selects
-    var selectedOptions = lastRow.getElementsByTagName('select')[0].value;
-    for (var i = 0; i < selects.length; i++) {
-        var options = selects[i].getElementsByTagName('option');
-        for (var j = 0; j < options.length; j++) {
-            if (options[j].value === selectedOptions) {
-                options[j].disabled = true;
-            }
-        }
-    }
-
-    table.appendChild(newRow);
-
-    // Show delete button only in cloned rows
-    var deleteButton = newRow.querySelector('.delete-row');
-    if (deleteButton) {
-        deleteButton.style.display = 'inline-block';
-    }
-
-    // Reinitialize Select2 only on the cloned row
-    $(newRow).find('.js-select2').select2();
-
-    // Attach delete button event handler to the new row
-    $(newRow).find('.delete-row').click(function() {
-        $(this).closest('tr').remove();
-    });
-}
-
-document.addEventListener("DOMContentLoaded", function() {
-    var select = document.querySelector('select[name="member[]"]');
-    select.addEventListener("change", function() {
-        var selectedOption = this.value;
-        var selects = document.querySelectorAll('select[name="member[]"]');
-        for (var i = 0; i < selects.length; i++) {
-            if (selects[i] !== this) {
-                var options = selects[i].options;
-                for (var j = 0; j < options.length; j++) {
-                    options[j].disabled = false;
-                    if (options[j].value === selectedOption) {
-                        options[j].disabled = true;
-                    }
-                }
-            }
-        }
-    });
-
-    // Initialize Select2 only on the original select element
-    $('.js-select2').first().select2();
-});
 
    
 </script>
