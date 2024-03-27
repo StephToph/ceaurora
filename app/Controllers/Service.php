@@ -434,6 +434,7 @@ class Service extends BaseController {
 				}
 				//When Adding Save in Session
 				if($this->request->getMethod() == 'post'){
+					die;
 					$guest = $this->request->getPost('guest');
 					$total = $this->request->getPost('total');
 					
