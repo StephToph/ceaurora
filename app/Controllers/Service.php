@@ -615,6 +615,7 @@ class Service extends BaseController {
 								var jsonData = ' . json_encode($convert) . ';
 								var jsonString = JSON.stringify(jsonData);
 								$("#converts").val(jsonString);
+								$("#new_convert").val('.count($first_name).');
 								$("#modal").modal("hide");
 							}, 2000); </script>';
 						}
@@ -680,7 +681,7 @@ class Service extends BaseController {
 						echo '<script> setTimeout(function() {
 							var jsonData = ' . json_encode($convert) . ';
 							var jsonString = JSON.stringify(jsonData);
-							$("#converts").val(jsonString);
+							$("#timers").val(jsonString);
 							$("#first_timer").val('.count($first_name).');
 							$("#modal").modal("hide");
 						}, 2000); </script>';
@@ -710,12 +711,15 @@ class Service extends BaseController {
 				} 
 
 				if($this->request->getMethod() == 'post'){
-					$creport_id = $this->request->getVar('creport_id');
-					$cell_id = $this->request->getVar('cell_id');
+					$report_id = $this->request->getVar('report_id');
 					$type = $this->request->getVar('type');
 					$attendance = $this->request->getVar('attendance');
 					$new_convert = $this->request->getVar('new_convert');
 					$first_timer = $this->request->getVar('first_timer');
+					$tithe = $this->request->getVar('tithe');
+					$partnership = $this->request->getVar('partnership');
+					$tither = $this->request->getVar('tither');
+					$partners = $this->request->getVar('partners');
 					$offering = $this->request->getVar('offering');
 					$note = $this->request->getVar('note');
 					$date = $this->request->getVar('dates');
@@ -727,7 +731,7 @@ class Service extends BaseController {
 					$dates = date('y-m-d', strtotime($date));
 
 					
-					$ins_data['cell_id'] = $cell_id;
+					$ins_data['tithers'] = $tither;
 					$ins_data['type'] = $type;
 					$ins_data['date'] = $dates;
 					$ins_data['attendance'] = $attendance;
@@ -735,12 +739,15 @@ class Service extends BaseController {
 					$ins_data['first_timer'] = $first_timer;
 					$ins_data['offering'] = $offering;
 					$ins_data['note'] = $note;
+					$ins_data['partnership'] = $partnership;
+					$ins_data['attendant'] = $attendant;
+					$ins_data['converts'] = $converts;
+					$ins_data['timers'] = $timers;
+					$ins_data['tithe'] = $tithe;
+					$ins_data['partners'] = $partners;
 					
-					if(!empty($attendant)){$attend = $attendant;}else{$attend = $this->session->get('cell_attendance');}
-					if(!empty($converts)){$conv = $converts;}else{$conv = $this->session->get('cell_convert');}
-					if(!empty($timers)){$times = $timers;}else{$times = $this->session->get('cell_timers');}
 					// do create or update
-					if($creport_id) {
+					if($report_id) {
 						
 						$ins_data['attendant'] = $attend;
 						$ins_data['converts'] = $conv;
@@ -768,27 +775,19 @@ class Service extends BaseController {
 					} else {
 						// echo $date;
 						if($this->Crud->check('date', $dates, $table) > 0) {
-							echo $this->Crud->msg('warning', 'Record Already Exist');
+							echo $this->Crud->msg('warning', 'Report Already Exist');
 						} else {
-							$ins_data['attendant'] = $this->session->get('cell_attendance');
-							$ins_data['converts'] = $this->session->get('cell_convert');
-							$ins_data['timers'] = $this->session->get('cell_timers');
+							// $ins_data['attendant'] = $this->session->get('cell_attendance');
+							// $ins_data['converts'] = $this->session->get('cell_convert');
+							// $ins_data['timers'] = $this->session->get('cell_timers');
 							
 							$ins_data['reg_date'] = date(fdate);
 							$ins_rec = $this->Crud->create($table, $ins_data);
 							if($ins_rec > 0) {
-								$at['type'] = 'cell';
-								$at['type_id'] = $ins_rec;
-								$at['attendant'] = $this->session->get('cell_attendance');
-								$at['reg_date'] = date(fdate);
-								$this->Crud->create('attendance', $at);
-								$this->session->set('cell_attendance', '');
-								$this->session->set('cell_convert', '');
-								$this->session->set('cell_timers', '');
 								
 								///// store activities
 								$by = $this->Crud->read_field('id', $log_id, 'user', 'firstname');
-								$action = $by.' created a Cell Meeting Report for ('.$date.')';
+								$action = $by.' created a Service Report for ('.$date.')';
 								$this->Crud->activity('user', $ins_rec, $action);
 
 								echo $this->Crud->msg('success', 'Report Created');
