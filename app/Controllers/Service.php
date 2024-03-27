@@ -324,7 +324,9 @@ class Service extends BaseController {
 		// manage record
 		if($param1 == 'manage') {
 			$data['first'] = [];
-				
+			$mem_id = $this->Crud->read_field('name', 'Member', 'access_role', 'id');
+			$mem = $this->Crud->read_single_order('role_id', $mem_id, 'user', 'firstname', 'asc');
+			$data['mem'] = $mem;
 			// prepare for delete
 			if($param2 == 'delete') {
 				if($param3) {

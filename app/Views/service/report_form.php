@@ -477,7 +477,7 @@ $this->Crud = new Crud();
             </table>
             <div class="col-12 my-3 text-center">
                 <p id="mem_resp"></p>
-                <button type="button" class="btn btn-primary" id="mem_btn" onclick="addRow()">Add More</button>
+                <button type="button" class="btn btn-primary" id="mem_btn">Add More</button>
             </div>
         </div>
         <hr>
@@ -1019,113 +1019,152 @@ $this->Crud = new Crud();
             $(this).closest('tr').remove();
             // Update Add More button state
             updateAddMoreButtonState();
-
+            updateTotal();
 
         });
     });
-    var rowIndex = 1; // Initialize row index
 
-    function addRow() {
-        var originalSelect = document.querySelector('.original-rows select');
-        var selectedValue = originalSelect.value;
+    $(document).ready(function() {
+        
+        var selectCounter = 1; 
 
-        if (selectedValue === '') {
-            $('#mem_resp').html('<span class="text-danger">Please select a value from the Member.</span>');
-            return; // Exit the function if no value is selected
+        // Function to create and return a new select element
+        function createSelectElements() {
+            var select = $('<select class="js-select2 members" data-search="on" name="members[]" data-placeholder="Select Memeber" required></select>');
+            
+            <?php 
+             
+            if(!empty($mem)) { ?>
+                <?php foreach($mem as $mm) { ?>
+                    var optionValue = '<?php echo htmlspecialchars($mm->id); ?>';
+                    var optionText = '<?php echo strtoupper(htmlspecialchars($mm->firstname.' '.$mm->surname)); ?>';
+
+                    // Check if this option is selected in any existing row
+                    var isSelected = selectedValues.includes(optionValue);
+
+                    // If the option is not selected in any existing row, add it to the new select element
+                    if (!isSelected) {
+                        select.append('<option value="' + optionValue + '">' + optionText + '</option>');
+                    }
+                <?php } ?>
+            <?php } ?>
+            return select;
+
         }
+        
 
-        var selectedOptions = $('.members').map(function() {
-            return $(this).val();
-        }).get();
-
-        if (selectedOptions.includes(selectedValue)) {
-            $('#mem_resp').html('<span class="text-danger">This value has already been selected.</span>');
-            // xit the function if the value is already selected in another row
-        }
-
-        var selectId = 'member' + rowIndex;
-        var newRow = '<tr>' +
-            '<td>' +
-            '<select class="js-select2 members" id="'+selectId+'" data-search="on" name="member[]" required>' +
-            '' +
-            $('#members').html() + // Clone options from original select
-            '</select>' +
-            '</td>';
-
-        <?php 
-            if(!empty($parts)){
-                foreach($parts as $pp){
-                    echo 'newRow += \'<td><input type="text" style="width:100px;" class="form-control amountInput" name="amount[]" value="0" oninput="updateTotal()"></td>\';';
-                }
+        function addNewRows() {
+            
+            var remainingOptions = $('.original-rows select option:not(:selected)');
+            if (remainingOptions.length === 0) {
+                $('#mem_resp').html("<span class='text-danger'>No more options available.</span>");
+                return;
             }
-        ?>
+            var selectedValue = $('.original-rows select').val();
+            if (selectedValue === "0") {
+                $('#mem_resp').html("<span class='text-danger'>Select a Member.</span>");
+                return; // Stop further execution
+            } 
+            $('#mem_resp').html('')
+            var newRow = $('<tr class="new-rows"></tr>');
 
-       
-        newRow += '<td><button type="button" class="btn btn-danger" onclick="deleteRow(this)">Delete</button></td>';
-        newRow += '</tr>';
+            var firstTimerSelect = createSelectElements();
 
-        // Append the new row
-        $('#member_table tbody').append(newRow);
+            // Assign a new unique id to the cloned select element
+            var newSelectId = 'members_' + selectCounter;
+            firstTimerSelect.attr('id', newSelectId);
 
-        // Initialize select2 for the new select element
-        $('#' + selectId).select2();
+            newRow.append('<td>' + firstTimerSelect.prop('outerHTML') + '</td>');
 
-        // Remove selected options from all select elements
-        $('.member').each(function() {
-            var value = $(this).val();
-            $(this).find('option').each(function() {
-                if (selectedOptions.includes($(this).val()) && $(this).val() !== value) {
-                    $(this).remove();
+            // Add input fields for each partnership
+            $('#member_table th').each(function (index) {
+                if (index > 1) {
+                    newRow.append('<td><input type="text" style="width:100px;" class="form-control amountInput" name="amount[]" value="0" oninput="updateTotal()"></td>');
                 }
             });
+
+            // Add delete button in the action cell
+            newRow.append('<td><button class="btn btn-danger btn-sm delete-row">Delete</button></td>');
+            $('#member_table tbody').append(newRow);
+
+            // Initialize select2 plugin for the new select element
+            initializeSelect2(newRow.find('select'));
+
+            // Increment the counter
+            selectCounter++;
+
+              // Update Add More button state
+            updateAddMoreButtonStates();
+        }
+
+       // Function to update the state of the Add More button
+        function updateAddMoreButtonStates() {
+            // Check if there are any new rows
+            var hasNewRows = $('.new-rows').length > 0;
+
+            // If there are no new rows, check the original row's select element
+            if (!hasNewRows) {
+                var originalSelectOptionsCount = $('.original-rows select option').length;
+                var selectedValue = $('.original-rows select').val();
+
+                if (selectedValue === "1" || originalSelectOptionsCount === 1) {
+                    $('#mem_btn').prop('disabled', true);
+                } else {
+                    $('#mem_btn').prop('disabled', false);
+                }
+            } else {
+                // Count the number of selected values except when value is 0
+                var selectedCount = selectedValues.filter(function(value) {
+                    return value !== "0";
+                }).length;
+
+                // Get the number of options in the last select element
+                var lastSelectOptionsCount = $('#mem_table .new-rows:last .members option').length;
+
+                // Disable "Add More" button if the number of selected values matches the number of original options minus 1
+                // or if the number of options in the last select element is 1
+                if (lastSelectOptionsCount === 1 || selectedCount === lastSelectOptionsCount - 1) {
+                    $('#mem_btn').prop('disabled', true);
+                } else {
+                    $('#mem_btn').prop('disabled', false);
+                }
+            }
+        }
+
+        // Event listener for the Add More button
+        $('#mem_btn').click(function() {
+           
+            // Add a new row with a fresh select element
+            addNewRows();
         });
 
-        // Increment the rowIndex for unique IDs
-        rowIndex++;
         
-        // Disable "Add More" button if all options are selected
-        var remainingOptions = $('select.js-select2 option:not([value=""])').length;
-        if (remainingOptions === 0) {
-            $('#mem_btn').prop('disabled', true);
-        }
-    }
+        // Event listener for selecting an option
+        $(document).on('change', '.members', function() {
+            var selectedValue = $(this).val();
+            if (selectedValue) {
+                selectedValues.push(selectedValue);
+            }
+        });
 
-    function deleteRow(btn) {
-        var row = $(btn).closest('tr');
-        var selectValue = row.find('select').val();
+        $('#mem_table').on('click', '.delete-row', function() {
+            var selectedValue = $(this).closest('tr').find('.members').val();
+            if (selectedValue) {
+                // Remove the selected value from the array
+                var index = selectedValues.indexOf(selectedValue);
+                if (index !== -1) {
+                    selectedValues.splice(index, 1);
+                }
+            }
+            
+            // Remove the closest tr
+            $(this).closest('tr').remove();
+            // Update Add More button state
+            updateAddMoreButtonStates();
+            updateTotal();
 
-        row.remove();
-
-        // Add the deleted value back to the select dropdown
-        $('#members').append('<option value="' + selectValue + '">' + selectValue + '</option>');
-
-        // Update select2
-        $('.js-select2').select2();
-
-        // Update total if needed
-        updateTotal();
-    }
-
-    function deleteRow(btn) {
-        var row = btn.parentNode.parentNode;
-        var selectValue = row.querySelector('select').value;
-
-        // Find the closest previous row
-        var closestRow = $(row).prev('tr');
-        var closestSelect = closestRow.find('select.js-select2');
-
-        row.parentNode.removeChild(row);
-
-        // Add the deleted value back to the closest select dropdown
-        closestSelect.append('<option value="' + selectValue + '">' + selectValue.toUpperCase() + '</option>');
-
-        // Update select2
-        closestSelect.select2();
-
-        updateTotal();
-    }
-
-
+        });
+    });
 
     function updateTotal() {
         var inputs = document.getElementsByClassName('amountInput');
