@@ -936,8 +936,10 @@ $this->Crud = new Crud();
 
             // Add input fields for each partnership
             $('#dataTable th').each(function (index) {
+                
                 if (index > 1) {
-                    newRow.append('<td><input type="text" style="width:100px;" class="form-control firsts_amount" name="amount[]" value="0"></td>');
+                    var partName = index + "_first[]"; // Adjust the prefix as needed
+                    newRow.append('<td><input type="text" style="width:100px;" class="form-control firsts_amount" name="' + partName + '" value="0"></td>');
                 }
             });
 
@@ -1078,6 +1080,10 @@ $this->Crud = new Crud();
 
             // Add input fields for each partnership
             $('#member_table th').each(function (index) {
+                if (index > 1) {
+                    var partName = index + "_member"; // Adjust the prefix as needed
+                    newRow.append('<td><input type="text" style="width:100px;" class="form-control members_amount" name="' + partName + '" value="0"></td>');
+                }
                 if (index > 1) {
                     newRow.append('<td><input type="text" style="width:100px;" class="form-control members_amount" name="amount[]" value="0"></td>');
                 }
