@@ -55,7 +55,7 @@
                                     <h5>Enter the Details for the Service Meeting Below</h5>
                                     <p class="text-danger">Always click the save record Button after update of attendance, first timers and new convert.</p>
                                     <?php echo form_open_multipart('service/report/manage', array('id'=>'bb_ajax_form', 'class'=>'row mt-4')); ?>
-                                        <input type="hidden" name="creport_id" id="report_id" value="<?php if(!empty($e_id)){echo $e_id;}?>">
+                                        <input type="hidden" name="report_id" id="report_id" value="<?php if(!empty($e_id)){echo $e_id;}?>">
                                         
                                         <div class="col-sm-4 mb-3">
                                             <div class="form-group">

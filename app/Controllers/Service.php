@@ -521,7 +521,7 @@ class Service extends BaseController {
 							var jsonData = ' . json_encode($partners) . ';
 							var jsonString = JSON.stringify(jsonData);
 							$("#partners").val(jsonString);
-							$("#partnership").val('.number_format($total_part,2).');
+							$("#partnership").val('.($total_part).');
 							$("#modal").modal("hide");
 						}, 2000); </script>';
 					}
@@ -769,24 +769,20 @@ class Service extends BaseController {
 					
 					// do create or update
 					if($report_id) {
-						
-						$ins_data['attendant'] = $attend;
-						$ins_data['converts'] = $conv;
-						$ins_data['timers'] = $times;
 								
-						$upd_rec = $this->Crud->updates('id', $creport_id, $table, $ins_data);
+						$upd_rec = $this->Crud->updates('id', $report_id, $table, $ins_data);
 						if($upd_rec > 0) {
-							$at['attendant'] = $this->session->get('cell_attendance');
-							$at_id = $this->Crud->read_field2('type_id', $creport_id, 'type', 'cell', 'attendance', 'id');
-							$this->Crud->updates('id', $at_id, 'attendance', $at);
-							$this->session->set('cell_attendance', '');
-							$this->session->set('cell_convert', '');
-							
-							$this->session->set('cell_timers', '');
+							$this->session->set('service_attendance', '');
+							$this->session->set('service_partnership', '');
+							$this->session->set('service_converts', '');
+							$this->session->set('service_timers', '');
+							$this->session->set('service_tithe', '');
+							$this->session->set('service_timer_count', '');
+
 							///// store activities
 							$by = $this->Crud->read_field('id', $log_id, 'user', 'firstname');
-							$action = $by.' updated Cell Meeting Report';
-							$this->Crud->activity('user', $cell_id, $action);
+							$action = $by.' updated Service Meeting Report';
+							$this->Crud->activity('user', $report_id, $action);
 
 							echo $this->Crud->msg('success', 'Report Updated');
 							echo '<script>location.reload(false);</script>';

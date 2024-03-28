@@ -525,31 +525,75 @@ $this->Crud = new Crud();
                     </tr>
                 </thead>
                 <tbody>
-                    <tr class="original-rows">
-                        <td>
-                            <select class="js-select2 members" name="members[]" id="members" required>
-                               <option value="">Select</option>
-                                <?php 
-                                    $mem_id = $this->Crud->read_field('name', 'Member', 'access_role', 'id');
-                                    $mem = $this->Crud->read_single_order('role_id', $mem_id, 'user', 'firstname', 'asc');
-                                    if(!empty($mem)){
-                                        foreach($mem as $mm){
-                                            echo '<option value="'.$mm->id.'" >'.strtoupper($mm->firstname.' '.$mm->surname).'</option>';
-                                        }
-                                    } 
-                                ?>
-                            </select>
-                        </td>
-                        <?php 
-                           if(!empty($parts)){
-                                foreach($parts as $pp => $val){
-                                    echo ' <td ><input type="text" style="width:100px;" class="form-control  members_amount" oninput=" bindInputEvents();" name="'.$pp
-                                    .'_member[]" value="0" ></td>';
+                    <?php if($param3){
+                        foreach($first as $f => $val){
+                            if($f == 'member'){
+                                $selval = [];
+                                if(!empty($val)){
+                                    foreach($val as $pp => $pval){
+                                        $selval[] = $pp;
+                                        $parts_val = (array)$pval;
+                                    
+                                    }  
                                 }
-                            }
                         ?>
-                        <td></td>
-                    </tr>
+                        <tr class="original-rows">
+                            <td>
+                                <select class="js-select2 members" name="members[]" id="members" required>
+                                <option value="">Select</option>
+                                    <?php 
+                                        $mem_id = $this->Crud->read_field('name', 'Member', 'access_role', 'id');
+                                        $mem = $this->Crud->read_single_order('role_id', $mem_id, 'user', 'firstname', 'asc');
+                                        if(!empty($mem)){
+                                            foreach($mem as $mm){
+                                                $sel = '';
+                                                if(in_array($mm->id,$selval))$sel = 'selected';
+                                                echo '<option value="'.$mm->id.'" '.$sel.'>'.strtoupper($mm->firstname.' '.$mm->surname).'</option>';
+                                            }
+                                        } 
+                                    ?>
+                                </select>
+                            </td>
+                            <?php 
+                                if(!empty($parts)){
+                                    $vall = 0;
+                                    foreach($parts as $pp => $val){
+                                        if(!empty($parts_val)){
+                                            if(!empty($parts_val[$pp])){$vall = $parts_val[$pp];}else{$vall = 0;}
+                                        }
+                                        echo '<td><input type="text" style="width:100px;" class="form-control members_amount" name="'.$pp.'_member[]" oninput="bindInputEvents();" value="'.$vall.'"></td>';
+                                    }
+                                }
+                            ?>
+                            <td></td>
+                        </tr>
+                    <?php } }
+                        } else{?>
+                        <tr class="original-rows">
+                            <td>
+                                <select class="js-select2 members" name="members[]" id="members" required>
+                                <option value="">Select</option>
+                                    <?php 
+                                        $mem_id = $this->Crud->read_field('name', 'Member', 'access_role', 'id');
+                                        $mem = $this->Crud->read_single_order('role_id', $mem_id, 'user', 'firstname', 'asc');
+                                        if(!empty($mem)){
+                                            foreach($mem as $mm){
+                                                echo '<option value="'.$mm->id.'" >'.strtoupper($mm->firstname.' '.$mm->surname).'</option>';
+                                            }
+                                        } 
+                                    ?>
+                                </select>
+                            </td>
+                            <?php 
+                            if(!empty($parts)){
+                                    foreach($parts as $pp => $val){
+                                        echo ' <td ><input type="text" style="width:100px;" class="form-control  members_amount" oninput=" bindInputEvents();" name="'.$pp.'_member[]" value="0" ></td>';
+                                    }
+                                }
+                            ?>
+                            <td></td>
+                        </tr>
+                    <?php } ?>
                 </tbody>
             </table>
             <div class="col-12 my-3 text-center">
