@@ -526,8 +526,13 @@ class Service extends BaseController {
 				}
 
 			} elseif($param2 == 'tithe'){
+				if($param3){
+					$data['table_rec'] = 'service/report/tithe_list/'.$param3; // ajax table
 				
-				$data['table_rec'] = 'service/report/tithe_list'; // ajax table
+				} else {
+					$data['table_rec'] = 'service/report/tithe_list'; // ajax table
+				
+				}
 				$data['order_sort'] = '0, "asc"'; // default ordering (0, 'asc')
 				$data['no_sort'] = '1'; // sort disable columns (1,3,5)
 		
@@ -984,6 +989,7 @@ class Service extends BaseController {
 			$list = $this->Crud->datatable_load($table, $column_order, $column_search, $order, $where);
 			$data = array();
 			// $no = $_POST['start'];
+			
 			$count = 1;
 			foreach ($list as $item) {
 				$id = $item->id;
@@ -991,27 +997,23 @@ class Service extends BaseController {
 				$surname = $item->surname;
 				$img = $this->Crud->image($item->img_id, 'big');
 				// add manage buttons
-
-				$attend = $this->session->get('service_attendance');
-				// print_r($attend);
-				$sel = '';
-				// if(!empty($attend)){
-				// 	$attends = json_decode($attend);
-				// 	$ats = (array)$attends;
-				// 	foreach($ats as $a => $val){
-				// 		if($a == 'attendant'){
-				// 			// $vall = json_decode($val);
-				// 			if(in_array($item->id, (array)$val)){
-				// 				$sel = 'checked';
-				// 			}
-				// 		}
-				// 	}
+				$value = '0';
+				if($param2){
+					$convertsa = json_decode($this->Crud->read_field('id', $param2, 'service_report', 'tithers'));
+					$converts =(array) $convertsa->list;
+					if(!empty($converts)){
+						foreach($converts as $co => $val){
+							if($id == $co){
+								$value = $val;
+							}
+						}
 					
-					
-				// }
+					}	
+				}
+				
 				$all_btn = '
 					<div class="text-center">
-						<input type="text" class="form-control tithes" name="tithe[]" id="tithe_'.$item->id.'" value="0" oninput="calculateTotal();this.value = this.value.replace(/[^\d.]/g,\'\');this.value = this.value.replace(/(\..*)\./g,\'$1\')">
+						<input type="text" class="form-control tithes" name="tithe[]" id="tithe_'.$item->id.'" value="'.$value.'" oninput="calculateTotal();this.value = this.value.replace(/[^\d.]/g,\'\');this.value = this.value.replace(/(\..*)\./g,\'$1\')">
 					</div>
 				';
 

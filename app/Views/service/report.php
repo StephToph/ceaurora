@@ -136,7 +136,7 @@
                                                     <div class="input-group">        
                                                         <input type="text" readonly name="tithe" id="tithe" oninput="this.value = this.value.replace(/[^\d.]/g,'');this.value = this.value.replace(/(\..*)\./g,'$1')" class="form-control" placeholder="0">        
                                                         <div class="input-group-append">            
-                                                            <button type="button"  class="btn btn-outline-primary btn-dim pop" pageTitle="Enter Tithe" pageSize="modal-lg" pageName="<?php echo  site_url('service/report/manage/tithe'); ?>" id="markButton">ADD</button>        
+                                                            <button type="button"  class="btn btn-outline-primary btn-dim pop" pageTitle="Enter Tithe" pageSize="modal-lg" pageName="<?php echo  site_url('service/report/manage/tithe'); ?>" id="titheBtn">ADD</button>        
                                                         </div>    
                                                     </div>
                                                     <span class="text-danger"></span>
@@ -150,7 +150,7 @@
                                                     <div class="input-group">        
                                                         <input type="text" readonly name="partnership" id="partnership" oninput="this.value = this.value.replace(/[^\d.]/g,'');this.value = this.value.replace(/(\..*)\./g,'$1')" class="form-control" placeholder="0">        
                                                         <div class="input-group-append">            
-                                                            <button type="button"  class="btn btn-outline-primary btn-dim pop" pageTitle="Add Partnership" pageSize="modal-xl" pageName="<?php echo  site_url('service/report/manage/partnership'); ?>" id="markButton">ADD</button>        
+                                                            <button type="button"  class="btn btn-outline-primary btn-dim pop" pageTitle="Add Partnership" pageSize="modal-xl" pageName="<?php echo  site_url('service/report/manage/partnership'); ?>" id="partnerBtn">ADD</button>        
                                                         </div>    
                                                     </div>
                                                     <span class="text-danger"></span>
@@ -235,6 +235,12 @@
     });
 
     function edit_report(id){
+        var selectElement = document.getElementById("cells_id");
+        var markButton = document.getElementById("markButton");
+        var convertBtn = document.getElementById("convertBtn");
+        var timerBtn = document.getElementById("timerBtn");
+        var partnerBtn = document.getElementById("partnerBtn");
+        var titheBtn = document.getElementById("titheBtn");
         $('#bb_ajax_msg').html('<div class="col-sm-12 text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>');
         $('#show').hide(500);
         $('#form').show(500);
@@ -276,6 +282,14 @@
                 var urls = site_url + 'service/report/manage/first_timer';
                 var updatedPageName = urls + "/" + dt.e_id;
                 timerBtn.setAttribute("pageName", updatedPageName);
+                
+                var urls = site_url + 'service/report/manage/partnership';
+                var updatedPageName = urls + "/" + dt.e_id;
+                partnerBtn.setAttribute("pageName", updatedPageName);
+                
+                var urls = site_url + 'service/report/manage/tithe';
+                var updatedPageName = urls + "/" + dt.e_id;
+                titheBtn.setAttribute("pageName", updatedPageName);
                 $('#bb_ajax_msg').html('');
             }
         });
@@ -287,6 +301,8 @@
         var markButton = document.getElementById("markButton");
         var convertBtn = document.getElementById("convertBtn");
         var timerBtn = document.getElementById("timerBtn");
+        var partnerBtn = document.getElementById("partnerBtn");
+        var titheBtn = document.getElementById("titheBtn");
         
         var selectedValue = selectElement.value;
        

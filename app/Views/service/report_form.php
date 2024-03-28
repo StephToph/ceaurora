@@ -306,20 +306,31 @@ $this->Crud = new Crud();
         </div>
     <?php } ?>
      
-    <?php if($param2 == 'tithe'){?>
+    <?php if($param2 == 'tithe'){
+        $converts = json_decode($this->Crud->read_field('id', $param3, 'service_report', 'tithers'));
+        $total =0 ;
+        $member = 0;
+        $guest = 0;
+        if(!empty($converts)){
+            $total = $converts->total;
+            $member = $converts->member;
+            $guest = $converts->guest;
+            
+        }
+        ?>
         <div class="row">
             <span class="text-danger mb-2">Enter Member's Tithe in the Table Below</span>
             <div class="col-sm-4 mb-3 ">
                 <label>Total</label>
-                <input class="form-control" id="total_tithe" type="text" name="total_tithe"  readonly value="0">
+                <input class="form-control" id="total_tithe" type="text" name="total_tithe"  readonly value="<?=number_format($total,2); ?>">
             </div>
             <div class="col-sm-4 mb-3">
                 <label>Member</label>
-                <input class="form-control" id="member_tithe" type="text" name="member_tithe"  readonly value="0">
+                <input class="form-control" id="member_tithe" type="text" name="member_tithe"  readonly value="<?=number_format($member,2); ?>">
             </div>
             <div class="col-sm-4 mb-3">
                 <label>Guest</label>
-                <input class="form-control" id="guest_tithe" type="text" name="guest_tithe" oninput="get_tithe();this.value = this.value.replace(/[^\d.]/g,'');this.value = this.value.replace(/(\..*)\./g,'$1')" value="0">
+                <input class="form-control" id="guest_tithe" type="text" name="guest_tithe" oninput="get_tithe();this.value = this.value.replace(/[^\d.]/g,'');this.value = this.value.replace(/(\..*)\./g,'$1')" value="<?=number_format($guest,2); ?>">
             </div>
         </div>
         <hr>
@@ -502,7 +513,7 @@ $this->Crud = new Crud();
                 $cell_id = $this->Crud->read_field('id', $param4, 'cell_report', 'cell_id');
                 $roles = $this->Crud->read_field('name', 'Member', 'access_role', 'id');
 
-                $converts = json_decode($this->Crud->read_field('id', $param4, 'cell_report', 'converts'));
+                $converts = json_decode($this->Crud->read_field('id', $param3, 'service_report', 'converts'));
                 if(!empty($converts)){
                     $firstIteration = true; // Flag to track the first iteration
 
@@ -618,7 +629,7 @@ $this->Crud = new Crud();
                 $cell_id = $this->Crud->read_field('id', $param4, 'cell_report', 'cell_id');
                 $roles = $this->Crud->read_field('name', 'Member', 'access_role', 'id');
 
-                $converts = json_decode($this->Crud->read_field('id', $param4, 'cell_report', 'timers'));
+                $converts = json_decode($this->Crud->read_field('id', $param3, 'service_report', 'timers'));
                 if(!empty($converts)){
                     $firstIteration = true; // Flag to track the first iteration
 
