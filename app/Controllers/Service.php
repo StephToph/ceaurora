@@ -767,6 +767,11 @@ class Service extends BaseController {
 					$ins_data['tithe'] = $tithe;
 					$ins_data['partners'] = $partners;
 					
+					if(!empty($partners)){
+						echo $partners;
+					}
+
+					die;
 					// do create or update
 					if($report_id) {
 								
@@ -794,13 +799,12 @@ class Service extends BaseController {
 						if($this->Crud->check2('type', $type, 'date', $dates, $table) > 0) {
 							echo $this->Crud->msg('warning', 'Report Already Exist');
 						} else {
-							// $ins_data['attendant'] = $this->session->get('cell_attendance');
-							// $ins_data['converts'] = $this->session->get('cell_convert');
-							// $ins_data['timers'] = $this->session->get('cell_timers');
 							
 							$ins_data['reg_date'] = date(fdate);
 							$ins_rec = $this->Crud->create($table, $ins_data);
 							if($ins_rec > 0) {
+
+								
 								$this->session->set('service_attendance', '');
 								$this->session->set('service_partnership', '');
 								$this->session->set('service_converts', '');
