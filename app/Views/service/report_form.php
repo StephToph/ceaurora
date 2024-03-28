@@ -969,7 +969,7 @@ $this->Crud = new Crud();
                 var originalSelectOptionsCount = $('.original-row select option').length;
                 var selectedValue = $('.original-row select').val();
 
-                if (selectedValue === "1" || originalSelectOptionsCount === 1) {
+                if (selectedValue === "1" || originalSelectOptionsCount <= 1) {
                     $('#more_btn').prop('disabled', true);
                 } else {
                     $('#more_btn').prop('disabled', false);
@@ -981,7 +981,7 @@ $this->Crud = new Crud();
                 }).length;
 
                 // Get the number of options in the last select element
-                var lastSelectOptionsCount = $('#dataTable .new-row:last .js-select2 option').length;
+                var lastSelectOptionsCount = $('#dataTable .new-row:last .firsts option').length;
 
                 // Disable "Add More" button if the number of selected values matches the number of original options minus 1
                 // or if the number of options in the last select element is 1
@@ -1007,6 +1007,7 @@ $this->Crud = new Crud();
             if (selectedValue) {
                 selectedValues.push(selectedValue);
             }
+            updateAddMoreButtonState();
         });
 
         $('#dataTable').on('click', '.delete-row', function() {
