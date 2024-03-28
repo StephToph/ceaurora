@@ -304,8 +304,10 @@ class Service extends BaseController {
 				if(!empty($edit)) {
 					foreach($edit as $e) {
 						$edata['e_id'] = $e->id;
-						$edata['e_cell_id'] = $e->cell_id;
 						$edata['e_type'] = $e->type;
+						$edata['e_date'] = $e->date;
+						$edata['e_tithe'] = $e->tithe;
+						$edata['e_partnership'] = $e->partnership;
 						$edata['e_date'] = $e->date;
 						$edata['e_attendance'] = $e->attendance;
 						$edata['e_new_convert'] = $e->new_convert;
@@ -313,6 +315,8 @@ class Service extends BaseController {
 						$edata['e_offering'] = $e->offering;
 						$edata['e_note'] = $e->note;
 						$edata['e_attendant'] = $e->attendant;
+						$edata['e_tithers'] = $e->tithers;
+						$edata['e_partners'] = $e->partners;
 						$edata['e_timers'] = $e->timers;
 						$edata['e_converts'] = $e->converts;
 					}

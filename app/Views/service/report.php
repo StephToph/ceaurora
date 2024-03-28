@@ -247,13 +247,14 @@
         $(this).find('em').removeClass().addClass('icon ni ' + currentInfo.iconClass);
 
         $.ajax({
-            url: site_url + 'accounts/creport/edit/' + id,
+            url: site_url + 'service/report/edit/' + id,
             type: 'get',
             success: function (data) {
                 var dt = JSON.parse(data);
                 $('#report_id').val(dt.e_id);
-                $('#type').val(dt.e_type).change();;
-                $("#cells_id").val(dt.e_cell_id).change();
+                $('#type').val(dt.e_type).change();
+                $("#partnership").val(dt.e_partnership).val();
+                $("#tithe").val(dt.e_tithe).val();
                 $('#dates').val(dt.e_date);
                 $('#attendance').val(dt.e_attendance);
                 $('#new_convert').val(dt.e_new_convert);
@@ -264,16 +265,16 @@
                 $('#timers').val(dt.e_timers);
                 $('#converts').val(dt.e_converts);
                 
-                var url = site_url + 'accounts/creport/manage/attendance';
-                var updatedPageName = url + "/" + dt.e_cell_id + "/" + dt.e_id;
+                var url = site_url + 'service/report/manage/attendance';
+                var updatedPageName = url + "/" + dt.e_id;
                 markButton.setAttribute("pageName", updatedPageName);
 
-                var urls = site_url + 'accounts/creport/manage/new_convert';
-                var updatedPageName = urls + "/" + dt.e_cell_id + "/" + dt.e_id;
+                var urls = site_url + 'service/report/manage/new_convert';
+                var updatedPageName = urls + "/" + dt.e_id;
                 convertBtn.setAttribute("pageName", updatedPageName);
                 
-                var urls = site_url + 'accounts/creport/manage/first_timer';
-                var updatedPageName = urls + "/" + dt.e_cell_id + "/" + dt.e_id;
+                var urls = site_url + 'service/report/manage/first_timer';
+                var updatedPageName = urls + "/" + dt.e_id;
                 timerBtn.setAttribute("pageName", updatedPageName);
                 $('#bb_ajax_msg').html('');
             }
