@@ -439,39 +439,47 @@ class Service extends BaseController {
 					$member = $this->request->getPost('members');
 					$partner = [];
 					$partss = $this->Crud->read_order('partnership', 'name', 'asc');
-					for($i=0;$i<count($first_timer);$i++){
-						$name = $first_timer[$i];
-						
-						if(!empty($partss)){
-							foreach($partss as $index => $pp){
-								
-								$amount = $this->request->getPost($index.'_first'); //Guest Partners
-								if($amount[$i] <= 0)continue;
-								$parts[$pp->id] = $amount[$i];
-								
-								
+					if(!empty($first_timer)){
+						for($i=0;$i<count($first_timer);$i++){
+							$name = $first_timer[$i];
+							
+							if(!empty($partss)){
+								foreach($partss as $index => $pp){
+									
+									$amount = $this->request->getPost($index.'_first'); //Guest Partners
+									if($amount[$i] <= 0)continue;
+									$parts[$pp->id] = $amount[$i];
+									
+									
+								}
 							}
+							
+							$partner[$name] = $parts;
 						}
-						
-						$partner[$name] = $parts;
 					}
 
+					
 					$pmember = [];
-					for($i=0;$i<count($member);$i++){
-						$name = $member[$i];
-						$par = [];
-						if(!empty($partss)){
-							foreach($partss as $index => $pp){
-								
-								$member_amount = $this->request->getPost($index.'_member'); //Guest Partners
-								
-								if($member_amount[$i] <= 0)continue;
-								$par[$pp->id] = $member_amount[$i];
-								
+					if(count($member) == 0){
+						echo $this->Crud->msg('danger', 'Select a Member and Enter the Partnership Amount');
+						die;
+					}else {
+						for($i=0;$i<count($member);$i++){
+							$name = $member[$i];
+							$par = [];
+							if(!empty($partss)){
+								foreach($partss as $index => $pp){
+									
+									$member_amount = $this->request->getPost($index.'_member'); //Guest Partners
+									
+									if($member_amount[$i] <= 0)continue;
+									$par[$pp->id] = $member_amount[$i];
+									
+								}
 							}
+							// 
+							$partner[$name] = $par;
 						}
-						// 
-						$partner[$name] = $par;
 					}
 					
 					$partnership = json_encode($partner);
@@ -484,6 +492,7 @@ class Service extends BaseController {
 					$partners['total_part'] = $total_part;
 					$partners['member_part'] = $member_part;
 					
+					$this->session->set('service_partnership', json_encode($partners));
 					
 					$mark = $this->session->get('service_attendance');
 
@@ -505,7 +514,7 @@ class Service extends BaseController {
 							var jsonData = ' . json_encode($partners) . ';
 							var jsonString = JSON.stringify(jsonData);
 							$("#partners").val(jsonString);
-							$("#partnership").val('.$total_part.');
+							$("#partnership").val('.number_format($total_part,2).');
 							$("#modal").modal("hide");
 						}, 2000); </script>';
 					}
@@ -559,7 +568,7 @@ class Service extends BaseController {
 					$tithe_list['list'] = $tither;
 					 
 					// print_r($tithe_list);
-					
+					$this->session->set('service_tithe', json_encode($tithe_list));
 					
 					echo $this->Crud->msg('success', 'Service Tithe Report Submitted');
 					// echo json_encode($mark);
@@ -567,7 +576,7 @@ class Service extends BaseController {
 						var jsonData = ' . json_encode($tithe_list) . ';
 						var jsonString = JSON.stringify(jsonData);
 						$("#tither").val(jsonString);
-						$("#tithe").val('.$total_tithe.');
+						$("#tithe").val('.number_format($total_tithe,2).');
 						$("#modal").modal("hide");
 					}, 2000); </script>';
 					
@@ -607,7 +616,7 @@ class Service extends BaseController {
 							echo $this->Crud->msg('danger', 'Enter the New Convert Details');
 							
 						} else{
-							$this->session->set('cell_convert', json_encode($convert));
+							$this->session->set('service_convert', json_encode($convert));
 							echo $this->Crud->msg('success', 'New Convert List Submitted');
 							// echo json_encode($mark);
 							
@@ -774,7 +783,7 @@ class Service extends BaseController {
 						}
 					} else {
 						// echo $date;
-						if($this->Crud->check('date', $dates, $table) > 0) {
+						if($this->Crud->check2('type', $type, 'date', $dates, $table) > 0) {
 							echo $this->Crud->msg('warning', 'Report Already Exist');
 						} else {
 							// $ins_data['attendant'] = $this->session->get('cell_attendance');
@@ -784,7 +793,12 @@ class Service extends BaseController {
 							$ins_data['reg_date'] = date(fdate);
 							$ins_rec = $this->Crud->create($table, $ins_data);
 							if($ins_rec > 0) {
-								
+								$this->session->set('service_attendance', '');
+								$this->session->set('service_partnership', '');
+								$this->session->set('service_converts', '');
+								$this->session->set('service_timers', '');
+								$this->session->set('service_tithe', '');
+								$this->session->set('service_timer_count', '');
 								///// store activities
 								$by = $this->Crud->read_field('id', $log_id, 'user', 'firstname');
 								$action = $by.' created a Service Report for ('.$date.')';

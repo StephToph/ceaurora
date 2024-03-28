@@ -400,7 +400,7 @@ $this->Crud = new Crud();
                         <tr class="original-row">
                             <td>
                                 <select class="js-select2 firsts"  data-search="on" name="first_timer[]" id="firsts" data-placeholder="Select First Timer" required>
-                                    <option value="0">Select</option>
+                                    <option value="">Select</option>
                                     <?php 
                                         if(!empty((array)$first)){
                                             foreach($first as $mm => $val){
@@ -413,7 +413,7 @@ $this->Crud = new Crud();
                             <?php 
                                 if(!empty($parts)){
                                     foreach($parts as $pp => $val){
-                                        echo '<td><input type="text" style="width:100px;" class="form-control firsts_amount" name="'.$pp.'_first[]" value="0"></td>';
+                                        echo '<td><input type="text" style="width:100px;" class="form-control firsts_amount" name="'.$pp.'_first[]" oninput="bindInputEvents();" value="0"></td>';
                                     }
                                 }
                             ?>
@@ -454,13 +454,13 @@ $this->Crud = new Crud();
                     <tr class="original-rows">
                         <td>
                             <select class="js-select2 members" name="members[]" id="members" required>
-                               
+                               <option value="">Select</option>
                                 <?php 
                                     $mem_id = $this->Crud->read_field('name', 'Member', 'access_role', 'id');
                                     $mem = $this->Crud->read_single_order('role_id', $mem_id, 'user', 'firstname', 'asc');
                                     if(!empty($mem)){
                                         foreach($mem as $mm){
-                                            echo '<option value="'.$mm->id.'">'.strtoupper($mm->firstname.' '.$mm->surname).'</option>';
+                                            echo '<option value="'.$mm->id.'" >'.strtoupper($mm->firstname.' '.$mm->surname).'</option>';
                                         }
                                     } 
                                 ?>
@@ -469,7 +469,7 @@ $this->Crud = new Crud();
                         <?php 
                            if(!empty($parts)){
                                 foreach($parts as $pp => $val){
-                                    echo ' <td ><input type="text" style="width:100px;" class="form-control  members_amount" name="'.$pp
+                                    echo ' <td ><input type="text" style="width:100px;" class="form-control  members_amount" oninput=" bindInputEvents();" name="'.$pp
                                     .'_member[]" value="0" ></td>';
                                 }
                             }
@@ -922,7 +922,7 @@ $this->Crud = new Crud();
                 return;
             }
             var selectedValue = $('.original-row select').val();
-            if (selectedValue === "0") {
+            if (selectedValue === "") {
                 $('#first_resp').html("<span class='text-danger'>Select a First Time.</span>");
                 return; // Stop further execution
             } 
@@ -941,7 +941,7 @@ $this->Crud = new Crud();
             $('#dataTable th').each(function (index) {
                 if (index > 1) {
                     var partName = (index-2) + "_first[]"; // Adjust the prefix as needed
-                    newRow.append('<td><input type="text" style="width:100px;" class="form-control firsts_amount" name="' + partName + '" value="0"></td>');
+                    newRow.append('<td><input type="text" style="width:100px;" class="form-control firsts_amount" name="' + partName + '" oninput="bindInputEvents();" value="0"></td>');
                 }
             });
 
@@ -1032,10 +1032,13 @@ $this->Crud = new Crud();
     $(document).ready(function() {
         
         var selectCounter = 1; 
-
+        function initializeSelect2(selectElement) {
+            selectElement.select2( );
+            selectElement.attr('data-search', 'true'); // Add data-search attribute
+        }
         // Function to create and return a new select element
         function createSelectElements() {
-            var select = $('<select class="js-select2 members" data-search="on" name="members[]" data-placeholder="Select Memeber" required></select>');
+            var select = $('<select class="js-select2 members" data-search="on" name="members[]" data-placeholder="Select Memeber" required><option value="">Select</option></select>');
             
             <?php 
              
@@ -1066,7 +1069,7 @@ $this->Crud = new Crud();
                 return;
             }
             var selectedValue = $('.original-rows select').val();
-            if (selectedValue === "0") {
+            if (selectedValue === "") {
                 $('#mem_resp').html("<span class='text-danger'>Select a Member.</span>");
                 return; // Stop further execution
             } 
@@ -1085,7 +1088,7 @@ $this->Crud = new Crud();
             $('#member_table th').each(function (index) {
                 if (index > 1) {
                     var partName = (index-2) + "_member[]"; // Adjust the prefix as needed
-                    newRow.append('<td><input type="text" style="width:100px;" class="form-control members_amount" name="' + partName + '" value="0"></td>');
+                    newRow.append('<td><input type="text" style="width:100px;" class="form-control members_amount" oninput=" bindInputEvents();" name="' + partName + '" value="0"></td>');
                 }
             });
 
@@ -1113,7 +1116,7 @@ $this->Crud = new Crud();
                 var originalSelectOptionsCount = $('.original-rows select option').length;
                 var selectedValue = $('.original-rows select').val();
 
-                if (selectedValue === "1" || originalSelectOptionsCount === 1) {
+                if (selectedValue === "1" || originalSelectOptionsCount <= 1) {
                     $('#mem_btn').prop('disabled', true);
                 } else {
                     $('#mem_btn').prop('disabled', false);
@@ -1125,7 +1128,7 @@ $this->Crud = new Crud();
                 }).length;
 
                 // Get the number of options in the last select element
-                var lastSelectOptionsCount = $('#mem_table .new-rows:last .members option').length;
+                var lastSelectOptionsCount = $('#member_table .new-rows:last .members option').length;
 
                 // Disable "Add More" button if the number of selected values matches the number of original options minus 1
                 // or if the number of options in the last select element is 1
@@ -1153,7 +1156,7 @@ $this->Crud = new Crud();
             }
         });
 
-        $('#mem_table').on('click', '.delete-row', function() {
+        $('#member_table').on('click', '.delete-row', function() {
             var selectedValue = $(this).closest('tr').find('.members').val();
             if (selectedValue) {
                 // Remove the selected value from the array
@@ -1327,11 +1330,16 @@ $this->Crud = new Crud();
         total_part();
     }
 
-    // Bind the calculateSum function to the input event of elements with class 'members'
-    $('.members_amount').on('input', calculateSum);
+   // Function to bind the calculateSum function to the input event of elements with class 'members_amount'
+    function bindInputEvents() {
+        $('.members_amount').on('input', calculateSum);
+        $('.members_amount').on('input', restrictNumericInput);
+        $('.firsts_amount').on('input', calculateFirst);
+        $('.firsts_amount').on('input', restrictNumericInput);
+    }
 
-    // Allow only numeric input with up to two decimal places
-    $('.members_amount').on('input', function() {
+    // Function to allow only numeric input with up to two decimal places
+    function restrictNumericInput() {
         // Replace any non-numeric characters (except decimal point) with an empty string
         $(this).val($(this).val().replace(/[^0-9.]/g, ''));
 
@@ -1342,7 +1350,11 @@ $this->Crud = new Crud();
             parts.pop();
             $(this).val(parts.join('.'));
         }
-    });
+    }
+
+    // Call the bindInputEvents function to bind the input events
+   
+
 
 
     function calculateFirst() {
