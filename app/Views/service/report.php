@@ -32,7 +32,7 @@
                                     <div class="card-tools me-n1">
                                         <ul class="btn-toolbar gx-1">
                                             <li>
-                                                <a href="javascript:;"  id="add_btn" class="btn btn-icon btn-outline-primary"><em class="icon ni ni-plus-c"></em></a>
+                                                <a href="javascript:;" data-bs-toggle="tooltip" data-bs-placement="top" title="Add Report"  id="add_btn" class="btn btn-icon btn-outline-primary"><em class="icon ni ni-plus-c"></em></a>
                                             </li><!-- li -->
                                            
                                         </ul><!-- .btn-toolbar -->
@@ -205,7 +205,7 @@
     var newInfo = {
         class: 'btn-outline-success',
         onclick: 'load();',
-        iconClass: 'ni-eye'
+        iconClass: 'ni-arrow-long-left'
     };
     var currentInfo = initialInfo;
 
@@ -213,12 +213,13 @@
         $('#show').toggle(500);
         $('#form').toggle(500);
         document.getElementById("bb_ajax_form").reset();
-        document.getElementById("cells_id").value = '';
         document.getElementById("type").value = '';
         $('#prev').hide(500);
         // Toggle between initial and new info
         currentInfo = (currentInfo === initialInfo) ? newInfo : initialInfo;
-
+       
+        $(this).attr('title', (currentInfo === initialInfo) ? 'Add Report' : 'Back to Reports');
+    
         // Update button class, onclick function, and icon class
         $(this).removeClass().addClass('btn btn-icon ' + currentInfo.class);
         // $(this).attr('onclick', currentInfo.onclick);

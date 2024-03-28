@@ -33,7 +33,7 @@ $(function () {
 		
 		// Stop the browser from submitting the form.
 		event.preventDefault();
-
+		
 		// scroll to top for notification display
 		// $('html, body').animate({
 		// 	scrollTop: form.offset().top
