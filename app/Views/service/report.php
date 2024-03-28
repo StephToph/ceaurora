@@ -55,7 +55,7 @@
                                     <h5>Enter the Details for the Service Meeting Below</h5>
                                     <p class="text-danger">Always click the save record Button after update of attendance, first timers and new convert.</p>
                                     <?php echo form_open_multipart('service/report/manage', array('id'=>'bb_ajax_form', 'class'=>'row mt-4')); ?>
-                                        <input type="hidden" name="creport_id" id="report_id" value="<?php if(!empty($e_id)){echo $e_id;}?>">
+                                        <input type="hidden" name="report_id" id="report_id" value="<?php if(!empty($e_id)){echo $e_id;}?>">
                                         
                                         <div class="col-sm-4 mb-3">
                                             <div class="form-group">
@@ -136,7 +136,7 @@
                                                     <div class="input-group">        
                                                         <input type="text" readonly name="tithe" id="tithe" oninput="this.value = this.value.replace(/[^\d.]/g,'');this.value = this.value.replace(/(\..*)\./g,'$1')" class="form-control" placeholder="0">        
                                                         <div class="input-group-append">            
-                                                            <button type="button"  class="btn btn-outline-primary btn-dim pop" pageTitle="Enter Tithe" pageSize="modal-lg" pageName="<?php echo  site_url('service/report/manage/tithe'); ?>" id="markButton">ADD</button>        
+                                                            <button type="button"  class="btn btn-outline-primary btn-dim pop" pageTitle="Enter Tithe" pageSize="modal-lg" pageName="<?php echo  site_url('service/report/manage/tithe'); ?>" id="titheBtn">ADD</button>        
                                                         </div>    
                                                     </div>
                                                     <span class="text-danger"></span>
@@ -150,7 +150,7 @@
                                                     <div class="input-group">        
                                                         <input type="text" readonly name="partnership" id="partnership" oninput="this.value = this.value.replace(/[^\d.]/g,'');this.value = this.value.replace(/(\..*)\./g,'$1')" class="form-control" placeholder="0">        
                                                         <div class="input-group-append">            
-                                                            <button type="button"  class="btn btn-outline-primary btn-dim pop" pageTitle="Add Partnership" pageSize="modal-xl" pageName="<?php echo  site_url('service/report/manage/partnership'); ?>" id="markButton">ADD</button>        
+                                                            <button type="button"  class="btn btn-outline-primary btn-dim pop" pageTitle="Add Partnership" pageSize="modal-xl" pageName="<?php echo  site_url('service/report/manage/partnership'); ?>" id="partnerBtn">ADD</button>        
                                                         </div>    
                                                     </div>
                                                     <span class="text-danger"></span>
@@ -235,6 +235,12 @@
     });
 
     function edit_report(id){
+        var selectElement = document.getElementById("cells_id");
+        var markButton = document.getElementById("markButton");
+        var convertBtn = document.getElementById("convertBtn");
+        var timerBtn = document.getElementById("timerBtn");
+        var partnerBtn = document.getElementById("partnerBtn");
+        var titheBtn = document.getElementById("titheBtn");
         $('#bb_ajax_msg').html('<div class="col-sm-12 text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>');
         $('#show').hide(500);
         $('#form').show(500);
@@ -247,13 +253,14 @@
         $(this).find('em').removeClass().addClass('icon ni ' + currentInfo.iconClass);
 
         $.ajax({
-            url: site_url + 'accounts/creport/edit/' + id,
+            url: site_url + 'service/report/edit/' + id,
             type: 'get',
             success: function (data) {
                 var dt = JSON.parse(data);
                 $('#report_id').val(dt.e_id);
-                $('#type').val(dt.e_type).change();;
-                $("#cells_id").val(dt.e_cell_id).change();
+                $('#type').val(dt.e_type).change();
+                $("#partnership").val(dt.e_partnership).val();
+                $("#tithe").val(dt.e_tithe).val();
                 $('#dates').val(dt.e_date);
                 $('#attendance').val(dt.e_attendance);
                 $('#new_convert').val(dt.e_new_convert);
@@ -264,17 +271,25 @@
                 $('#timers').val(dt.e_timers);
                 $('#converts').val(dt.e_converts);
                 
-                var url = site_url + 'accounts/creport/manage/attendance';
-                var updatedPageName = url + "/" + dt.e_cell_id + "/" + dt.e_id;
+                var url = site_url + 'service/report/manage/attendance';
+                var updatedPageName = url + "/" + dt.e_id;
                 markButton.setAttribute("pageName", updatedPageName);
 
-                var urls = site_url + 'accounts/creport/manage/new_convert';
-                var updatedPageName = urls + "/" + dt.e_cell_id + "/" + dt.e_id;
+                var urls = site_url + 'service/report/manage/new_convert';
+                var updatedPageName = urls + "/" + dt.e_id;
                 convertBtn.setAttribute("pageName", updatedPageName);
                 
-                var urls = site_url + 'accounts/creport/manage/first_timer';
-                var updatedPageName = urls + "/" + dt.e_cell_id + "/" + dt.e_id;
+                var urls = site_url + 'service/report/manage/first_timer';
+                var updatedPageName = urls + "/" + dt.e_id;
                 timerBtn.setAttribute("pageName", updatedPageName);
+                
+                var urls = site_url + 'service/report/manage/partnership';
+                var updatedPageName = urls + "/" + dt.e_id;
+                partnerBtn.setAttribute("pageName", updatedPageName);
+                
+                var urls = site_url + 'service/report/manage/tithe';
+                var updatedPageName = urls + "/" + dt.e_id;
+                titheBtn.setAttribute("pageName", updatedPageName);
                 $('#bb_ajax_msg').html('');
             }
         });
@@ -286,6 +301,8 @@
         var markButton = document.getElementById("markButton");
         var convertBtn = document.getElementById("convertBtn");
         var timerBtn = document.getElementById("timerBtn");
+        var partnerBtn = document.getElementById("partnerBtn");
+        var titheBtn = document.getElementById("titheBtn");
         
         var selectedValue = selectElement.value;
        
@@ -300,7 +317,14 @@
         var urls = site_url + 'accounts/creport/manage/first_timer';
         var updatedPageName = urls + "/" + selectedValue;
         timerBtn.setAttribute("pageName", updatedPageName);
-                
+        
+        var urls = site_url + 'service/report/manage/partnership';
+        var updatedPageName = urls + "/" + selectedValue;
+        partnerBtn.setAttribute("pageName", updatedPageName);
+        
+        var urls = site_url + 'service/report/manage/tithe';
+        var updatedPageName = urls + "/" + selectedValue;
+        titheBtn.setAttribute("pageName", updatedPageName);
         
     }
 

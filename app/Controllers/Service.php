@@ -304,8 +304,10 @@ class Service extends BaseController {
 				if(!empty($edit)) {
 					foreach($edit as $e) {
 						$edata['e_id'] = $e->id;
-						$edata['e_cell_id'] = $e->cell_id;
 						$edata['e_type'] = $e->type;
+						$edata['e_date'] = $e->date;
+						$edata['e_tithe'] = $e->tithe;
+						$edata['e_partnership'] = $e->partnership;
 						$edata['e_date'] = $e->date;
 						$edata['e_attendance'] = $e->attendance;
 						$edata['e_new_convert'] = $e->new_convert;
@@ -313,6 +315,8 @@ class Service extends BaseController {
 						$edata['e_offering'] = $e->offering;
 						$edata['e_note'] = $e->note;
 						$edata['e_attendant'] = $e->attendant;
+						$edata['e_tithers'] = $e->tithers;
+						$edata['e_partners'] = $e->partners;
 						$edata['e_timers'] = $e->timers;
 						$edata['e_converts'] = $e->converts;
 					}
@@ -421,6 +425,7 @@ class Service extends BaseController {
 			}  elseif($param2 == 'partnership'){
 				$timer_count = $this->session->get('service_timers');
 				// $first = json_decode($timer_count);
+				// echo $timer_count;
 				$data['first'] = $timer_count;
 				if($param3) {
 					$edit = $this->Crud->read2('type_id', $param3, 'type', 'cell', 'attendance');
@@ -457,7 +462,7 @@ class Service extends BaseController {
 							$partner[$name] = $parts;
 						}
 					}
-
+					$partnerships['guest'] = $partner;
 					
 					$pmember = [];
 					if(count($member) == 0){
@@ -478,16 +483,18 @@ class Service extends BaseController {
 								}
 							}
 							// 
-							$partner[$name] = $par;
+							$pmember[$name] = $par;
 						}
 					}
+					$partnerships['member'] = $pmember;
 					
-					$partnership = json_encode($partner);
+					
+					$partnership = json_encode($partnerships);
 					$guest_part = $this->request->getPost('guest_part');
 					$total_part = $this->request->getPost('total_part');
 					$member_part = $this->request->getPost('member_part');
 
-					$partners['partnership'] = $partnership;
+					$partners['partnership'] = $partnerships;
 					$partners['guest_part'] = $guest_part;
 					$partners['total_part'] = $total_part;
 					$partners['member_part'] = $member_part;
@@ -514,7 +521,7 @@ class Service extends BaseController {
 							var jsonData = ' . json_encode($partners) . ';
 							var jsonString = JSON.stringify(jsonData);
 							$("#partners").val(jsonString);
-							$("#partnership").val('.number_format($total_part,2).');
+							$("#partnership").val('.($total_part).');
 							$("#modal").modal("hide");
 						}, 2000); </script>';
 					}
@@ -522,8 +529,13 @@ class Service extends BaseController {
 				}
 
 			} elseif($param2 == 'tithe'){
+				if($param3){
+					$data['table_rec'] = 'service/report/tithe_list/'.$param3; // ajax table
 				
-				$data['table_rec'] = 'service/report/tithe_list'; // ajax table
+				} else {
+					$data['table_rec'] = 'service/report/tithe_list'; // ajax table
+				
+				}
 				$data['order_sort'] = '0, "asc"'; // default ordering (0, 'asc')
 				$data['no_sort'] = '1'; // sort disable columns (1,3,5)
 		
@@ -757,24 +769,20 @@ class Service extends BaseController {
 					
 					// do create or update
 					if($report_id) {
-						
-						$ins_data['attendant'] = $attend;
-						$ins_data['converts'] = $conv;
-						$ins_data['timers'] = $times;
 								
-						$upd_rec = $this->Crud->updates('id', $creport_id, $table, $ins_data);
+						$upd_rec = $this->Crud->updates('id', $report_id, $table, $ins_data);
 						if($upd_rec > 0) {
-							$at['attendant'] = $this->session->get('cell_attendance');
-							$at_id = $this->Crud->read_field2('type_id', $creport_id, 'type', 'cell', 'attendance', 'id');
-							$this->Crud->updates('id', $at_id, 'attendance', $at);
-							$this->session->set('cell_attendance', '');
-							$this->session->set('cell_convert', '');
-							
-							$this->session->set('cell_timers', '');
+							$this->session->set('service_attendance', '');
+							$this->session->set('service_partnership', '');
+							$this->session->set('service_converts', '');
+							$this->session->set('service_timers', '');
+							$this->session->set('service_tithe', '');
+							$this->session->set('service_timer_count', '');
+
 							///// store activities
 							$by = $this->Crud->read_field('id', $log_id, 'user', 'firstname');
-							$action = $by.' updated Cell Meeting Report';
-							$this->Crud->activity('user', $cell_id, $action);
+							$action = $by.' updated Service Meeting Report';
+							$this->Crud->activity('user', $report_id, $action);
 
 							echo $this->Crud->msg('success', 'Report Updated');
 							echo '<script>location.reload(false);</script>';
@@ -980,6 +988,7 @@ class Service extends BaseController {
 			$list = $this->Crud->datatable_load($table, $column_order, $column_search, $order, $where);
 			$data = array();
 			// $no = $_POST['start'];
+			
 			$count = 1;
 			foreach ($list as $item) {
 				$id = $item->id;
@@ -987,27 +996,23 @@ class Service extends BaseController {
 				$surname = $item->surname;
 				$img = $this->Crud->image($item->img_id, 'big');
 				// add manage buttons
-
-				$attend = $this->session->get('service_attendance');
-				// print_r($attend);
-				$sel = '';
-				// if(!empty($attend)){
-				// 	$attends = json_decode($attend);
-				// 	$ats = (array)$attends;
-				// 	foreach($ats as $a => $val){
-				// 		if($a == 'attendant'){
-				// 			// $vall = json_decode($val);
-				// 			if(in_array($item->id, (array)$val)){
-				// 				$sel = 'checked';
-				// 			}
-				// 		}
-				// 	}
+				$value = '0';
+				if($param2){
+					$convertsa = json_decode($this->Crud->read_field('id', $param2, 'service_report', 'tithers'));
+					$converts =(array) $convertsa->list;
+					if(!empty($converts)){
+						foreach($converts as $co => $val){
+							if($id == $co){
+								$value = $val;
+							}
+						}
 					
-					
-				// }
+					}	
+				}
+				
 				$all_btn = '
 					<div class="text-center">
-						<input type="text" class="form-control tithes" name="tithe[]" id="tithe_'.$item->id.'" value="0" oninput="calculateTotal();this.value = this.value.replace(/[^\d.]/g,\'\');this.value = this.value.replace(/(\..*)\./g,\'$1\')">
+						<input type="text" class="form-control tithes" name="tithe[]" id="tithe_'.$item->id.'" value="'.$value.'" oninput="calculateTotal();this.value = this.value.replace(/[^\d.]/g,\'\');this.value = this.value.replace(/(\..*)\./g,\'$1\')">
 					</div>
 				';
 

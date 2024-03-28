@@ -306,20 +306,31 @@ $this->Crud = new Crud();
         </div>
     <?php } ?>
      
-    <?php if($param2 == 'tithe'){?>
+    <?php if($param2 == 'tithe'){
+        $converts = json_decode($this->Crud->read_field('id', $param3, 'service_report', 'tithers'));
+        $total =0 ;
+        $member = 0;
+        $guest = 0;
+        if(!empty($converts)){
+            $total = $converts->total;
+            $member = $converts->member;
+            $guest = $converts->guest;
+            
+        }
+        ?>
         <div class="row">
             <span class="text-danger mb-2">Enter Member's Tithe in the Table Below</span>
             <div class="col-sm-4 mb-3 ">
                 <label>Total</label>
-                <input class="form-control" id="total_tithe" type="text" name="total_tithe"  readonly value="0">
+                <input class="form-control" id="total_tithe" type="text" name="total_tithe"  readonly value="<?=number_format($total,2); ?>">
             </div>
             <div class="col-sm-4 mb-3">
                 <label>Member</label>
-                <input class="form-control" id="member_tithe" type="text" name="member_tithe"  readonly value="0">
+                <input class="form-control" id="member_tithe" type="text" name="member_tithe"  readonly value="<?=number_format($member,2); ?>">
             </div>
             <div class="col-sm-4 mb-3">
                 <label>Guest</label>
-                <input class="form-control" id="guest_tithe" type="text" name="guest_tithe" oninput="get_tithe();this.value = this.value.replace(/[^\d.]/g,'');this.value = this.value.replace(/(\..*)\./g,'$1')" value="0">
+                <input class="form-control" id="guest_tithe" type="text" name="guest_tithe" oninput="get_tithe();this.value = this.value.replace(/[^\d.]/g,'');this.value = this.value.replace(/(\..*)\./g,'$1')" value="<?=number_format($guest,2); ?>">
             </div>
         </div>
         <hr>
@@ -348,26 +359,43 @@ $this->Crud = new Crud();
         </div>
     <?php } ?>
     
-    <?php if($param2 == 'partnership'){?>
+    <?php if($param2 == 'partnership'){
+        $total =0 ;
+        $member = 0;
+        $guest = 0;
+        $first = json_decode($first);
+        if($param3){
+            $converts = json_decode($this->Crud->read_field('id', $param3, 'service_report', 'partners'));
+        
+            if(!empty($converts)){
+                $total = $converts->total_part;
+                $member = $converts->member_part;
+                $guest = $converts->guest_part;
+                $firsts = $converts->partnership;
+                $first = (array)$firsts;
+                
+            }
+        }
+        
+        ?>
         <div class="row">
             <span class="text-danger mb-2">Enter Member's Partnership in the Table Below</span>
             <div class="col-sm-4 mb-3 ">
                 <label>Total</label>
-                <input class="form-control" id="total_part" type="text" name="total_part"  readonly value="0">
+                <input class="form-control" id="total_part" type="text" name="total_part"  readonly value="<?=($total); ?>">
             </div>
             <div class="col-sm-4 mb-3">
                 <label>Member</label>
-                <input class="form-control" id="member_part" type="text" name="member_part"  readonly value="0">
+                <input class="form-control" id="member_part" type="text" name="member_part"  readonly value="<?=($member); ?>">
             </div>
             <div class="col-sm-4 mb-3">
                 <label>First Timer</label>
-                <input class="form-control" id="guest_part" type="text" name="guest_part" oninput="get_part();this.value = this.value.replace(/[^\d.]/g,'');this.value = this.value.replace(/(\..*)\./g,'$1')" readonly value="0">
+                <input class="form-control" id="guest_part" type="text" name="guest_part" oninput="get_part();this.value = this.value.replace(/[^\d.]/g,'');this.value = this.value.replace(/(\..*)\./g,'$1')" readonly value="<?=($guest); ?>">
             </div>
         </div>
         <hr>
         <div class="table-responsive">
             <?php
-                $first = json_decode($first);
                 if(!empty($first)){
             ?>
                 <table class="table table-striped table-hover mt-5" id="dataTable">
@@ -397,28 +425,74 @@ $this->Crud = new Crud();
                         </tr>
                     </thead>
                     <tbody>
-                        <tr class="original-row">
-                            <td>
-                                <select class="js-select2 firsts"  data-search="on" name="first_timer[]" id="firsts" data-placeholder="Select First Timer" required>
-                                    <option value="">Select</option>
-                                    <?php 
-                                        if(!empty((array)$first)){
-                                            foreach($first as $mm => $val){
-                                                echo '<option value="'.$val->fullname.'">'.strtoupper($val->fullname).'</option>';
-                                            }
-                                        } 
-                                    ?>
-                                </select>
-                            </td>
-                            <?php 
-                                if(!empty($parts)){
-                                    foreach($parts as $pp => $val){
-                                        echo '<td><input type="text" style="width:100px;" class="form-control firsts_amount" name="'.$pp.'_first[]" oninput="bindInputEvents();" value="0"></td>';
+                        <?php if($param3){
+                            foreach($first as $f => $val){
+                                if($f == 'guest'){
+                                    $selval = [];
+                                    if(!empty($val)){
+                                        foreach($val as $pp => $pval){
+                                            $selval[] = $pp;
+                                            $parts_val = (array)$pval;
+                                       
+                                        }  
                                     }
-                                }
                             ?>
-                            <td></td> <!-- Empty cell for Action -->
-                        </tr>
+                            <tr class="original-row">
+                                <td>
+                                    <select class="js-select2 firsts"  data-search="on" name="first_timer[]" id="firsts" data-placeholder="Select First Timer" selected required>
+                                        
+                                        <?php 
+                                            if(!empty((array)$selval)){
+                                                foreach($selval as $mm => $val){
+                                                    echo '<option value="'.$val.'">'.strtoupper($val).'</option>';
+                                                }
+                                            } 
+                                        ?>
+                                    </select>
+                                </td>
+                                <?php 
+
+                                    if(!empty($parts)){
+                                        $vall = 0;
+                                        foreach($parts as $pp => $val){
+                                            if(!empty($parts_val)){
+                                                if(!empty($parts_val[$pp])){$vall = $parts_val[$pp];}else{$vall = 0;}
+                                            }
+                                            echo '<td><input type="text" style="width:100px;" class="form-control firsts_amount" name="'.$pp.'_first[]" oninput="bindInputEvents();" value="'.$vall.'"></td>';
+                                        }
+                                    }
+                                ?>
+                                <td></td>
+                            </tr>
+                        <?php } 
+                            }
+                        }
+                        else{?>
+
+                            
+                            <tr class="original-row">
+                                <td>
+                                    <select class="js-select2 firsts"  data-search="on" name="first_timer[]" id="firsts" data-placeholder="Select First Timer" required>
+                                        <option value="">Select</option>
+                                        <?php 
+                                            if(!empty((array)$first)){
+                                                foreach($first as $mm => $val){
+                                                    echo '<option value="'.$val->fullname.'">'.strtoupper($val->fullname).'</option>';
+                                                }
+                                            } 
+                                        ?>
+                                    </select>
+                                </td>
+                                <?php 
+                                    if(!empty($parts)){
+                                        foreach($parts as $pp => $val){
+                                            echo '<td><input type="text" style="width:100px;" class="form-control firsts_amount" name="'.$pp.'_first[]" oninput="bindInputEvents();" value="0"></td>';
+                                        }
+                                    }
+                                ?>
+                                <td></td>
+                            </tr>
+                        <?php } ?>
                     </tbody>
                 </table>
                 <div class="col-12 my-3 text-center">
@@ -451,31 +525,75 @@ $this->Crud = new Crud();
                     </tr>
                 </thead>
                 <tbody>
-                    <tr class="original-rows">
-                        <td>
-                            <select class="js-select2 members" name="members[]" id="members" required>
-                               <option value="">Select</option>
-                                <?php 
-                                    $mem_id = $this->Crud->read_field('name', 'Member', 'access_role', 'id');
-                                    $mem = $this->Crud->read_single_order('role_id', $mem_id, 'user', 'firstname', 'asc');
-                                    if(!empty($mem)){
-                                        foreach($mem as $mm){
-                                            echo '<option value="'.$mm->id.'" >'.strtoupper($mm->firstname.' '.$mm->surname).'</option>';
-                                        }
-                                    } 
-                                ?>
-                            </select>
-                        </td>
-                        <?php 
-                           if(!empty($parts)){
-                                foreach($parts as $pp => $val){
-                                    echo ' <td ><input type="text" style="width:100px;" class="form-control  members_amount" oninput=" bindInputEvents();" name="'.$pp
-                                    .'_member[]" value="0" ></td>';
+                    <?php if($param3){
+                        foreach($first as $f => $val){
+                            if($f == 'member'){
+                                $selval = [];
+                                if(!empty($val)){
+                                    foreach($val as $pp => $pval){
+                                        $selval[] = $pp;
+                                        $parts_val = (array)$pval;
+                                    
+                                    }  
                                 }
-                            }
                         ?>
-                        <td></td>
-                    </tr>
+                        <tr class="original-rows">
+                            <td>
+                                <select class="js-select2 members" name="members[]" id="members" required>
+                                <option value="">Select</option>
+                                    <?php 
+                                        $mem_id = $this->Crud->read_field('name', 'Member', 'access_role', 'id');
+                                        $mem = $this->Crud->read_single_order('role_id', $mem_id, 'user', 'firstname', 'asc');
+                                        if(!empty($mem)){
+                                            foreach($mem as $mm){
+                                                $sel = '';
+                                                if(in_array($mm->id,$selval))$sel = 'selected';
+                                                echo '<option value="'.$mm->id.'" '.$sel.'>'.strtoupper($mm->firstname.' '.$mm->surname).'</option>';
+                                            }
+                                        } 
+                                    ?>
+                                </select>
+                            </td>
+                            <?php 
+                                if(!empty($parts)){
+                                    $vall = 0;
+                                    foreach($parts as $pp => $val){
+                                        if(!empty($parts_val)){
+                                            if(!empty($parts_val[$pp])){$vall = $parts_val[$pp];}else{$vall = 0;}
+                                        }
+                                        echo '<td><input type="text" style="width:100px;" class="form-control members_amount" name="'.$pp.'_member[]" oninput="bindInputEvents();" value="'.$vall.'"></td>';
+                                    }
+                                }
+                            ?>
+                            <td></td>
+                        </tr>
+                    <?php } }
+                        } else{?>
+                        <tr class="original-rows">
+                            <td>
+                                <select class="js-select2 members" name="members[]" id="members" required>
+                                <option value="">Select</option>
+                                    <?php 
+                                        $mem_id = $this->Crud->read_field('name', 'Member', 'access_role', 'id');
+                                        $mem = $this->Crud->read_single_order('role_id', $mem_id, 'user', 'firstname', 'asc');
+                                        if(!empty($mem)){
+                                            foreach($mem as $mm){
+                                                echo '<option value="'.$mm->id.'" >'.strtoupper($mm->firstname.' '.$mm->surname).'</option>';
+                                            }
+                                        } 
+                                    ?>
+                                </select>
+                            </td>
+                            <?php 
+                            if(!empty($parts)){
+                                    foreach($parts as $pp => $val){
+                                        echo ' <td ><input type="text" style="width:100px;" class="form-control  members_amount" oninput=" bindInputEvents();" name="'.$pp.'_member[]" value="0" ></td>';
+                                    }
+                                }
+                            ?>
+                            <td></td>
+                        </tr>
+                    <?php } ?>
                 </tbody>
             </table>
             <div class="col-12 my-3 text-center">
@@ -502,7 +620,7 @@ $this->Crud = new Crud();
                 $cell_id = $this->Crud->read_field('id', $param4, 'cell_report', 'cell_id');
                 $roles = $this->Crud->read_field('name', 'Member', 'access_role', 'id');
 
-                $converts = json_decode($this->Crud->read_field('id', $param4, 'cell_report', 'converts'));
+                $converts = json_decode($this->Crud->read_field('id', $param3, 'service_report', 'converts'));
                 if(!empty($converts)){
                     $firstIteration = true; // Flag to track the first iteration
 
@@ -618,7 +736,7 @@ $this->Crud = new Crud();
                 $cell_id = $this->Crud->read_field('id', $param4, 'cell_report', 'cell_id');
                 $roles = $this->Crud->read_field('name', 'Member', 'access_role', 'id');
 
-                $converts = json_decode($this->Crud->read_field('id', $param4, 'cell_report', 'timers'));
+                $converts = json_decode($this->Crud->read_field('id', $param3, 'service_report', 'timers'));
                 if(!empty($converts)){
                     $firstIteration = true; // Flag to track the first iteration
 
@@ -895,8 +1013,8 @@ $this->Crud = new Crud();
 
             <?php if(!empty((array)$first)) { ?>
                 <?php foreach($first as $mm => $val) { ?>
-                    var optionValue = '<?php echo htmlspecialchars($val->fullname); ?>';
-                    var optionText = '<?php echo strtoupper(htmlspecialchars($val->fullname)); ?>';
+                    var optionValue = '<?php //echo htmlspecialchars($val->fullname); ?>';
+                    var optionText = '<?php //echo strtoupper(htmlspecialchars($val->fullname)); ?>';
 
                     // Check if this option is selected in any existing row
                     var isSelected = selectedValues.includes(optionValue);
