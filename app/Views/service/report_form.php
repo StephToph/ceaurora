@@ -526,6 +526,7 @@ $this->Crud = new Crud();
                 </thead>
                 <tbody>
                     <?php if($param3){
+                        if(!empty($first)){
                         foreach($first as $f => $val){
                             if($f == 'member'){
                                 $selval = [];
@@ -567,7 +568,7 @@ $this->Crud = new Crud();
                             ?>
                             <td></td>
                         </tr>
-                    <?php } }
+                    <?php } } }
                         } else{?>
                         <tr class="original-rows">
                             <td>

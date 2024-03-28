@@ -269,6 +269,8 @@
                 $('#note').val(dt.e_note);
                 $('#attendant').val(dt.e_attendant);
                 $('#timers').val(dt.e_timers);
+                $('#tither').val(dt.e_tither);
+                $('#partners').val(dt.e_partners);
                 $('#converts').val(dt.e_converts);
                 
                 var url = site_url + 'service/report/manage/attendance';
