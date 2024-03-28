@@ -425,6 +425,7 @@ class Service extends BaseController {
 			}  elseif($param2 == 'partnership'){
 				$timer_count = $this->session->get('service_timers');
 				// $first = json_decode($timer_count);
+				// echo $timer_count;
 				$data['first'] = $timer_count;
 				if($param3) {
 					$edit = $this->Crud->read2('type_id', $param3, 'type', 'cell', 'attendance');
@@ -461,7 +462,7 @@ class Service extends BaseController {
 							$partner[$name] = $parts;
 						}
 					}
-
+					$partnerships['guest'] = $partner;
 					
 					$pmember = [];
 					if(count($member) == 0){
@@ -482,16 +483,18 @@ class Service extends BaseController {
 								}
 							}
 							// 
-							$partner[$name] = $par;
+							$pmember[$name] = $par;
 						}
 					}
+					$partnerships['member'] = $pmember;
 					
-					$partnership = json_encode($partner);
+					
+					$partnership = json_encode($partnerships);
 					$guest_part = $this->request->getPost('guest_part');
 					$total_part = $this->request->getPost('total_part');
 					$member_part = $this->request->getPost('member_part');
 
-					$partners['partnership'] = $partnership;
+					$partners['partnership'] = $partnerships;
 					$partners['guest_part'] = $guest_part;
 					$partners['total_part'] = $total_part;
 					$partners['member_part'] = $member_part;

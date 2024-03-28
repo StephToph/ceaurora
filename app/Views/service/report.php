@@ -317,7 +317,14 @@
         var urls = site_url + 'accounts/creport/manage/first_timer';
         var updatedPageName = urls + "/" + selectedValue;
         timerBtn.setAttribute("pageName", updatedPageName);
-                
+        
+        var urls = site_url + 'service/report/manage/partnership';
+        var updatedPageName = urls + "/" + selectedValue;
+        partnerBtn.setAttribute("pageName", updatedPageName);
+        
+        var urls = site_url + 'service/report/manage/tithe';
+        var updatedPageName = urls + "/" + selectedValue;
+        titheBtn.setAttribute("pageName", updatedPageName);
         
     }
 
