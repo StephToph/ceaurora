@@ -824,19 +824,19 @@ class Service extends BaseController {
 										}
 										
 									}
-									if(!empty($partners)){
-										$partners = (array)json_decode($partners);
-										$part = $partners['partnership'];
-										$part = ((array)$part);
-										$guest = (array)($part['guest']);
-										if(!empty($guest)){
-											foreach ($guest as $Gkey => $Gvalue) {
-												if($Gkey != $fullname){
-													print_r($Gvalue);
-												}
-											}
-										}
-									}
+									// if(!empty($partners)){
+									// 	$partners = (array)json_decode($partners);
+									// 	$part = $partners['partnership'];
+									// 	$part = ((array)$part);
+									// 	$guest = (array)($part['guest']);
+									// 	if(!empty($guest)){
+									// 		foreach ($guest as $Gkey => $Gvalue) {
+									// 			if($Gkey != $fullname){
+									// 				print_r($Gvalue);
+									// 			}
+									// 		}
+									// 	}
+									// }
 									
 								}
 							}
