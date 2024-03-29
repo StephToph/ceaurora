@@ -59,11 +59,9 @@ $this->Crud = new Crud();
                         ';
                     } else{
                         foreach($reports as $r){
-                            $types = '';
-                            if($r->type == 'wk1')$types = 'WK1 - Prayer and Planning';
-                            if($r->type == 'wk2')$types = 'Wk2 - Bible Study';
-                            if($r->type == 'wk3')$types = 'Wk3 - Bible Study';
-                            if($r->type == 'wk4')$types = 'Wk4 - Fellowship / Outreach';
+                           $types = $this->Crud->read_field('id', $r->type, 'service_type', 'name');
+
+                            
                 ?>    
                     <div class="row">
                         <div class="col-sm-3 mb-3">
@@ -128,22 +126,37 @@ $this->Crud = new Crud();
                         <div class="col-sm-12">No Record</div>
                     ';
                 } else {
+                    $attendant = json_decode($r->attendant);
                     echo '<div class="row"> 
                         <div class="col-sm-3  mb-3">
-                            <label class="fw-bold">Attendance</label>
+                            <label class="fw-bold">Total Attendance</label>
                         </div>
                         <div class="col-sm-9  mb-3">
                             <p>'.$r->attendance.'</p>
-                        </div>';
-                    $attendant = json_decode($r->attendant);
-                    print_r($attendant);
+                        </div>
+                        <div class="col-sm-3  mb-3">
+                        <label class="fw-bold">Member</label>
+                        </div>
+                        <div class="col-sm-9  mb-3">
+                            <p>'.$attendant->member.'</p>
+                        </div>
+                        <div class="col-sm-3  mb-3">
+                            <label class="fw-bold">First Timer</label>
+                        </div>
+                        <div class="col-sm-9  mb-3">
+                            <p>'.$attendant->guest.'</p>
+                        </div>
+                        
+                        ';
+                   
+                        $attendant = $attendant->attendant;
                     if(!empty($attendant)){
-                       
+                      
                         foreach($attendant as $at => $val){
                             $name = $this->Crud->read_field('id', $val, 'user', 'firstname').' '.$this->Crud->read_field('id', $val, 'user', 'surname');
-                        ?>
-                        <div class="col-sm-4 mb-2 border"><?=ucwords($name); ?></div>
-                    <?php } echo '</div>';
+                         ?>
+                        <div class="col-sm-4 mb-2 border"><?=strtoupper($name); ?></div>
+                     <?php } echo '</div>';
                     } else {
                         echo '
                             <div class="col-sm-12">No Attendance Record</div>
@@ -234,19 +247,7 @@ $this->Crud = new Crud();
                             </div>
                             <div class="col-sm-4 mb-2 ">
                                 <label class="fw-bold">Invited By</label>
-                                <p><?=ucwords($time['invited_by']); ?></p>
                             </div>
-                            <?php if($time['invited_by'] == 'Member'){?>
-                                <div class="col-sm-4 mb-2 ">
-                                    <label class="fw-bold">Channel</label>
-                                    <p><?=ucwords($this->Crud->read_field('id', $time['channel'], 'user', 'firstname').' '.$this->Crud->read_field('id', $time['channel'], 'user', 'surname')); ?></p>
-                                </div>
-                            <?php } else{?>
-                                <div class="col-sm-4 mb-2 ">
-                                    <label class="fw-bold">Channel</label>
-                                    <p><?=ucwords($time['channel']); ?></p>
-                                </div>
-                            <?php } ?>
                             
                         </div>
                     <?php }
@@ -257,6 +258,94 @@ $this->Crud = new Crud();
                     }
                 }?>     
             </div>
+            <div class="tab-pane" id="tabItem5">        
+                <?php if(empty($reports)){
+                    echo '
+                        <div class="col-sm-12">No Record</div>
+                    ';
+                } else {
+                    $tithers = json_decode($r->tithers);
+                    echo '<div class="row"> 
+                        <div class="col-sm-3  mb-3">
+                            <label class="fw-bold">Total</label>
+                        </div>
+                        <div class="col-sm-9  mb-3">
+                            <p>$'.number_format($tithers->total,2).'</p>
+                        </div>
+                        <div class="col-sm-3  mb-3">
+                        <label class="fw-bold">Member</label>
+                        </div>
+                        <div class="col-sm-9  mb-3">
+                            <p>$'.number_format($tithers->member,2).'</p>
+                        </div>
+                        <div class="col-sm-3  mb-3">
+                            <label class="fw-bold">Guest</label>
+                        </div>
+                        <div class="col-sm-9  mb-3">
+                            <p>$'.number_format($tithers->guest,2).'</p>
+                        </div>
+                        
+                        ';
+                   
+                        $attendant = $tithers->list;
+                    if(!empty($attendant)){
+                    //   print_r($attendant);
+                        foreach($attendant as $at => $val){
+                            $name = $this->Crud->read_field('id', $at, 'user', 'firstname').' '.$this->Crud->read_field('id', $at, 'user', 'surname');
+                         ?>
+                        <div class="col-sm-4 mb-2 border"><?=strtoupper($name); ?> => $<?=number_format($val,2); ?></div>
+                     <?php } echo '</div>';
+                    } else {
+                        echo '
+                            <div class="col-sm-12">No Tither Record</div>
+                        ';
+                    }
+                }?>
+            </div>   
+            <div class="tab-pane" id="tabItem6">        
+                <?php if(empty($reports)){
+                    echo '
+                        <div class="col-sm-12">No Record</div>
+                    ';
+                } else {
+                    $attendant = json_decode($r->attendant);
+                    echo '<div class="row"> 
+                        <div class="col-sm-3  mb-3">
+                            <label class="fw-bold">Total Attendance</label>
+                        </div>
+                        <div class="col-sm-9  mb-3">
+                            <p>'.$r->attendance.'</p>
+                        </div>
+                        <div class="col-sm-3  mb-3">
+                        <label class="fw-bold">Member</label>
+                        </div>
+                        <div class="col-sm-9  mb-3">
+                            <p>'.$attendant->member.'</p>
+                        </div>
+                        <div class="col-sm-3  mb-3">
+                            <label class="fw-bold">First Timer</label>
+                        </div>
+                        <div class="col-sm-9  mb-3">
+                            <p>'.$attendant->guest.'</p>
+                        </div>
+                        
+                        ';
+                   
+                        $attendant = $attendant->attendant;
+                    if(!empty($attendant)){
+                      
+                        foreach($attendant as $at => $val){
+                            $name = $this->Crud->read_field('id', $val, 'user', 'firstname').' '.$this->Crud->read_field('id', $val, 'user', 'surname');
+                         ?>
+                        <div class="col-sm-4 mb-2 border"><?=strtoupper($name); ?></div>
+                     <?php } echo '</div>';
+                    } else {
+                        echo '
+                            <div class="col-sm-12">No Attendance Record</div>
+                        ';
+                    }
+                }?>
+            </div>   
         </div>
     <?php } ?>
         
