@@ -39,12 +39,20 @@ $this->Crud = new Crud();
             <li class="nav-item">       
                 <a class="nav-link" data-bs-toggle="tab" href="#tabItem4"><em class="icon ni ni-repeat"></em><span>New Convert</span></a>    
             </li>
+            <li class="nav-item">        
+                <a class="nav-link" data-bs-toggle="tab" href="#tabItem5"><em class="icon ni ni-wallet"></em><span>Tithe</span></a>    
+            </li>    
+            
+            <li class="nav-item">        
+                <a class="nav-link" data-bs-toggle="tab" href="#tabItem6"><em class="icon ni ni-money"></em><span>Partnership</span></a>    
+            </li>    
+            
         </ul>
         <div class="tab-content">    
             <div class="tab-pane active" id="tabItem1">    
                 <?php 
                     $r_id = $param3;
-                    $reports = $this->Crud->read_single('id', $r_id, 'cell_report');
+                    $reports = $this->Crud->read_single('id', $r_id, 'service_report');
                     if(empty($reports)){
                         echo '
                             <div class="col-sm-12">No Record</div>
@@ -128,6 +136,7 @@ $this->Crud = new Crud();
                             <p>'.$r->attendance.'</p>
                         </div>';
                     $attendant = json_decode($r->attendant);
+                    print_r($attendant);
                     if(!empty($attendant)){
                        
                         foreach($attendant as $at => $val){

@@ -1810,7 +1810,7 @@ class Crud extends Model {
 			$builder->where('member_id', $log_id);
 		} 
         // build query
-		$builder->orderBy('id', 'asc');
+		$builder->orderBy('id', 'desc');
 		
         if(!empty($search)) {
             $builder->like('name', $search);
