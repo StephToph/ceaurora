@@ -416,7 +416,7 @@ $this->Crud = new Crud();
                                         // if($pp->name == 'BIBLE SPONSOR')$name = 'Bible';
                                         
                                         echo ' <th >'.strtoupper($name).'</th>';
-                                        echo '<input type="hidden" name="'.$index.'_parts[]" value="'.$pp->id.'">';
+                                        echo '<input type="hidden" name="'.($index-1).'_parts[]" value="'.$pp->id.'">';
 
                                     }
                                 }
@@ -458,7 +458,7 @@ $this->Crud = new Crud();
                                             if(!empty($parts_val)){
                                                 if(!empty($parts_val[$pp])){$vall = $parts_val[$pp];}else{$vall = 0;}
                                             }
-                                            echo '<td><input type="text" style="width:100px;" class="form-control firsts_amount" name="'.$pp.'_first[]" oninput="bindInputEvents();" value="'.$vall.'"></td>';
+                                            echo '<td><input type="text" style="width:100px;" class="form-control firsts_amount" name="'.($pp-1).'_first[]" oninput="bindInputEvents();" value="'.$vall.'"></td>';
                                         }
                                     }
                                 ?>
@@ -562,7 +562,7 @@ $this->Crud = new Crud();
                                         if(!empty($parts_val)){
                                             if(!empty($parts_val[$pp])){$vall = $parts_val[$pp];}else{$vall = 0;}
                                         }
-                                        echo '<td><input type="text" style="width:100px;" class="form-control members_amount" name="'.$pp.'_member[]" oninput="bindInputEvents();" value="'.$vall.'"></td>';
+                                        echo '<td><input type="text" style="width:100px;" class="form-control members_amount" name="'.($pp-1).'_member[]" oninput="bindInputEvents();" value="'.$vall.'"></td>';
                                     }
                                 }
                             ?>
@@ -588,7 +588,7 @@ $this->Crud = new Crud();
                             <?php 
                             if(!empty($parts)){
                                     foreach($parts as $pp => $val){
-                                        echo ' <td ><input type="text" style="width:100px;" class="form-control  members_amount" oninput=" bindInputEvents();" name="'.$pp.'_member[]" value="0" ></td>';
+                                        echo ' <td ><input type="text" style="width:100px;" class="form-control  members_amount" oninput=" bindInputEvents();" name="'.($pp-1).'_member[]" value="0" ></td>';
                                     }
                                 }
                             ?>

@@ -767,8 +767,80 @@ class Service extends BaseController {
 					$ins_data['tithe'] = $tithe;
 					$ins_data['partners'] = $partners;
 					
-					if(!empty($partners)){
-						echo $partners;
+					if(!empty($timers)){
+						//Create membership
+						$first = json_decode($timers);
+						if(!empty($first)){
+							foreach ($first as $key => $value) {
+								if(!empty($value)){
+									foreach ($value as $keys => $values) {
+										if($keys == 'fullname'){
+											$words = explode(" ", $values);
+											$fullname = $values;
+											// Get the last word
+											$surname = array_pop($words);
+					
+											// Reassemble the remaining words
+											$first_name = implode(" ", $words);
+											
+										}
+										
+										if($keys == 'email')$email = $values;
+										if($keys == 'phone')$phone = $values;
+										if($keys == 'gender')$gender = $values;
+										if($keys == 'family_position')$family_position = $values;
+										if($keys == 'dob')$dob = $values;
+
+									}
+									$title = 'Brother';
+									if($gender == 'Female')$title = 'Sister';
+									$uData['firstname'] = $first_name;
+									$uData['surname'] = $surname;
+									$uData['email'] = $email;
+									$uData['phone'] = $phone;
+									
+									$uData['gender'] = $gender;
+									$uData['dob'] = $dob;
+									$uData['activate'] = 0;
+									$role_ids = $this->Crud->read_field('name', 'Member', 'access_role', 'id');
+									$uData['role_id'] = $role_ids;
+									$uData['title'] = $title;
+									$uData['reg_date'] = date(fdate);
+									
+									if($this->Crud->check('email', $email, 'user') > 0 || $thid->Crud->check('phone', $phone, 'user') > 0){
+										echo $this->Crud->msg('warning', 'Email/Phone Number Already Exisit');
+									} else {
+										$Urec = $this->Crud->create('user', $uData);
+										if($Urec > 0) {
+
+											///// store activities
+											$by = $this->Crud->read_field('id', $log_id, 'user', 'firstname');
+											$code = $this->Crud->read_field('id', $Urec, 'user', 'surname');
+											$this->Crud->updates('id', $Urec, 'user', array('user_no'=>'CEAM-00'.$Urec));
+
+											$user_no = 'CEAM-00'.$Urec;
+
+											
+										}
+										
+									}
+									if(!empty($partners)){
+										$partners = (array)json_decode($partners);
+										$part = $partners['partnership'];
+										$part = ((array)$part);
+										$guest = (array)($part['guest']);
+										if(!empty($guest)){
+											foreach ($guest as $Gkey => $Gvalue) {
+												if($Gkey != $fullname){
+													print_r($Gvalue);
+												}
+											}
+										}
+									}
+									
+								}
+							}
+						}
 					}
 
 					die;
