@@ -807,6 +807,9 @@ class Service extends BaseController {
 									$uData['title'] = $title;
 									$uData['reg_date'] = date(fdate);
 									
+
+									
+
 									if($this->Crud->check('email', $email, 'user') > 0 || $thid->Crud->check('phone', $phone, 'user') > 0){
 										echo $this->Crud->msg('warning', 'Email/Phone Number Already Exisit');
 									} else {
@@ -820,23 +823,59 @@ class Service extends BaseController {
 
 											$user_no = 'CEAM-00'.$Urec;
 
+											if(!empty($partners)){
+												$partners = (array)json_decode($partners);
+												$part = $partners['partnership'];
+												$part = ((array)$part);
+												$guest = (array)($part['guest']);
+												if(!empty($guest)){
+													foreach ($guest as $Gkey => $Gvalue) {
+														if($Gkey == $fullname){
+															$uid = $this->Crud->read_field('email', $email, 'user', 'id');
+															if(!empty($Gvalue)){
+																foreach($Gvalue as $gb => $gamount){
+																	$p_ins['member_id'] = $uid;
+																	$p_ins['partnership_id'] = $gb;
+																	$p_ins['amount_paid'] = $gamount;
+																	$p_ins['reg_date'] = date(fdate);
+																	$p_ins['status'] = 1;
+																	$p_ins['date_paid'] = $dates;
+		
+																	if($this->Crud->check2('member_id', $uid, 'date_paid', $dates, 'partners_history') == 0){
+																		$this->Crud->create('partners_history', $p_ins);
+																	}
+																}
+															}
+															
+														}
+													}
+												}
+												$member = (array)($part['member']);
+												if(!empty($member)){
+													foreach ($member as $Gkey => $Gvalue) {
+														if(!empty($Gvalue)){
+															foreach($Gvalue as $gb => $gamount){
+																$p_ins['member_id'] = $Gkey;
+																$p_ins['partnership_id'] = $gb;
+																$p_ins['amount_paid'] = $gamount;
+																$p_ins['reg_date'] = date(fdate);
+																$p_ins['status'] = 1;
+																$p_ins['date_paid'] = $dates;
+		
+																if($this->Crud->check2('member_id', $Gkey, 'date_paid', $dates, 'partners_history') == 0){
+																	$this->Crud->create('partners_history', $p_ins);
+																}
+															}
+														}
+															
+														
+													}
+												}
+											}
 											
 										}
 										
 									}
-									// if(!empty($partners)){
-									// 	$partners = (array)json_decode($partners);
-									// 	$part = $partners['partnership'];
-									// 	$part = ((array)$part);
-									// 	$guest = (array)($part['guest']);
-									// 	if(!empty($guest)){
-									// 		foreach ($guest as $Gkey => $Gvalue) {
-									// 			if($Gkey != $fullname){
-									// 				print_r($Gvalue);
-									// 			}
-									// 		}
-									// 	}
-									// }
 									
 								}
 							}
