@@ -308,37 +308,141 @@ $this->Crud = new Crud();
                         <div class="col-sm-12">No Record</div>
                     ';
                 } else {
-                    $attendant = json_decode($r->attendant);
+                    $attendant = json_decode($r->partners);
                     echo '<div class="row"> 
                         <div class="col-sm-3  mb-3">
-                            <label class="fw-bold">Total Attendance</label>
+                            <label class="fw-bold">Total</label>
                         </div>
                         <div class="col-sm-9  mb-3">
-                            <p>'.$r->attendance.'</p>
+                            <p>$'.number_format($attendant->total_part,2).'</p>
                         </div>
                         <div class="col-sm-3  mb-3">
                         <label class="fw-bold">Member</label>
                         </div>
                         <div class="col-sm-9  mb-3">
-                            <p>'.$attendant->member.'</p>
+                            <p>$'.$attendant->member_part.'</p>
                         </div>
                         <div class="col-sm-3  mb-3">
                             <label class="fw-bold">First Timer</label>
                         </div>
                         <div class="col-sm-9  mb-3">
-                            <p>'.$attendant->guest.'</p>
+                            <p>$'.$attendant->guest_part.'</p>
                         </div>
                         
-                        ';
-                   
-                        $attendant = $attendant->attendant;
+                    ';
+                
+                    $attendant = $attendant->partnership;
                     if(!empty($attendant)){
-                      
+                        $name = '';
+                        $partners = (array)$attendant;
                         foreach($attendant as $at => $val){
-                            $name = $this->Crud->read_field('id', $val, 'user', 'firstname').' '.$this->Crud->read_field('id', $val, 'user', 'surname');
+                            echo '
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                            ';
+                            if($at == 'guest'){
+                                echo '
+                                    <tr>
+                                        <td><b>GUEST</b></td>
+                                    </tr>
+                                    <tr>
+                                        <th>NAME</th>
+                                    ';
+                                    $parts = $this->Crud->read_order('partnership', 'name', 'asc');
+                                    if(!empty($parts)){
+                                        foreach($parts as $index => $pp){
+                                            $name = $pp->name;
+                                            if(strtoupper($pp->name) == 'BIBLE SPONSOR')$name = 'Bible';
+                                            if(strtoupper($pp->name) == 'CHILDREN MINISTRY')$name = 'Children';
+                                            if(strtoupper($pp->name) == 'HEALING SCHOOL MAGAZINE')$name = 'H.S.M';
+                                            if(strtoupper($pp->name) == 'HEALING STREAM')$name = 'H.S';
+                                            if(strtoupper($pp->name) == 'LOVEWORLD LWUSA')$name = 'lwusa';
+                                            if(strtoupper($pp->name) == 'MINISTRY PROGRAM')$name = 'Ministry';
+                                            // if($pp->name == 'BIBLE SPONSOR')$name = 'Bible';
+                                            
+                                            echo ' <th >'.strtoupper($name).'</th>';
+                                        }
+                                    }
+                                    echo '</tr>';
+
+                                    if(!empty($val)){
+                                        $vals = (array)$val;
+                                        foreach($vals as $v => $am){
+                                            $ams = (array)$am;
+                                            
+                                            echo '<tr>
+                                                    <td>'.strtoupper($v).'</td> ';
+                                            ?>
+                                            <?php  
+                                                $parts = $this->Crud->read_order('partnership', 'name', 'asc');
+                                                if(!empty($parts)){
+                                                    foreach($parts as $index => $pp){
+                                                        $pps = 0;
+                                                        if(!empty($ams[$pp->id])){
+                                                            $pps =  $ams[$pp->id];
+                                                        }
+                                                        echo ' <td>'.($pps).'</td>';
+                                                    }
+                                                }
+                                            echo '</tr>';
+                                        }
+                                    }
+                            }
+                            if($at == 'member'){
+                                echo '
+                                    <tr>
+                                        <td><b>MEMBER</b></td>
+                                    </tr>
+                                    <tr>
+                                        <th>NAME</th>
+                                    ';
+                                    $parts = $this->Crud->read_order('partnership', 'name', 'asc');
+                                    if(!empty($parts)){
+                                        foreach($parts as $index => $pp){
+                                            $name = $pp->name;
+                                            if(strtoupper($pp->name) == 'BIBLE SPONSOR')$name = 'Bible';
+                                            if(strtoupper($pp->name) == 'CHILDREN MINISTRY')$name = 'Children';
+                                            if(strtoupper($pp->name) == 'HEALING SCHOOL MAGAZINE')$name = 'H.S.M';
+                                            if(strtoupper($pp->name) == 'HEALING STREAM')$name = 'H.S';
+                                            if(strtoupper($pp->name) == 'LOVEWORLD LWUSA')$name = 'lwusa';
+                                            if(strtoupper($pp->name) == 'MINISTRY PROGRAM')$name = 'Ministry';
+                                            // if($pp->name == 'BIBLE SPONSOR')$name = 'Bible';
+                                            
+                                            echo ' <th >'.strtoupper($name).'</th>';
+                                        }
+                                    }
+                                    echo '</tr>';
+
+                                    if(!empty($val)){
+                                        $vals = (array)$val;
+                                        foreach($vals as $v => $am){
+                                            $ams = (array)$am;
+                                            $vname = $this->Crud->read_field('id', $v, 'user', 'firstname').' '.$this->Crud->read_field('id', $v, 'user', 'surname');
+                                            echo '<tr>
+                                                    <td>'.strtoupper($vname).'</td> ';
+                                            ?>
+                                            <?php  
+                                                $parts = $this->Crud->read_order('partnership', 'name', 'asc');
+                                                if(!empty($parts)){
+                                                    foreach($parts as $index => $pp){
+                                                        $pps = 0;
+                                                        if(!empty($ams[$pp->id])){
+                                                            $pps =  $ams[$pp->id];
+                                                        }
+                                                        echo ' <td>'.($pps).'</td>';
+                                                    }
+                                                }
+                                            echo '</tr>';
+                                        }
+                                    }
+                            }
+                           
                          ?>
-                        <div class="col-sm-4 mb-2 border"><?=strtoupper($name); ?></div>
-                     <?php } echo '</div>';
+                        
+                            <?php echo '
+                                    </table>
+                                </div>';
+                        } 
                     } else {
                         echo '
                             <div class="col-sm-12">No Attendance Record</div>
