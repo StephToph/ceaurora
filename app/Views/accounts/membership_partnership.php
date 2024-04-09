@@ -16,19 +16,19 @@
                 <div class="nk-block-head nk-block-head-sm">
                     <div class="nk-block-between">
                         <div class="nk-block-head-content">
-                            <h3 class="nk-block-title page-title"><?php if(!empty($param2)){echo ucwords($this->Crud->read_field('id', $param2, 'user', 'surname')).'`s '; } ?><?=translate_phrase('Partnership');?></h3>
+                            <h3 class="nk-block-title page-title"><?php if(!empty($param2)){echo ucwords($this->Crud->read_field('id', $param2, 'user', 'surname')).'`s '; } ?><?=translate_phrase('Partnership Goal');?></h3>
                         </div>
-                        <div class="nk-block-head-content">
-                            <a class="btn btn-info" href="<?=site_url('accounts/membership'); ?>"><em class="icon ni ni-arrow-long-left"></em>Back to Membership</a>
-                        </div><!-- .nk-block-head-content -->
+                        <?php if($role != 'member'){?>
+                            <div class="nk-block-head-content">
+                                <a class="btn btn-info" href="<?=site_url('accounts/membership'); ?>"><em class="icon ni ni-arrow-long-left"></em>Back to Membership</a>
+                            </div><!-- .nk-block-head-content -->
+                        <?php } ?>
                     </div><!-- .nk-block-between -->
                 </div><!-- .nk-block-head -->
                 <div class="nk-block">
                     <div class="card card-bordered card-stretch">
                         <div class="card-inner-group">
-                            <?php 
-                                if(empty($this->Crud->read_field('id', $param2, 'user', 'partnership'))){
-                            ?>
+                            
                             <div class="card-inner position-relative card-tools-toggle">
                                 <div class="card-title-group">
                                     <div class="card-tools">
@@ -36,16 +36,23 @@
                                     </div><!-- .card-tools -->
                                     <div class="card-tools me-n1">
                                         <ul class="btn-toolbar gx-1">
-                                            <li>
-                                                <a href="javascript:;" pageTitle="Add Partnership" class="btn btn-outline-primary btn-icon pop" pageName="<?=site_url('accounts/membership/partnership/'.$param2.'/add'); ?>"><em class="icon ni ni-plus-c"></em></a>
-                                            </li><!-- li -->
-                                           
+                                            <?php 
+                                                if(empty($this->Crud->read_field('id', $param2, 'user', 'partnership'))){
+                                            ?>
+                                                <li>
+                                                    <a href="javascript:;" pageTitle="Add Partnership" class="btn btn-outline-primary btn-icon pop" pageName="<?=site_url('accounts/membership/partnership/'.$param2.'/add'); ?>"><em class="icon ni ni-plus-c"></em></a>
+                                                </li><!-- li -->
+                                            <?php } else{?>
+                                                <li>
+                                                    <a href="javascript:;" pageTitle="Edit Partnership" class="btn btn-outline-danger btn-icon pop" pageName="<?=site_url('accounts/membership/partnership/'.$param2.'/edit'); ?>"><em class="icon ni ni-edit"></em></a>
+                                                </li><!-- li -->
+                                            <?php } ?>
                                         </ul><!-- .btn-toolbar -->
                                     </div><!-- .card-tools -->
                                 </div><!-- .card-title-group -->
                                
                             </div><!-- .card-inner -->
-                            <?php } ?>
+                            
                             <div class="card-inner p-0">
                                 <div class="nk-tb-list nk-tb-ulist" id="load_data">
                                 </div><!-- .nk-tb-list -->

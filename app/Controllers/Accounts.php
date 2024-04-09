@@ -2762,9 +2762,7 @@ class Accounts extends BaseController {
 		}
 
 		if($param1 == 'partnership'){
-			if($role_c == 0){
-				return redirect()->to(site_url('dashboard'));	
-			}
+			
 			if($param2) {
 				$user_id = $param2;
 				$data['id'] = $user_id;
@@ -2774,6 +2772,15 @@ class Accounts extends BaseController {
 				}
 				
 				if($param3){
+					if($param3 == 'edit'){
+						$edit = $this->Crud->read_single('id', $param2, 'user');
+						if(!empty($edit)) {
+							foreach($edit as $e) {
+								$data['e_id'] = $e->id;
+								$data['e_partnership'] = $e->partnership;
+							}
+						}
+					}
 					if($this->request->getMethod() == 'post'){
 						$part_id = $this->request->getPost('part_id');
 						$partnership = $this->request->getPost('partnership');
@@ -2878,15 +2885,13 @@ class Accounts extends BaseController {
 							}
 							
 							// add manage buttons
-							if ($role_u != 1) {
-								$all_btn = '';
-							} else {
+							
 								$all_btn = '
 								<li><a href="javascript:;" class="text-primary pop" pageTitle="View ' . $name . '" pageName="' . site_url($mod . '/manage/view/' . $id.'/'.$member_id) . '"><em class="icon ni ni-eye"></em><span>'.translate_phrase('View').'</span></a></li>
 								
 									
 								';
-							}
+							
 
 							$item .= '
 								<div class="nk-tb-item">

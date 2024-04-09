@@ -9,23 +9,42 @@ $this->Crud = new Crud();
         <input type="hidden" name="part_id" value="">
         <div class="row">
             <?php 
+                $value = 0;
                 $partner = $this->Crud->read_order('partnership', 'name', 'asc');
                 if(!empty($partner)){
-                    foreach($partner as $p){
-            ?>
-                <div class="col-sm-6 mb-2">
-                    <div class="form-group" id="">
-                        <label for="activate"><?=translate_phrase('Partnership');?></label>
-                        <input class="form-control" type="text" value="<?=ucwords($p->name); ?>" id="partnership" name="partnership[]" readonly>
+                    foreach($partner as $p){ 
+                        $amount = 0;
+                        if($param3 == 'edit'){
+                            $goal = json_decode($e_partnership);
+                            // Convert stdClass object to array
+                            $arrayFromObject = (array) $goal;
+                            if (array_key_exists($p->id, $arrayFromObject)) {
+                                if ($arrayFromObject[$p->id] == null) {
+                                    $value = 0;
+                                } else {
+                                    $value = $arrayFromObject[$p->id];
+                                }
+                            } else {
+                                // Key does not exist, return 0
+                                $value = 0;
+                            }
+
+                        }
+
+                        ?>
+                    <div class="col-sm-6 mb-2">
+                        <div class="form-group" id="">
+                            <label for="activate"><?=translate_phrase('Partnership');?></label>
+                            <input class="form-control" type="text" value="<?=ucwords($p->name); ?>" id="partnership" name="partnership[]" readonly>
+                        </div>
                     </div>
-                </div>
-                <div class="col-sm-6 mb-2">
-                    <div class="form-group">
-                        <label for="password"><?=translate_phrase('Yearly Goal');?></label>
-                        <input class="form-control" type="text" id="goal" name="goal[]">
+                    <div class="col-sm-6 mb-2">
+                        <div class="form-group">
+                            <label for="password"><?=translate_phrase('Yearly Goal');?></label>
+                            <input class="form-control" type="text" id="goal" value="<?=$value; ?>" name="goal[]">
+                        </div>
                     </div>
-                </div>
-            <?php 
+                <?php 
                 }
             }
             ?>
