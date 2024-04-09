@@ -77,6 +77,7 @@ $this->Crud = new Crud();
                     </div>
                 </div>
             </div>
+            <?php if($role != 'member'){?>
             <div class="col-sm-12 mb-3">
                 <div class="form-group">
                     <label for="name">*<?=translate_phrase('Members'); ?></label>
@@ -100,6 +101,9 @@ $this->Crud = new Crud();
                     </select>
                 </div>
             </div>
+            <?php } else {?>
+                <input type="hidden" name="member_id" value="<?=$log_id; ?>">
+            <?php } ?>
             <div class="col-sm-12 mb-3">
                 <div class="form-group">
                     <label for="name">*<?=translate_phrase('Partnership'); ?></label>
@@ -151,6 +155,8 @@ $this->Crud = new Crud();
                         </select>
                     </div>
                 </div>
+            <?php } else{?>
+                <input type="hidden" name="status" value="0">
             <?php } ?>
             
         </div>

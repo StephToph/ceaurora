@@ -31,6 +31,9 @@
                                     <li class="nav-item">
                                         <a class="nav-link active" href="<?=site_url('auth/profile'); ?>"><em class="icon ni ni-user-fill-c"></em><span><?=translate_phrase('Personal'); ?></span></a>
                                     </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="<?=site_url('accounts/membership/partnership/'.$log_id); ?>"><em class="icon ni ni-cc-secure"></em><span><?=translate_phrase('Partnership Goals'); ?></span></a>
+                                    </li>
                                 </ul><!-- .nav-tabs -->
                                 <div class="card-inner card-inner-lg">
                                     <div class="nk-block-head">
