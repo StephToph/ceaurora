@@ -1602,6 +1602,13 @@ class Accounts extends BaseController {
 						
 						if(!empty($getImg->path)) $img_id = $getImg->path;
 					}
+
+					if($role == 'member'){
+						if(empty($img_id)){
+							echo $this->Crud->msg('danger', 'Upload Payment Receipt');
+							die;
+						}
+					}
 					
 					$ins_data['member_id'] = $member_id;
 					$ins_data['partnership_id'] = $partnership_id;
@@ -1668,8 +1675,8 @@ class Accounts extends BaseController {
 			$items = '
 				<div class="nk-tb-item nk-tb-head">
 					<div class="nk-tb-col nk-tb-col-md"><span class="sub-text text-dark"><b>'.('Date').'</b></span></div>
-					<div class="nk-tb-col"><span class="sub-text text-dark"><b>'.translate_phrase('Partnership').'</b></span></div>
-					<div class="nk-tb-col nk-tb-col-md"><span class="sub-text text-dark"><b>'.translate_phrase('Member').'</b></span></div>
+					<div class="nk-tb-col"><span class="sub-text text-dark"><b>'.translate_phrase('Member').'</b></span></div>
+					<div class="nk-tb-col nk-tb-col-md"><span class="sub-text text-dark"><b>'.translate_phrase('Partnership').'</b></span></div>
 					<div class="nk-tb-col"><span class="sub-text text-dark"><b>'.translate_phrase('Amount').'</b></span></div>
 					<div class="nk-tb-col"><span class="sub-text text-dark"><b>'.translate_phrase('Status').'</b></span></div>
 					<div class="nk-tb-col nk-tb-col-tools">
@@ -1704,7 +1711,7 @@ class Accounts extends BaseController {
 						$partnership_id = $q->partnership_id;
 						$amount_paid = $q->amount_paid;
 						$status = $q->status;
-						$reg_date = date('d M Y h:iA', strtotime($q->date_paid));
+						$reg_date = date('d M Y', strtotime($q->date_paid));
 						$member = $this->Crud->read_field('id', $member_id, 'user', 'firstname').' '.$this->Crud->read_field('id', $member_id, 'user', 'surname');
 						$partnership = $this->Crud->read_field('id', $partnership_id, 'partnership', 'name');
 						
@@ -1716,6 +1723,7 @@ class Accounts extends BaseController {
 						if ($role_u != 1) {
 							$all_btn = '';
 						} else {
+							
 							$all_btn = '
 								<li><a href="javascript:;" class="text-primary pop" pageTitle="Edit" pageName="' . site_url($mod . '/manage/edit/' . $id) . '"><em class="icon ni ni-edit-alt"></em><span>'.translate_phrase('Edit').'</span></a></li>
 								<li><a href="javascript:;" class="text-danger pop" pageTitle="Delete" pageName="' . site_url($mod . '/manage/delete/' . $id) . '"><em class="icon ni ni-trash-alt"></em><span>'.translate_phrase('Delete').'</span></a></li>
@@ -2166,7 +2174,7 @@ class Accounts extends BaseController {
         $role_u = $this->Crud->module($role_id, $mod, 'update');
         $role_d = $this->Crud->module($role_id, $mod, 'delete');
         if($role_r == 0){
-            return redirect()->to(site_url('dashboard'));	
+            // return redirect()->to(site_url('dashboard'));	
         }
         $data['log_id'] = $log_id;
         $data['role'] = $role;
@@ -2754,6 +2762,9 @@ class Accounts extends BaseController {
 		}
 
 		if($param1 == 'partnership'){
+			if($role_c == 0){
+				return redirect()->to(site_url('dashboard'));	
+			}
 			if($param2) {
 				$user_id = $param2;
 				$data['id'] = $user_id;

@@ -444,6 +444,7 @@ class Service extends BaseController {
 					$member = $this->request->getPost('members');
 					$partner = [];
 					$partss = $this->Crud->read_order('partnership', 'name', 'asc');
+
 					if(!empty($first_timer)){
 						for($i=0;$i<count($first_timer);$i++){
 							$name = $first_timer[$i];
@@ -462,23 +463,27 @@ class Service extends BaseController {
 							$partner[$name] = $parts;
 						}
 					}
+
 					$partnerships['guest'] = $partner;
 					
-					$pmember = [];
+					$pmember = [];$par = [];
 					if(count($member) == 0){
 						echo $this->Crud->msg('danger', 'Select a Member and Enter the Partnership Amount');
 						die;
-					}else {
+					} else {
 						for($i=0;$i<count($member);$i++){
 							$name = $member[$i];
-							$par = [];
+							
 							if(!empty($partss)){
 								foreach($partss as $index => $pp){
 									
 									$member_amount = $this->request->getPost($index.'_member'); //Guest Partners
+									// echo ($member_amount[$index].' ');
 									
-									if($member_amount[$i] <= 0)continue;
-									$par[$pp->id] = $member_amount[$i];
+									if(!empty($member_amount[$i])){
+										if($member_amount[$i] <= 0)continue;
+										$par[$pp->id] = $member_amount[$i];
+									}
 									
 								}
 							}
@@ -767,6 +772,7 @@ class Service extends BaseController {
 					$ins_data['tithe'] = $tithe;
 					$ins_data['partners'] = $partners;
 			
+					
 
 					// do create or update
 					if($report_id) {
@@ -884,27 +890,6 @@ class Service extends BaseController {
 																	}
 																}
 															}
-															$member = (array)($part['member']);
-															if(!empty($member)){
-																foreach ($member as $Gkey => $Gvalue) {
-																	if(!empty($Gvalue)){
-																		foreach($Gvalue as $gb => $gamount){
-																			$p_ins['member_id'] = $Gkey;
-																			$p_ins['partnership_id'] = $gb;
-																			$p_ins['amount_paid'] = $gamount;
-																			$p_ins['reg_date'] = date(fdate);
-																			$p_ins['status'] = 1;
-																			$p_ins['date_paid'] = $dates;
-					
-																			if($this->Crud->check2('member_id', $Gkey, 'date_paid', $dates, 'partners_history') == 0){
-																				$this->Crud->create('partners_history', $p_ins);
-																			}
-																		}
-																	}
-																		
-																	
-																}
-															}
 														}
 														
 													}
@@ -912,6 +897,34 @@ class Service extends BaseController {
 												}
 												
 											}
+										}
+									}
+								}
+
+								//Make Partnership Payment
+								if(!empty($partners)){
+									$partners = (array)json_decode($partners);
+									$part = $partners['partnership'];
+									$part = ((array)$part);
+									$member = (array)($part['member']);
+									if(!empty($member)){
+										foreach ($member as $Gkey => $Gvalue) {
+											if(!empty($Gvalue)){
+												foreach($Gvalue as $gb => $gamount){
+													$p_ins['member_id'] = $Gkey;
+													$p_ins['partnership_id'] = $gb;
+													$p_ins['amount_paid'] = $gamount;
+													$p_ins['reg_date'] = date(fdate);
+													$p_ins['status'] = 1;
+													$p_ins['date_paid'] = $dates;
+
+													if($this->Crud->check3('member_id', $Gkey, 'partnership_id', $gb, 'date_paid', $dates, 'partners_history') == 0){
+														$this->Crud->create('partners_history', $p_ins);
+													}
+												}
+											}
+												
+											
 										}
 									}
 								}
@@ -1248,13 +1261,13 @@ class Service extends BaseController {
 									<span class="text-dark">' . ucwords($types) . '</span>
 								</div>
 								<div class="nk-tb-col">
-									<span class="text-dark">$' . number_format($offering,2) . '</span>
+									<span class="text-dark">$' . number_format((float)$offering,2) . '</span>
 								</div>
 								<div class="nk-tb-col">
-									<span class="text-dark">$' . number_format($tithe,2) . '</span>
+									<span class="text-dark">$' . number_format((float)$tithe,2) . '</span>
 								</div>
 								<div class="nk-tb-col">
-									<span class="text-dark">$' . number_format($partnership,2) . '</span>
+									<span class="text-dark">$' . number_format((float)$partnership,2) . '</span>
 								</div>
 								<div class="nk-tb-col tb-col">
 									<span class="text-dark"><span>' . ucwords($attendance) . '</b></span>
