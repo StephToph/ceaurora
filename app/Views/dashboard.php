@@ -60,29 +60,26 @@
                                 <div class="card-inner">
                                     <div class="card-title-group align-start mb-0">
                                         <div class="card-title">
-                                            <h6 class="title">Total Booking</h6>
+                                            <h6 class="title">Total Offering</h6>
                                         </div>
-                                        <div class="card-tools"><em class="card-hint icon ni ni-help-fill"
+                                        <div class="card-tools">
+                                            <em class="card-hint icon ni ni-help-fill"
                                                 data-bs-toggle="tooltip" data-bs-placement="left"
-                                                title="Total Booking"></em></div>
+                                                title="Total Offering"></em>
+                                            </div>
                                     </div>
-                                    <div class="card-amount"><span class="amount"> 11,230 </span><span
-                                            class="change down text-danger"><em
-                                                class="icon ni ni-arrow-long-down"></em>1.93%</span>
+                                    <div class="card-amount">
+                                        <span class="amount"> 0.00 <span
+                                                class="currency currency-usd">USD</span></span>
                                     </div>
                                     <div class="invest-data">
                                         <div class="invest-data-amount g-2">
                                             <div class="invest-data-history">
-                                                <div class="title">This Month</div>
-                                                <div class="amount">1913</div>
-                                            </div>
-                                            <div class="invest-data-history">
-                                                <div class="title">This Week</div>
-                                                <div class="amount">1125</div>
+                                                <div class="title">Partipant</div>
+                                                <div class="amount">0 </span>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div class="invest-data-ck"><canvas class="iv-data-chart"
-                                                id="totalBooking"></canvas></div>
                                     </div>
                                 </div>
                             </div>
@@ -92,26 +89,22 @@
                                 <div class="card-inner">
                                     <div class="card-title-group align-start mb-0">
                                         <div class="card-title">
-                                            <h6 class="title">Rooms Available</h6>
+                                            <h6 class="title">Total Tithe</h6>
                                         </div>
                                         <div class="card-tools"><em class="card-hint icon ni ni-help-fill"
                                                 data-bs-toggle="tooltip" data-bs-placement="left"
-                                                title="Total Room"></em></div>
+                                                title="Total Tithe"></em></div>
                                     </div>
-                                    <div class="card-amount"><span class="amount"> 312 </span></div>
+                                    <div class="card-amount"><span class="amount"> 0.00 <span
+                                                class="currency currency-usd">USD</span></span></div>
                                     <div class="invest-data">
                                         <div class="invest-data-amount g-2">
                                             <div class="invest-data-history">
-                                                <div class="title">Booked (M)</div>
-                                                <div class="amount">913</div>
-                                            </div>
-                                            <div class="invest-data-history">
-                                                <div class="title">Booked (W)</div>
-                                                <div class="amount">125</div>
+                                                <div class="title">Participant</div>
+                                                <div class="amount">0</span>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div class="invest-data-ck"><canvas class="iv-data-chart"
-                                                id="totalRoom"></canvas></div>
                                     </div>
                                 </div>
                             </div>
@@ -121,29 +114,21 @@
                                 <div class="card-inner">
                                     <div class="card-title-group align-start mb-0">
                                         <div class="card-title">
-                                            <h6 class="title">Expenses</h6>
+                                            <h6 class="title">Total Partnership</h6>
                                         </div>
                                         <div class="card-tools"><em class="card-hint icon ni ni-help-fill"
                                                 data-bs-toggle="tooltip" data-bs-placement="left"
-                                                title="Total Expenses"></em></div>
+                                                title="Total Partnership"></em></div>
                                     </div>
-                                    <div class="card-amount"><span class="amount"> 79,358.50 <span
+                                    <div class="card-amount"><span class="amount"> 0.00 <span
                                                 class="currency currency-usd">USD</span></span></div>
                                     <div class="invest-data">
                                         <div class="invest-data-amount g-2">
                                             <div class="invest-data-history">
-                                                <div class="title">This Month</div>
-                                                <div class="amount">3,540.59 <span
-                                                        class="currency currency-usd">USD</span></div>
-                                            </div>
-                                            <div class="invest-data-history">
-                                                <div class="title">This Week</div>
-                                                <div class="amount">1,259.28 <span
-                                                        class="currency currency-usd">USD</span></div>
+                                                <div class="title">Participant</div>
+                                                <div class="amount">0 </div>
                                             </div>
                                         </div>
-                                        <div class="invest-data-ck"><canvas class="iv-data-chart"
-                                                id="totalExpenses"></canvas></div>
                                     </div>
                                 </div>
                             </div>
@@ -153,8 +138,7 @@
                                 <div class="card-inner d-flex flex-column h-100">
                                     <div class="card-title-group mb-3">
                                         <div class="card-title me-1">
-                                            <h6 class="title">Top Selected Package</h6>
-                                            <p>In last 30 days top selected package.</p>
+                                            <h6 class="title">Partnership Section</h6>
                                         </div>
                                         <div class="card-tools mt-n1 me-n1">
                                             <div class="drodown"><a href="#"
@@ -282,7 +266,7 @@
                                 <div class="card-inner">
                                     <div class="card-title-group">
                                         <div class="card-title">
-                                            <h6 class="title">Room Booking Chart</h6>
+                                            <h6 class="title">Service Attendance Chart</h6>
                                         </div>
                                         <div class="card-tools">
                                             <div class="drodown"><a href="#"
@@ -336,16 +320,13 @@
                                 <div class="card-inner">
                                     <div class="card-title-group pb-3 g-2">
                                         <div class="card-title">
-                                            <h6 class="title">Income vs Expenses</h6>
-                                            <p>How was your income and Expenses this month.</p>
+                                            <h6 class="title">Sunday vs Wednesday</h6>
                                         </div>
                                         <div class="card-tools shrink-0 d-none d-sm-block">
                                             <ul class="nav nav-switch-s2 nav-tabs bg-white">
-                                                <li class="nav-item"><a href="#" class="nav-link">7
-                                                        D</a></li>
-                                                <li class="nav-item"><a href="#" class="nav-link active">1 M</a></li>
-                                                <li class="nav-item"><a href="#" class="nav-link">3
-                                                        M</a></li>
+                                                <li class="nav-item"><a href="#" class="nav-link">Offering</a></li>
+                                                <li class="nav-item"><a href="#" class="nav-link active">Tithe</a></li>
+                                                <li class="nav-item"><a href="#" class="nav-link">Partnership</a></li>
                                             </ul>
                                         </div>
                                     </div>
@@ -383,7 +364,7 @@
                                     <div class="card-inner">
                                         <div class="card-title-group">
                                             <div class="card-title">
-                                                <h6 class="title">New Customer</h6>
+                                                <h6 class="title">First Timer</h6>
                                             </div>
                                             <div class="card-tools"><a href="customers.html" class="link">View All</a>
                                             </div>
@@ -523,7 +504,7 @@
                                 <div class="card-inner border-bottom">
                                     <div class="card-title-group">
                                         <div class="card-title">
-                                            <h6 class="title">Recent Activities</h6>
+                                            <h6 class="title">Activity Log</h6>
                                         </div>
                                         <div class="card-tools">
                                             <ul class="card-tools-nav">
@@ -579,8 +560,7 @@
                                 <div class="card-inner mb-n2">
                                     <div class="card-title-group">
                                         <div class="card-title card-title-sm">
-                                            <h6 class="title">Traffic Channel</h6>
-                                            <p>Top traffic channels metrics.</p>
+                                            <h6 class="title">Cell Report</h6>
                                         </div>
                                         <div class="card-tools">
                                             <div class="drodown"><a href="#"
