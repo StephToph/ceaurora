@@ -282,4 +282,119 @@ class Dashboard extends BaseController {
         die;
     }
 
+    public function service_metric(){
+        $log_id = $this->session->get('td_id');
+        
+        $role_id = $this->Crud->read_field('id', $log_id, 'user', 'role_id');
+        $role = strtolower($this->Crud->read_field('id', $role_id, 'access_role', 'name'));
+
+        $service_date = '';
+        $service_key = '';
+      
+        
+        $date_type = $this->request->getPost('date_type');
+		$date_type = $this->request->getPost('date_type');
+		if(!empty($this->request->getPost('start_date'))) { $start_dates = $this->request->getPost('start_date'); } else { $start_dates = ''; }
+		if(!empty($this->request->getPost('end_date'))) { $end_dates = $this->request->getPost('end_date'); } else { $end_dates = ''; }
+		if($date_type == 'Today'){
+			$start_date = date('Y-m-d');
+			$end_date = date('Y-m-d');
+		} elseif($date_type == 'Yesterday'){
+			$start_date = date('Y-m-d', strtotime( '-1 days' ));
+			$end_date = date('Y-m-d', strtotime( '-1 days' ));
+		} elseif($date_type == 'Last_Week'){
+			$start_date = date('Y-m-d', strtotime( '-7 days' ));
+			$end_date = date('Y-m-d');
+		} elseif($date_type == 'Last_Month'){
+			$start_date = date('Y-m-d', strtotime( '-30 days' ));
+			$end_date = date('Y-m-d');
+		} elseif($date_type == 'Date_Range'){
+			$start_date = $start_dates;
+			$end_date = $end_dates;
+		} elseif($date_type == 'This_Year'){
+			$start_date = date('Y-01-01');
+			$end_date = date('Y-m-d');
+		} else {
+			$start_date = date('Y-m-01');
+			$end_date = date('Y-m-d');
+		}
+        
+        $male = 0;$female = 0;$children=0;$ft=0;$nc=0;
+        $male_per = 0;$female_per = 0;$children_per=0;$ft_per=0;$nc_per=0;
+        if($role == 'developer' || $role == 'administrator'){
+            $service = $this->Crud->read_order('service_report','id', 'asc');
+            
+            if(!empty($service)){
+                foreach($service as $u){
+                   
+                }
+                $type = $this->Crud->read_field('id', $u->type, 'service_type', 'name');
+                $service_date = $type.' - '.date('d F Y', strtotime($u->date));
+                $attend = $u->attendance;
+                $attendance = $u->attendant;
+                $attendant = json_decode($attendance);
+                $attendant = (array)$attendant;
+
+                // echo $attendant['male'];
+                $male = $attendant['male'];
+                $female = $attendant['female'];
+                $children = $attendant['children'];
+                
+                $ft = $u->first_timer;
+
+                $male_per = ((int)$male * 100)/(int)$attend;
+                $female_per = ((int)$female * 100)/(int)$attend;
+                $children_per = ((int)$children * 100)/(int)$attend;
+                $ft_per = ((int)$ft * 100)/(int)$attend;
+
+            }
+           
+            $service_key .= '
+            <div class="traffic-channel-data">
+                <div class="title"><span class="dot dot-lg sq bg-info" data-bg="#ffa353"></span><span>Male</span></div>
+                <div class="amount">'.number_format($male).' <small>'.number_format($male_per,2).'%</small></div>
+            </div>
+            <div class="traffic-channel-data">
+                <div class="title"><span class="dot dot-lg sq  bg-teal" data-bg="#ffa353"></span><span>Female</span></div>
+                <div class="amount">'.number_format($female).' <small>'.number_format($female_per,2).'%</small></div>
+            </div>
+            <div class="traffic-channel-data">
+                <div class="title"><span class="dot dot-lg sq  bg-warning" data-bg="#ffa353"></span><span>Children</span></div>
+                <div class="amount">'.number_format($children).' <small>'.number_format($children_per,2).'%</small></div>
+            </div>
+            <div class="traffic-channel-data">
+                <div class="title"><span class="dot dot-lg sq  bg-danger" data-bg="#ffa353"></span><span>First Timer</span></div>
+                <div class="amount">'.number_format($ft).' <small>'.number_format($ft_per,2).'%</small></div>
+            </div>
+           
+
+            ';
+           
+        }
+        // print_r($service);
+        // echo $offering.' e';
+
+        if($role != 'developer' && $role != 'administrator'){
+            $trade_id = $this->Crud->read_field('id', $log_id, 'user', 'trade');
+            $duration = $this->Crud->read_field('id', $log_id, 'user', 'duration');
+            if(!empty($trade_id)){
+                $remittance = $this->Crud->read_field('id', $trade_id, 'trade', 'medium');
+                $paids = $this->Crud->read_single('user_id', $log_id, 'history');
+                if(!empty($paids)){
+                    foreach($paids as $p){
+                        $total_paid  += (float)$p->amount;
+                    }
+                }
+                
+            }
+        }
+
+        $resp['service_date'] = ($service_date);
+        $resp['service_key'] = ($service_key);
+
+        
+        echo json_encode($resp);
+        die;
+    }
+
 }

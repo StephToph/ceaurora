@@ -167,18 +167,11 @@
                                     <div class="card-title-group">
                                         <div class="card-title">
                                             <h6 class="title">Service Attendance Chart</h6>
+                                            <p id="service_date">In last 30 days top selected package.</p>
                                         </div>
                                         <div class="card-tools">
-                                            <div class="drodown"><a href="#"
-                                                    class="dropdown-toggle dropdown-indicator btn btn-sm btn-outline-light btn-white"
-                                                    data-bs-toggle="dropdown">30 Days</a>
-                                                <div class="dropdown-menu dropdown-menu-end dropdown-menu-xs">
-                                                    <ul class="link-list-opt no-bdr">
-                                                        <li><a href="#"><span>7 Days</span></a></li>
-                                                        <li><a href="#"><span>15 Days</span></a></li>
-                                                        <li><a href="#"><span>30 Days</span></a></li>
-                                                    </ul>
-                                                </div>
+                                            <div class="drodown">
+                                                <a href="javascript:;" class="btn btn-sm btn-outline-light btn-white"  data-bs-toggle="dropdown">VIEW MORE</a>
                                             </div>
                                         </div>
                                     </div>
@@ -186,30 +179,9 @@
                                         <div class="traffic-channel-doughnut-ck"><canvas class="analytics-doughnut"
                                                 id="BookingData"></canvas>
                                         </div>
-                                        <div class="traffic-channel-group g-2">
-                                            <div class="traffic-channel-data">
-                                                <div class="title"><span class="dot dot-lg sq"
-                                                        data-bg="#9cabff"></span><span>Single</span>
-                                                </div>
-                                                <div class="amount">1913 <small>58.63%</small></div>
-                                            </div>
-                                            <div class="traffic-channel-data">
-                                                <div class="title"><span class="dot dot-lg sq"
-                                                        data-bg="#1ee0ac"></span><span>Double</span>
-                                                </div>
-                                                <div class="amount">859 <small>23.94%</small></div>
-                                            </div>
-                                            <div class="traffic-channel-data">
-                                                <div class="title"><span class="dot dot-lg sq"
-                                                        data-bg="#f9db7b"></span><span>Delux</span>
-                                                </div>
-                                                <div class="amount">482 <small>12.94%</small></div>
-                                            </div>
-                                            <div class="traffic-channel-data">
-                                                <div class="title"><span class="dot dot-lg sq"
-                                                        data-bg="#ffa353"></span><span>Suit</span></div>
-                                                <div class="amount">138 <small>4.49%</small></div>
-                                            </div>
+                                        <div class="traffic-channel-group g-2" id="service_key">
+                                            
+                                           
                                         </div>
                                     </div>
                                 </div>
@@ -470,7 +442,7 @@ var site_url = '<?php echo site_url(); ?>';
 </script>
 <script>
     $(function() {
-        metric_load();
+        metric_load(); load();
     });
 
     $('.typeBtn').click(function() {
@@ -488,56 +460,28 @@ var site_url = '<?php echo site_url(); ?>';
         }
     });
 
-    function load(x, y) {
+    function load() {
+        $('#service_date').html( '<div class="col-sm-12 text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>' );
+        $('#service_key').html( '<div class="col-sm-12 text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>' );
 
 
-        var more = 'no';
-        var methods = '';
-        if (parseInt(x) > 0 && parseInt(y) > 0) {
-            more = 'yes';
-            methods = '/' + x + '/' + y;
-        }
-
-        if (more == 'no') {
-            $('#load_data').html(
-                '<div class="col-sm-12 text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div><span><?=translate_phrase('Loading.. Please Wait'); ?></span></div>'
-                );
-            $('#total_id').html(
-                '<div class="col-sm-12 text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>'
-                );
-        } else {
-            $('#loadmore').html(
-                '<div class="col-sm-12 text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div><?=translate_phrase('Loading.. PLease Wait'); ?></div>'
-                );
-        }
-
-        var loads = '<?=translate_phrase('Load More'); ?>';
         var date_type = $('#date_type').val();
         var start_date = $('#start_date').val();
         var end_date = $('#end_date').val();
-        var territory = $('#territory').val();
-        var lga_id = $('#lga_id').val();
 
         $.ajax({
-            url: site_url + 'dashboard/index/tax_metric' + methods,
+            url: site_url + 'dashboard/service_metric',
             data: {
                 date_type: date_type,
                 start_date: start_date,
-                end_date: end_date,
-                territory: territory,
-                lga_id: lga_id
+                end_date: end_date
             },
             type: 'post',
             success: function(data) {
                 var dt = JSON.parse(data);
-                if (more == 'no') {
-                    $('#load_data').html(dt.item);
-                } else {
-                    $('#load_data').append(dt.item);
-                }
-            },
-            complete: function() {
-                $.getScript(site_url + '/assets/js/jsmodal.js');
+                $('#service_date').html(dt.service_date);
+                $('#service_key').html(dt.service_key);
+                
             }
         });
     }
