@@ -120,6 +120,7 @@ class Dashboard extends BaseController {
         $partnership = 0;
         $partnership_part = 0;
         $offering = 0;
+        $partnership_list = '';
 
         $date_type = $this->request->getPost('date_type');
 		$date_type = $this->request->getPost('date_type');
@@ -177,6 +178,37 @@ class Dashboard extends BaseController {
                 }
             }
 
+            $parts = $this->Crud->read('partnership');
+            if(!empty($parts)){
+                $col = array('success', 'primary', 'danger', 'info', 'warning', 'azure', 'gray','blue', 'indigo', 'orange', 'teal', 'purple');
+                
+                foreach($parts as $p){
+                    
+                    // Select a random key
+                    $random_key = array_rand($col);
+
+                    // Get the value at the random key
+                    $cols = $col[$random_key];
+
+                    
+                    $partnership_list .= '
+                        <div class="progress-wrap">
+                            <div class="progress-text">
+                                <div class="progress-label">'.ucwords($p->name).'</div>
+                                <div class="progress-amount">'.$p->id.'</div>
+                            </div>
+                            <div class="progress ">
+                                <div class="progress-bar bg-'.$cols.' progress-bar-striped progress-bar-animated" data-progress="'.$p->id.'"></div>
+                            </div>
+                        </div>
+                    ';
+                    // Remove the element from the array
+                    unset($col[$random_key]);
+
+                    // Re-index the array if needed
+                    $col = array_values($col);
+                }
+            }
            
         }
         // print_r($service_report);
@@ -203,6 +235,7 @@ class Dashboard extends BaseController {
         $resp['offering'] = '$'.number_format($offering,2);
         $resp['partnership'] = '$'.number_format($partnership,2);
         $resp['partnership_part'] = number_format($partnership_part);
+        $resp['partnership_list'] = ($partnership_list);
 
         
         echo json_encode($resp);

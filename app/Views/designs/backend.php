@@ -36,42 +36,6 @@
     <!-- StyleSheets  -->
     <link rel="stylesheet" href="<?=site_url(); ?>assets/css/dashlitee5ca.css?ver=3.2.3">
     <link id="skin-default" rel="stylesheet" href="<?=site_url(); ?>assets/css/skins/theme-egyptian.css?ver=3.2.3">
-    <style>
-        
-       @media (max-width: 768px) {
-        
-            .navbars {
-                background-color: #333;
-                padding: 15px;
-                text-align: center;
-                color: white;
-                position: fixed;
-                bottom: 0;
-                width: 100%;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                z-index: 1000; 
-            }
-
-            .nav-linkss {
-                list-style: none;
-                padding: 0;
-                margin: 0;
-                display: flex;
-                justify-content: center;
-            }
-
-            .nav-linkss li {
-                margin: 0 15px;
-            }
-
-            .nav-linkss a {
-                color: white;
-                text-decoration: none;
-            }
-        }
-    </style>
     
 </head>
 
@@ -374,76 +338,5 @@
         });
         </script>
     <?php } ?>
-
-
-    <script>
-        function saveDivAsPDF() {
-            console.log('test');
-            $('#card_response').html('<div class="col-sm-12 text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>');
-                        // Get the div element
-            var divToCapture = document.getElementById('qrcode');
-            html2canvas(divToCapture, { scale: 8 }).then(function (canvas) {
-                var imgData = canvas.toDataURL('image/png', 3.0); // Set quality to 1.0 (max quality) for JPEG
-                    // Open the image in a new browser window for printing
-                var imgWindow = window.open();
-                
-                // Set the width of the image to match the page width
-                imgWindow.document.write('<img src="' + imgData + '" style="width: 100%; image-rendering: crisp-edges;" />');
-                imgWindow.document.close();
-
-                // Trigger the print dialog
-                imgWindow.print();
-                $('#card_response').html('<div class="col-sm-12 text-center">Printing..</div>');
-            });
-        }
-        function qrcodes() {
-            console.log('test');
-            $('#qr_response').html('<div class="col-sm-12 text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>');
-            
-                        // Get the div element
-            var divToCapture = document.getElementById('qrcodes');
-            html2canvas(divToCapture, {
-                useCORS: true,  // Enable cross-origin resource sharing for stylesheets
-                scale: 10       // Set the scale for higher quality (adjust as needed)
-            }).then(function(canvas) {
-                // Convert the canvas content to a data URI in PNG format
-                var data = canvas.toDataURL('image/png');
-
-                // Create an image element
-                var img = document.createElement('img');
-                img.src = data;
-
-                // Append the image to the document (you can replace 'output' with the ID of the container where you want to display the image)
-                // document.getElementById('output').appendChild(img);
-
-                // Create a link element
-                var link = document.createElement('a');
-                link.href = data;
-                link.download = 'my_qr.png';
-                
-                $('#qr_response').html('<div class="col-sm-12 text-center">Printing</div>');
-                // Append the image to the document (you can replace 'output' with the ID of the container where you want to display the image)
-                // document.getElementById('output').appendChild(img);
-
-                // Create a link element for downloading
-                var link = document.createElement('a');
-                link.href = data;
-                link.download = 'qrcode.png';
-
-                // Trigger a click event on the link to initiate the download
-                // link.click();
-                var pdf = new window.jspdf.jsPDF(); // Use window.jspdf.jsPDF to avoid "jsPDF is not defined" error
-                pdf.addImage(data, 'PNG', 10, 10, 190, 100); // Adjust the position and size as needed
-
-                // Save the PDF or display it
-                pdf.save('qrcode.pdf');
-                
-                
-                $('#qr_response').html('');
-            });
-        }
-
-    </script>
-    
     <script src="<?=site_url(); ?>assets/js/charts/chart-hotele5ca.js"></script> 
 </html>

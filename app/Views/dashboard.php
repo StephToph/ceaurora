@@ -139,21 +139,8 @@
                                         <div class="card-title me-1">
                                             <h6 class="title">Partnership Section</h6>
                                         </div>
-                                        <div class="card-tools mt-n1 me-n1">
-                                            <div class="drodown"><a href="#"
-                                                    class="dropdown-toggle dropdown-indicator btn btn-sm btn-outline-light btn-white"
-                                                    data-bs-toggle="dropdown">30 Days</a>
-                                                <div class="dropdown-menu dropdown-menu-end dropdown-menu-xs">
-                                                    <ul class="link-list-opt no-bdr">
-                                                        <li><a href="#"><span>7 Days</span></a></li>
-                                                        <li><a href="#"><span>15 Days</span></a></li>
-                                                        <li><a href="#"><span>30 Days</span></a></li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                        </div>
                                     </div>
-                                    <div class="progress-list gy-3">
+                                    <div class="progress-list gy-3" id="partnership_list">
                                         <div class="progress-wrap">
                                             <div class="progress-text">
                                                 <div class="progress-label">Strater Package</div>
@@ -161,55 +148,6 @@
                                             </div>
                                             <div class="progress progress-md">
                                                 <div class="progress-bar" data-progress="58"></div>
-                                            </div>
-                                        </div>
-                                        <div class="progress-wrap">
-                                            <div class="progress-text">
-                                                <div class="progress-label">Honeymoon Package</div>
-                                                <div class="progress-amount">43%</div>
-                                            </div>
-                                            <div class="progress progress-md">
-                                                <div class="progress-bar bg-warning" data-progress="43">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="progress-wrap">
-                                            <div class="progress-text">
-                                                <div class="progress-label">Vacation Package</div>
-                                                <div class="progress-amount">33%</div>
-                                            </div>
-                                            <div class="progress progress-md">
-                                                <div class="progress-bar bg-azure" data-progress="33">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="progress-wrap">
-                                            <div class="progress-text">
-                                                <div class="progress-label">Continental Package</div>
-                                                <div class="progress-amount">29%</div>
-                                            </div>
-                                            <div class="progress progress-md">
-                                                <div class="progress-bar bg-pink" data-progress="29">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="progress-wrap">
-                                            <div class="progress-text">
-                                                <div class="progress-label">Spring Package</div>
-                                                <div class="progress-amount">18.49%</div>
-                                            </div>
-                                            <div class="progress progress-md">
-                                                <div class="progress-bar bg-orange" data-progress="18.49"></div>
-                                            </div>
-                                        </div>
-                                        <div class="progress-wrap">
-                                            <div class="progress-text">
-                                                <div class="progress-label">All suite Package</div>
-                                                <div class="progress-amount">16%</div>
-                                            </div>
-                                            <div class="progress progress-md">
-                                                <div class="progress-bar bg-teal" data-progress="16">
-                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -752,7 +690,7 @@ var site_url = '<?php echo site_url(); ?>';
         $('#offering_part').html(
             '<div class="col-sm-12 text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>'
             );
-        $('#field').html(
+        $('#partnership_list').html(
             '<div class="col-sm-12 text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>'
             );
         var date_type = $('#date_type').val();
@@ -776,48 +714,11 @@ var site_url = '<?php echo site_url(); ?>';
                 $('#offering').html(dt.offering);
                 $('#partnership_part').html(dt.partnership_part);
                 $('#partnership').html(dt.partnership);
-
+                $('#partnership_list').html(dt.partnership_list);
+                NioApp.BS.progress('[data-progress]');
             }
         });
     }
 
-    function virtual_create() {
-        $('#virtual_resp').html(
-            '<div class="col-sm-12 text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>'
-            );
-        $.ajax({
-            url: site_url + 'dashboard/create_virtual',
-            type: 'post',
-            success: function(data) {
-                $('#virtual_resp').html(data);
-
-            }
-        });
-    }
-
-    function copyToClipboard() {
-        // Get the text content of the div
-        var textToCopy = document.getElementById('tax_id').innerText;
-
-        // Create a textarea element to temporarily hold the text
-        var textarea = document.createElement('textarea');
-        textarea.value = textToCopy;
-        document.body.appendChild(textarea);
-
-        // Select the text in the textarea
-        textarea.select();
-        textarea.setSelectionRange(0, textarea.value.length);
-
-        // Copy the selected text to the clipboard
-        document.execCommand('copy');
-
-        // Remove the textarea from the DOM
-        document.body.removeChild(textarea);
-        $('#copy_resp').html('<span class="text-danger">Tax ID Copied</span>');
-        // Optionally, provide some visual feedback (e.g., an alert)
-        setTimeout(function() {
-            $('#copy_resp').html('');
-        }, 3000);
-    }
 </script>
 <?=$this->endSection();?>
