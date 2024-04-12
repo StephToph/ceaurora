@@ -49,7 +49,7 @@ $(function () {
 		var formData = new FormData($(this)[0]);
 		var clear = $(form).attr('clear');
 		var processung = 'Processing, please wait';
-		console.log(processung);
+		
 		// show prograss loading
 		$('#bb_ajax_msg').html('<div class="row"><div class="text-center col-lg-12"><div class="spinner-border" role="status">  <span class="visually-hidden">Loading...</span></div><br/>'+processung+'...</div></div>');
 		// Submit the form using AJAX.
