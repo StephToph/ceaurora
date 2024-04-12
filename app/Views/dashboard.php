@@ -148,45 +148,16 @@
                         </div>
                         <div class="col-md-7">
                             <div class="card card-bordered h-100">
-                                <div class="card-inner">
-                                    <div class="card-title-group align-start pb-3 g-2">
-                                        <div class="card-title">
-                                            <h6 class="title">Sales Revenue</h6>
-                                            <p>In last 30 days revenue from rent.</p>
+                                <div class="card-inner mb-n2">
+                                    <div class="card-title-group">
+                                        <div class="card-title card-title-sm">
+                                            <h6 class="title">Cell Report</h6>
                                         </div>
-                                        <div class="card-tools"><em class="card-hint icon ni ni-help"
-                                                data-bs-toggle="tooltip" data-bs-placement="left"
-                                                title="Revenue of this month"></em></div>
+                                        
                                     </div>
-                                    <div class="analytic-au">
-                                        <div class="analytic-data-group analytic-au-group g-3">
-                                            <div class="analytic-data analytic-au-data">
-                                                <div class="title">Monthly</div>
-                                                <div class="amount">9.28K</div>
-                                                <div class="change up"><em class="icon ni ni-arrow-long-up"></em>4.63%
-                                                </div>
-                                            </div>
-                                            <div class="analytic-data analytic-au-data">
-                                                <div class="title">Weekly</div>
-                                                <div class="amount">2.69K</div>
-                                                <div class="change down"><em
-                                                        class="icon ni ni-arrow-long-down"></em>1.92%
-                                                </div>
-                                            </div>
-                                            <div class="analytic-data analytic-au-data">
-                                                <div class="title">Daily (Avg)</div>
-                                                <div class="amount">0.94K</div>
-                                                <div class="change up"><em class="icon ni ni-arrow-long-up"></em>3.45%
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="analytic-au-ck"><canvas class="analytics-au-chart"
-                                                id="analyticAuData"></canvas></div>
-                                        <div class="chart-label-group">
-                                            <div class="chart-label">01 Jan, 2020</div>
-                                            <div class="chart-label">30 Jan, 2020</div>
-                                        </div>
-                                    </div>
+                                </div>
+                                <div class="nk-tb-list is-loose traffic-channel-table" id="cell_data">
+                                    
                                 </div>
                             </div>
                         </div>
@@ -484,98 +455,7 @@
                                 </ul>
                             </div>
                         </div>
-                        <div class="col-md-12">
-                            <div class="card card-bordered h-100">
-                                <div class="card-inner mb-n2">
-                                    <div class="card-title-group">
-                                        <div class="card-title card-title-sm">
-                                            <h6 class="title">Cell Report</h6>
-                                        </div>
-                                        <div class="card-tools">
-                                            <div class="drodown"><a href="#"
-                                                    class="dropdown-toggle dropdown-indicator btn btn-sm btn-outline-light btn-white"
-                                                    data-bs-toggle="dropdown">30 Days</a>
-                                                <div
-                                                    class="dropdown-menu dropdown-menu-end dropdown-menu-xs">
-                                                    <ul class="link-list-opt no-bdr">
-                                                        <li><a href="#"><span>7 Days</span></a></li>
-                                                        <li><a href="#"><span>15 Days</span></a></li>
-                                                        <li><a href="#"><span>30 Days</span></a></li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="nk-tb-list is-loose traffic-channel-table">
-                                    <div class="nk-tb-item nk-tb-head">
-                                        <div class="nk-tb-col nk-tb-channel"><span>Channel</span></div>
-                                        <div class="nk-tb-col nk-tb-sessions"><span>Sessions</span>
-                                        </div>
-                                        <div class="nk-tb-col nk-tb-prev-sessions"><span>Prev
-                                                Sessions</span></div>
-                                        <div class="nk-tb-col nk-tb-change"><span>Change</span></div>
-                                        
-                                    </div>
-                                    <div class="nk-tb-item">
-                                        <div class="nk-tb-col nk-tb-channel"><span
-                                                class="tb-lead">Organic Search</span></div>
-                                        <div class="nk-tb-col nk-tb-sessions"><span
-                                                class="tb-sub tb-amount"><span>4,305</span></span></div>
-                                        <div class="nk-tb-col nk-tb-prev-sessions"><span
-                                                class="tb-sub tb-amount"><span>4,129</span></span></div>
-                                        <div class="nk-tb-col nk-tb-change"><span
-                                                class="tb-sub"><span>4.29%</span> <span
-                                                    class="change up"><em
-                                                        class="icon ni ni-arrow-long-up"></em></span></span>
-                                        </div>
-                                        
-                                    </div>
-                                    <div class="nk-tb-item">
-                                        <div class="nk-tb-col nk-tb-channel"><span
-                                                class="tb-lead">Social Media</span></div>
-                                        <div class="nk-tb-col nk-tb-sessions"><span
-                                                class="tb-sub tb-amount"><span>859</span></span></div>
-                                        <div class="nk-tb-col nk-tb-prev-sessions"><span
-                                                class="tb-sub tb-amount"><span>936</span></span></div>
-                                        <div class="nk-tb-col nk-tb-change"><span
-                                                class="tb-sub"><span>15.8%</span> <span
-                                                    class="change down"><em
-                                                        class="icon ni ni-arrow-long-down"></em></span></span>
-                                        </div>
-                                        
-                                    </div>
-                                    <div class="nk-tb-item">
-                                        <div class="nk-tb-col nk-tb-channel"><span
-                                                class="tb-lead">Referrals</span></div>
-                                        <div class="nk-tb-col nk-tb-sessions"><span
-                                                class="tb-sub tb-amount"><span>482</span></span></div>
-                                        <div class="nk-tb-col nk-tb-prev-sessions"><span
-                                                class="tb-sub tb-amount"><span>793</span></span></div>
-                                        <div class="nk-tb-col nk-tb-change"><span
-                                                class="tb-sub"><span>41.3%</span> <span
-                                                    class="change down"><em
-                                                        class="icon ni ni-arrow-long-down"></em></span></span>
-                                        </div>
-                                        
-                                    </div>
-                                    <div class="nk-tb-item">
-                                        <div class="nk-tb-col nk-tb-channel"><span
-                                                class="tb-lead">Others</span></div>
-                                        <div class="nk-tb-col nk-tb-sessions"><span
-                                                class="tb-sub tb-amount"><span>138</span></span></div>
-                                        <div class="nk-tb-col nk-tb-prev-sessions"><span
-                                                class="tb-sub tb-amount"><span>97</span></span></div>
-                                        <div class="nk-tb-col nk-tb-change"><span
-                                                class="tb-sub"><span>12.6%</span> <span
-                                                    class="change up"><em
-                                                        class="icon ni ni-arrow-long-up"></em></span></span>
-                                        </div>
-                                        
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        
                     </div>
                 </div>
             </div>
@@ -684,6 +564,9 @@ var site_url = '<?php echo site_url(); ?>';
         $('#partnership_list').html(
             '<div class="col-sm-12 text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>'
             );
+        $('#cell_data').html(
+        '<div class="col-sm-12 text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>'
+        );
         var date_type = $('#date_type').val();
         var start_date = $('#start_date').val();
         var end_date = $('#end_date').val();
@@ -706,6 +589,7 @@ var site_url = '<?php echo site_url(); ?>';
                 $('#partnership_part').html(dt.partnership_part);
                 $('#partnership').html(dt.partnership);
                 $('#partnership_list').html(dt.partnership_list);
+                $('#cell_data').html(dt.cell_data);
                 NioApp.BS.progress('[data-progress]');
             }
         });

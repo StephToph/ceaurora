@@ -121,7 +121,7 @@ class Dashboard extends BaseController {
         $partnership_part = 0;
         $offering = 0;
         $partnership_list = '';
-
+        $cell_data = '';
         $date_type = $this->request->getPost('date_type');
 		$date_type = $this->request->getPost('date_type');
 		if(!empty($this->request->getPost('start_date'))) { $start_dates = $this->request->getPost('start_date'); } else { $start_dates = ''; }
@@ -163,8 +163,36 @@ class Dashboard extends BaseController {
             }
 
             if(!empty($cell_report)){
+                $cell_data .= '
+                        <div class="nk-tb-item nk-tb-head">
+                        <div class="nk-tb-col nk-tb-channel"><span>Cell</span></div>
+                        <div class="nk-tb-col nk-tb-channel"><span>Meeting</span></div>
+                            <div class="nk-tb-col nk-tb-sessions"><span>Attendant</span>
+                            </div>
+                            <div class="nk-tb-col nk-tb-prev-sessions"><span>New Convert</span></div>
+                            <div class="nk-tb-col nk-tb-change"><span>First Timer</span></div>
+                            
+                        </div>
+                ';
                 foreach($cell_report as $u){
                     $offering += (float)$u->offering;
+                    if($u->type == 'wk1')$types = 'WK1 - Prayer and Planning';
+                    if($u->type == 'wk2')$types = 'Wk2 - Bible Study';
+                    if($u->type == 'wk3')$types = 'Wk3 - Bible Study';
+                    if($u->type == 'wk4')$types = 'Wk4 - Fellowship / Outreach';
+                    $cell_data .= '
+                        
+                            <div class="nk-tb-item">
+                                <div class="nk-tb-col nk-tb-channel"><span class="tb-lead">'.ucwords($this->Crud->read_field('id', $u->cell_id, 'cells', 'name')).'</span></div>
+                                <div class="nk-tb-col nk-tb-channel"><span class="tb-lead">'.ucwords($types).'</span></div>
+                                <div class="nk-tb-col nk-tb-sessions"><span class="tb-sub tb-amount"><span>'.number_format($u->attendance).'</span></span></div>
+                                <div class="nk-tb-col nk-tb-prev-sessions"><span class="tb-sub tb-amount"><span>'.number_format($u->new_convert).'</span></span></div>
+                                <div class="nk-tb-col nk-tb-change"><span class="tb-sub"><span>'.number_format($u->first_timer).'</span></span>
+                                </div>
+                                
+                            </div>
+                    ';
+
                 }
             }
 
@@ -205,8 +233,8 @@ class Dashboard extends BaseController {
                     $partnership_list .= '
                         <div class="progress-wrap">
                             <div class="progress-text">
-                                <div class="progress-label">'.ucwords($p->name).'</div>
-                                <div class="progress-amount">'.number_format($paid,2).'</div>
+                                <div class="progress-label">'.ucwords($p->name).' <b>($'.number_format($paid,2).')</b></div>
+                                <div class="progress-amount">'.number_format($paids,1).'%</div>
                             </div>
                             <div class="progress ">
                                 <div class="progress-bar bg-'.$cols.' progress-bar-striped progress-bar-animated" data-progress="'.$paids.'"></div>
@@ -247,6 +275,7 @@ class Dashboard extends BaseController {
         $resp['partnership'] = '$'.number_format($partnership,2);
         $resp['partnership_part'] = number_format($partnership_part);
         $resp['partnership_list'] = ($partnership_list);
+        $resp['cell_data'] = ($cell_data);
 
         
         echo json_encode($resp);
