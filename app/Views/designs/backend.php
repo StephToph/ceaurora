@@ -164,7 +164,7 @@
             <div class="nk-wrap ">
                 <div class="nk-header nk-header-fixed bg-white">
                     <div class="container-fluid">
-                    <div class="nk-header-wrap">
+                        <div class="nk-header-wrap">
                             <div class="nk-menu-trigger d-xl-none ms-n1">
                                 <a href="javascript:;" class="nk-nav-toggle nk-quick-nav-icon" data-target="sidebarMenu"><em class="icon ni ni-menu"></em></a>
                             </div>
@@ -174,10 +174,6 @@
                                     <img class="logo-dark logo-img logo-img-lg" src="<?=site_url();?>assets/logo.png?v=0" srcset="<?=site_url();?>assets/logo.png?v=0 2x" width="" alt="logo-dark">
                                 </a>
                             </div>
-                            <div class="nk-header-search ms-3 ms-xl-0">
-                                <!-- <em class="icon ni ni-search"></em>
-                                <input type="text" class="form-control border-transparent form-focus-none" placeholder="Search anything"> -->
-                            </div>
                             
                         </div>
                     </div>
@@ -185,49 +181,49 @@
                 
                 <?=$this->renderSection('content');?>
         
-            <!-- content @e -->
-            <div class="nk-footer nk-footer-fluid bg-lighter">
-                <div class="container-xl wide-lg">
-                    <div class="nk-footer-wrap">
-                        <div class="nk-footer-copyright">&copy;<?=date('Y'); ?> <?=app_name;?>. <?=translate_phrase('All Rights Reserved.'); ?>
-                        </div>
-                        <div class="nk-footer-links">
-                            <ul class="nav nav-sm">
-                                <li class="nav-item dropup">
-                                    <a class="dropdown-toggle dropdown-indicator has-indicator nav-link" data-bs-toggle="dropdown" data-offset="0,10"><small><?=$current_language; ?></small></a>
-                                    <div class="dropdown-menu dropdown-menu-sm dropdown-menu-end">
-                                        <ul class="language-list">
-                                            <?php
-                                                $lang = $this->Crud->read_single_order('status', 1,'language_code', 'name', 'asc');
-                                                if(!empty($lang)){
-                                                    foreach($lang as $l){
-                                                        $l_name = $l->name;
-                                                        if($l->name == 'Hausa' || $l->name == 'Igbo' || $l->name == 'Yoruba')$l_name = 'Nigerian';
-                                                
-                                            ?>
-                                            <li>
-                                                <a href="javascript:;" onclick="lang_session(<?=$l->id; ?>)" class="language-item">
-                                                    <img src="<?=site_url(); ?>assets/images/flags/<?=strtolower($l_name); ?>.png" alt="" class="language-flag">
-                                                    <span class="language-name"><?=$l->name; ?></span>
-                                                </a>
-                                            </li>
+                <!-- content @e -->
+                <div class="nk-footer nk-footer-fluid bg-lighter">
+                    <div class="container-xl wide-lg">
+                        <div class="nk-footer-wrap">
+                            <div class="nk-footer-copyright">&copy;<?=date('Y'); ?> <?=app_name;?>. <?=translate_phrase('All Rights Reserved.'); ?>
+                            </div>
+                            <div class="nk-footer-links">
+                                <ul class="nav nav-sm">
+                                    <li class="nav-item dropup">
+                                        <a class="dropdown-toggle dropdown-indicator has-indicator nav-link" data-bs-toggle="dropdown" data-offset="0,10"><small><?=$current_language; ?></small></a>
+                                        <div class="dropdown-menu dropdown-menu-sm dropdown-menu-end">
+                                            <ul class="language-list">
+                                                <?php
+                                                    $lang = $this->Crud->read_single_order('status', 1,'language_code', 'name', 'asc');
+                                                    if(!empty($lang)){
+                                                        foreach($lang as $l){
+                                                            $l_name = $l->name;
+                                                            if($l->name == 'Hausa' || $l->name == 'Igbo' || $l->name == 'Yoruba')$l_name = 'Nigerian';
+                                                    
+                                                ?>
+                                                <li>
+                                                    <a href="javascript:;" onclick="lang_session(<?=$l->id; ?>)" class="language-item">
+                                                        <img src="<?=site_url(); ?>assets/images/flags/<?=strtolower($l_name); ?>.png" alt="" class="language-flag">
+                                                        <span class="language-name"><?=$l->name; ?></span>
+                                                    </a>
+                                                </li>
 
-                                            <?php
-                                                }
-                                                }
-                                            ?>
-                                        </ul>
-                                    </div>
-                                </li>
-                            </ul>
+                                                <?php
+                                                    }
+                                                    }
+                                                ?>
+                                            </ul>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </div>
+                <div id="bb_ajax_msgs"></div>
+                    
+                <!-- wrap @e -->
             </div>
-            <div id="bb_ajax_msgs"></div>
-                
-            <!-- wrap @e -->
-        </div>
         <!-- wrap @e -->
     </div>
     <div class="modal modal-center fade" tabindex="-1" id="modal" role="dialog" data-keyboard="false"
