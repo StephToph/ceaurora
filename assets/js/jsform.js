@@ -4,11 +4,11 @@
 * Website: http://iyinusa.kenafftech.com
 * Module/App: Js Form
 */
+
 $(function() {
 	$('.js-select2').each(function () {
 		$(this).select2({
 			dropdownParent: $(this).parent(),// fix select2 search input focus bug
-			minimumResultsForSearch: 1
 		})
 	})  
 
@@ -33,11 +33,11 @@ $(function () {
 		
 		// Stop the browser from submitting the form.
 		event.preventDefault();
-		
+
 		// scroll to top for notification display
-		// $('html, body').animate({
-		// 	scrollTop: form.offset().top
-		// }, 1000);
+		$('html, body').animate({
+			scrollTop: form.offset().top
+		}, 1000);
 
 		// disable submit button
 		var formBtn = $('.bb_form_btn');
@@ -48,10 +48,10 @@ $(function () {
 		//var formData = $(form).serializeArray();
 		var formData = new FormData($(this)[0]);
 		var clear = $(form).attr('clear');
-		var processung = 'Processing, please wait';
+
 		
 		// show prograss loading
-		$('#bb_ajax_msg').html('<div class="row"><div class="text-center col-lg-12"><div class="spinner-border" role="status">  <span class="visually-hidden">Loading...</span></div><br/>'+processung+'...</div></div>');
+		$('#bb_ajax_msg').html('<div class="row"><div class="text-center col-lg-12"><div class="spinner-border" role="status">  <span class="visually-hidden">Loading...</span></div><br/> Processing Request, Please Hold On..</div></div>');
 		// Submit the form using AJAX.
 		$.ajax({
 			type: 'POST',
@@ -85,9 +85,9 @@ $(function () {
 		event.preventDefault();
 
 		// scroll to top for notification display
-		// $('html, body').animate({
-		// 	scrollTop: form2.offset().top
-		// }, 1000);
+		$('html, body').animate({
+			scrollTop: form2.offset().top
+		}, 1000);
 
 		// disable submit button
 		var formBtn = $('.bb_form_btn');
@@ -99,7 +99,7 @@ $(function () {
 		var clear = $(form2).attr('clear');
 
 		// show prograss loading
-		$(formMessages2).html('<div class="row"><div class="text-center col-lg-12"><div class="spinner-border" role="status">  <span class="visually-hidden">Loading...</span></div><br/> Processing, please wait...</div></div>');
+		$(formMessages2).html('<div class="row"><div class="text-center col-lg-12"><div class="spinner-border" role="status">  <span class="visually-hidden">Loading...</span></div><br/> Processing Request, Please Hold On..</div></div>');
 
 		// Submit the form using AJAX.
 		$.ajax({
@@ -134,9 +134,9 @@ $(function () {
 		event.preventDefault();
 
 		// scroll to top for notification display
-		// $('html, body').animate({
-		// 	scrollTop: form3.offset().top
-		// }, 1000);
+		$('html, body').animate({
+			scrollTop: form3.offset().top
+		}, 1000);
 
 		// disable submit button
 		var formBtn = $('.bb_form_btn');
@@ -148,7 +148,7 @@ $(function () {
 		var clear = $(form3).attr('clear');
 
 		// show prograss loading
-		$(formMessages3).html('<div class="row"><div class="text-center col-lg-12"><div class="spinner-border" role="status">  <span class="visually-hidden">Loading...</span></div><br/> Processing, please wait...</div></div>');
+		$(formMessages3).html('<div class="row"><div class="text-center col-lg-12"><div class="spinner-border" role="status">  <span class="visually-hidden">Loading...</span></div><br/> Processing Request, Please Hold On..</div></div>');
 
 		// Submit the form using AJAX.
 		$.ajax({

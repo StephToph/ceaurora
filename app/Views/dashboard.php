@@ -141,15 +141,7 @@
                                         </div>
                                     </div>
                                     <div class="progress-list gy-3" id="partnership_list">
-                                        <div class="progress-wrap">
-                                            <div class="progress-text">
-                                                <div class="progress-label">Strater Package</div>
-                                                <div class="progress-amount">58%</div>
-                                            </div>
-                                            <div class="progress progress-md">
-                                                <div class="progress-bar" data-progress="58"></div>
-                                            </div>
-                                        </div>
+                                        
                                     </div>
                                 </div>
                             </div>
@@ -596,7 +588,6 @@
 <script>
 var site_url = '<?php echo site_url(); ?>';
 </script>
-<script src="<?php echo base_url(); ?>/assets/js/jquery.min.js"></script>
 <script>
     $(function() {
         metric_load();

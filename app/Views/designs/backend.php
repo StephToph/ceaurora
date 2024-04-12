@@ -244,13 +244,12 @@
             </div>
         </div>
     </div>
-                                                
-    <div id="output"></div>
+                              
 </body>
 
 
-    <script src="<?=site_url(); ?>assets/js/bundlee5ca.js"></script>
-    <script src="<?=site_url(); ?>assets/js/scriptse5ca.js"></script>
+    <script src="<?=site_url(); ?>assets/js/bundle.js"></script>
+    <script src="<?=site_url(); ?>assets/js/scripts.js"></script>
    
     
     <script>
@@ -267,7 +266,6 @@
         }
     
     </script>
-    <script src="<?php echo site_url(); ?>assets/js/apps/messages.js?ver=3.1.2"></script>
     <?=$this->renderSection('scripts');?>
     <script>
     function mark_read(id) {

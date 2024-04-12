@@ -183,22 +183,33 @@ class Dashboard extends BaseController {
                 $col = array('success', 'primary', 'danger', 'info', 'warning', 'azure', 'gray','blue', 'indigo', 'orange', 'teal', 'purple');
                 
                 foreach($parts as $p){
+                    $paid = 0;
+                    $partners = $this->Crud->date_range2($start_date, 'reg_date', $end_date, 'reg_date', 'status', 1, 'partnership_id', $p->id, 'partners_history');
+                    if(!empty($partners)){
+                        foreach($partners as $u){
+                            $paid += (float)$u->amount_paid;
+                        }
+                       
+                    }
                     
+                    
+                    $paids = ((float)$paid * 100)/(float)$partnership;
                     // Select a random key
                     $random_key = array_rand($col);
 
                     // Get the value at the random key
                     $cols = $col[$random_key];
 
+
                     
                     $partnership_list .= '
                         <div class="progress-wrap">
                             <div class="progress-text">
                                 <div class="progress-label">'.ucwords($p->name).'</div>
-                                <div class="progress-amount">'.$p->id.'</div>
+                                <div class="progress-amount">'.number_format($paid,2).'</div>
                             </div>
                             <div class="progress ">
-                                <div class="progress-bar bg-'.$cols.' progress-bar-striped progress-bar-animated" data-progress="'.$p->id.'"></div>
+                                <div class="progress-bar bg-'.$cols.' progress-bar-striped progress-bar-animated" data-progress="'.$paids.'"></div>
                             </div>
                         </div>
                     ';
