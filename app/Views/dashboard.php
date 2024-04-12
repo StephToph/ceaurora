@@ -24,28 +24,34 @@
                                 </a>
                                 <div class="toggle-expand-content" data-content="pageMenu">
                                     <ul class="nk-block-tools g-3">
+                                        <input type="hidden" id="date_type" value="This Month">
+
                                         <li>
-                                            <div class="dropdown"><a href="#"
-                                                    class="dropdown-toggle btn btn-white btn-dim btn-outline-light"
-                                                    data-bs-toggle="dropdown"><em
-                                                        class="d-none d-sm-inline icon ni ni-calender-date"></em><span><span
-                                                            class="d-none d-md-inline">Last</span> 30
-                                                        Days</span><em
-                                                        class="dd-indc icon ni ni-chevron-right"></em></a>
+                                            <div class="drodown">
+                                                <a href="javascript:;" class="dropdown-toggle btn btn-white btn  btn-outline-light" data-bs-toggle="dropdown"><em class="d-none d-sm-inline icon ni ni-calender-date"></em><span id="filter_type"><span class="d-none d-md-inline" id="filter_type"><?=translate_phrase('This'); ?></span> <?=translate_phrase('Month'); ?></span></a>
                                                 <div class="dropdown-menu dropdown-menu-end">
                                                     <ul class="link-list-opt no-bdr">
-                                                        <li><a href="#"><span>Last 30 Days</span></a>
-                                                        </li>
-                                                        <li><a href="#"><span>Last 6 Months</span></a>
-                                                        </li>
-                                                        <li><a href="#"><span>Last 1 Years</span></a>
-                                                        </li>
+                                                        <li><a href="javascript:;" class="typeBtn" data-value="Today"><span><?=translate_phrase('Today');?></span></a></li>
+                                                        <li><a href="javascript:;" class="typeBtn" data-value="Yesterday"><span><?=translate_phrase('Yesterday');?></span></a></li>
+                                                        <li><a href="javascript:;" class="typeBtn" data-value="Last_Week"><span><?=translate_phrase('Last 7 Days');?></span></a></li>
+                                                        <li><a href="javascript:;" class="typeBtn active" data-value=""><span><?=translate_phrase('This Month');?></span></a></li>
+                                                        <li><a href="javascript:;" class="typeBtn" data-value="This_Year"><span><?=translate_phrase('This Year');?></span></a></li>
+                                                        <li><a href="javascript:;" class="typeBtn" data-value="Last_Month"><span><?=translate_phrase('Last 30 Days');?></span></a></li>
+                                                        <li><a href="javascript:;" class="typeBtn" data-value="Date_Range"><span><?=translate_phrase('Date Range');?></span></a></li>
                                                     </ul>
                                                 </div>
                                             </div>
                                         </li>
-                                        <li class="nk-block-tools-opt"><a href="#" class="btn btn-primary"><em
-                                                    class="icon ni ni-reports"></em><span>Reports</span></a>
+                                        <li>
+                                            <div class="btn-group align-items-center" id="data-resp" style="display:none;">
+                                                &nbsp;|&nbsp;<b><?=translate_phrase('Date');?>:</b>&nbsp;
+                                                <input type="date" class="form-control" name="date_from" id="date_from" oninput="load()" style="border:1px solid #ddd;" placeholder="<?=translate_phrase('START DATE');?>">
+                                                &nbsp;<i class="anticon anticon-arrow-right"></i>&nbsp;
+                                                <input type="date" class="form-control" name="date_to" id="date_to" oninput="load()" style="border:1px solid #ddd;" placeholder="<?=translate_phrase('END DATE');?>">
+                                            </div>
+
+                                            <div class="col-md-12" style="color:transparent;  text-white align:right;"><span id="date_resul"></span></div>
+
                                         </li>
                                     </ul>
                                 </div>
@@ -69,17 +75,8 @@
                                             </div>
                                     </div>
                                     <div class="card-amount">
-                                        <span class="amount"> 0.00 <span
+                                        <span class="amount" id="offering"> 0.00 <span
                                                 class="currency currency-usd">USD</span></span>
-                                    </div>
-                                    <div class="invest-data">
-                                        <div class="invest-data-amount g-2">
-                                            <div class="invest-data-history">
-                                                <div class="title">Partipant</div>
-                                                <div class="amount">0 </span>
-                                                </div>
-                                            </div>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -95,13 +92,14 @@
                                                 data-bs-toggle="tooltip" data-bs-placement="left"
                                                 title="Total Tithe"></em></div>
                                     </div>
-                                    <div class="card-amount"><span class="amount"> 0.00 <span
-                                                class="currency currency-usd">USD</span></span></div>
+                                    <div class="card-amount"><span class="amount" id="tithe"> 0.00 
+                                        <span class="currency currency-usd">USD</span></span>
+                                    </div>
                                     <div class="invest-data">
                                         <div class="invest-data-amount g-2">
                                             <div class="invest-data-history">
                                                 <div class="title">Participant</div>
-                                                <div class="amount">0</span>
+                                                <div class="amount" id="tithe_part">0</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -118,15 +116,16 @@
                                         </div>
                                         <div class="card-tools"><em class="card-hint icon ni ni-help-fill"
                                                 data-bs-toggle="tooltip" data-bs-placement="left"
-                                                title="Total Partnership"></em></div>
+                                                title="Total Partnership"></em>
+                                            </div>
                                     </div>
-                                    <div class="card-amount"><span class="amount"> 0.00 <span
+                                    <div class="card-amount"><span class="amount" id="partnership"> 0.00 <span
                                                 class="currency currency-usd">USD</span></span></div>
                                     <div class="invest-data">
                                         <div class="invest-data-amount g-2">
                                             <div class="invest-data-history">
                                                 <div class="title">Participant</div>
-                                                <div class="amount">0 </div>
+                                                <div class="amount" id="partnership_part">0 </div>
                                             </div>
                                         </div>
                                     </div>
@@ -661,169 +660,164 @@ var site_url = '<?php echo site_url(); ?>';
 </script>
 <script src="<?php echo base_url(); ?>/assets/js/jquery.min.js"></script>
 <script>
-$(function() {
-
-});
-
-$('.typeBtn').click(function() {
-    $('#date_type').val($(this).attr('data-value'));
-    $('#filter_type').html($(this).html());
-    $(this).addClass('active');
-    $(this).siblings().removeClass('active');
-
-    if ($(this).attr('data-value') == 'Date_Range') {
-        $('#data-resp').show(300);
-    } else {
-        $('#data-resp').hide(300);
+    $(function() {
         metric_load();
-        load();
+    });
+
+    $('.typeBtn').click(function() {
+        $('#date_type').val($(this).attr('data-value'));
+        $('#filter_type').html($(this).html());
+        $(this).addClass('active');
+        $(this).siblings().removeClass('active');
+
+        if ($(this).attr('data-value') == 'Date_Range') {
+            $('#data-resp').show(300);
+        } else {
+            $('#data-resp').hide(300);
+            metric_load();
+            load();
+        }
+    });
+
+    function load(x, y) {
+
+
+        var more = 'no';
+        var methods = '';
+        if (parseInt(x) > 0 && parseInt(y) > 0) {
+            more = 'yes';
+            methods = '/' + x + '/' + y;
+        }
+
+        if (more == 'no') {
+            $('#load_data').html(
+                '<div class="col-sm-12 text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div><span><?=translate_phrase('Loading.. Please Wait'); ?></span></div>'
+                );
+            $('#total_id').html(
+                '<div class="col-sm-12 text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>'
+                );
+        } else {
+            $('#loadmore').html(
+                '<div class="col-sm-12 text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div><?=translate_phrase('Loading.. PLease Wait'); ?></div>'
+                );
+        }
+
+        var loads = '<?=translate_phrase('Load More'); ?>';
+        var date_type = $('#date_type').val();
+        var start_date = $('#start_date').val();
+        var end_date = $('#end_date').val();
+        var territory = $('#territory').val();
+        var lga_id = $('#lga_id').val();
+
+        $.ajax({
+            url: site_url + 'dashboard/index/tax_metric' + methods,
+            data: {
+                date_type: date_type,
+                start_date: start_date,
+                end_date: end_date,
+                territory: territory,
+                lga_id: lga_id
+            },
+            type: 'post',
+            success: function(data) {
+                var dt = JSON.parse(data);
+                if (more == 'no') {
+                    $('#load_data').html(dt.item);
+                } else {
+                    $('#load_data').append(dt.item);
+                }
+            },
+            complete: function() {
+                $.getScript(site_url + '/assets/js/jsmodal.js');
+            }
+        });
     }
-});
 
-function load(x, y) {
-
-
-    var more = 'no';
-    var methods = '';
-    if (parseInt(x) > 0 && parseInt(y) > 0) {
-        more = 'yes';
-        methods = '/' + x + '/' + y;
-    }
-
-    if (more == 'no') {
-        $('#load_data').html(
-            '<div class="col-sm-12 text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div><span><?=translate_phrase('Loading.. Please Wait'); ?></span></div>'
-            );
-        $('#total_id').html(
+    function metric_load() {
+        $('#partnership').html(
             '<div class="col-sm-12 text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>'
             );
-    } else {
-        $('#loadmore').html(
-            '<div class="col-sm-12 text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div><?=translate_phrase('Loading.. PLease Wait'); ?></div>'
+        $('#partnership_part').html(
+            '<div class="col-sm-12 text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>'
             );
+        $('#tithe_part').html(
+            '<div class="col-sm-12 text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>'
+            );
+        $('#tithe').html(
+            '<div class="col-sm-12 text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>'
+            );
+        $('#offering').html(
+            '<div class="col-sm-12 text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>'
+            );
+        $('#offering_part').html(
+            '<div class="col-sm-12 text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>'
+            );
+        $('#field').html(
+            '<div class="col-sm-12 text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>'
+            );
+        var date_type = $('#date_type').val();
+        var start_date = $('#start_date').val();
+        var end_date = $('#end_date').val();
+
+        $.ajax({
+            url: site_url + 'dashboard/metric',
+            type: 'post',
+            data: {
+                date_type: date_type,
+                start_date: start_date,
+                end_date: end_date
+            },
+            success: function(data) {
+                var dt = JSON.parse(data);
+
+                $('#tithe').html(dt.tithe);
+                $('#tithe_part').html(dt.tithe_part);
+                $('#offering_part').html(dt.offering_part);
+                $('#offering').html(dt.offering);
+                $('#partnership_part').html(dt.partnership_part);
+                $('#partnership').html(dt.partnership);
+
+            }
+        });
     }
 
-    var loads = '<?=translate_phrase('Load More'); ?>';
-    var date_type = $('#date_type').val();
-    var start_date = $('#start_date').val();
-    var end_date = $('#end_date').val();
-    var territory = $('#territory').val();
-    var lga_id = $('#lga_id').val();
+    function virtual_create() {
+        $('#virtual_resp').html(
+            '<div class="col-sm-12 text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>'
+            );
+        $.ajax({
+            url: site_url + 'dashboard/create_virtual',
+            type: 'post',
+            success: function(data) {
+                $('#virtual_resp').html(data);
 
-    $.ajax({
-        url: site_url + 'dashboard/index/tax_metric' + methods,
-        data: {
-            date_type: date_type,
-            start_date: start_date,
-            end_date: end_date,
-            territory: territory,
-            lga_id: lga_id
-        },
-        type: 'post',
-        success: function(data) {
-            var dt = JSON.parse(data);
-            if (more == 'no') {
-                $('#load_data').html(dt.item);
-            } else {
-                $('#load_data').append(dt.item);
             }
-        },
-        complete: function() {
-            $.getScript(site_url + '/assets/js/jsmodal.js');
-        }
-    });
-}
+        });
+    }
 
-function metric_load() {
-    $('#remittance').html(
-        '<div class="col-sm-12 text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>'
-        );
-    $('#total_paid').html(
-        '<div class="col-sm-12 text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>'
-        );
-    $('#total_unpaid').html(
-        '<div class="col-sm-12 text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>'
-        );
-    $('#personal').html(
-        '<div class="col-sm-12 text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>'
-        );
-    $('#business').html(
-        '<div class="col-sm-12 text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>'
-        );
-    $('#master').html(
-        '<div class="col-sm-12 text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>'
-        );
-    $('#field').html(
-        '<div class="col-sm-12 text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>'
-        );
-    var date_type = $('#date_type').val();
-    var start_date = $('#start_date').val();
-    var end_date = $('#end_date').val();
-    var territory = $('#territory').val();
-    var lga_id = $('#lga_id').val();
+    function copyToClipboard() {
+        // Get the text content of the div
+        var textToCopy = document.getElementById('tax_id').innerText;
 
-    $.ajax({
-        url: site_url + 'dashboard/metric',
-        type: 'post',
-        data: {
-            date_type: date_type,
-            start_date: start_date,
-            end_date: end_date,
-            territory: territory,
-            lga_id: lga_id
-        },
-        success: function(data) {
-            var dt = JSON.parse(data);
+        // Create a textarea element to temporarily hold the text
+        var textarea = document.createElement('textarea');
+        textarea.value = textToCopy;
+        document.body.appendChild(textarea);
 
-            $('#remittance').html(dt.remittance);
-            $('#total_paid').html(dt.total_paid);
-            $('#total_unpaid').html(dt.total_unpaid);
-            $('#personal').html(dt.personal);
-            $('#business').html(dt.business);
-            $('#master').html(dt.master);
-            $('#field').html(dt.field);
+        // Select the text in the textarea
+        textarea.select();
+        textarea.setSelectionRange(0, textarea.value.length);
 
-        }
-    });
-}
+        // Copy the selected text to the clipboard
+        document.execCommand('copy');
 
-function virtual_create() {
-    $('#virtual_resp').html(
-        '<div class="col-sm-12 text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>'
-        );
-    $.ajax({
-        url: site_url + 'dashboard/create_virtual',
-        type: 'post',
-        success: function(data) {
-            $('#virtual_resp').html(data);
-
-        }
-    });
-}
-
-function copyToClipboard() {
-    // Get the text content of the div
-    var textToCopy = document.getElementById('tax_id').innerText;
-
-    // Create a textarea element to temporarily hold the text
-    var textarea = document.createElement('textarea');
-    textarea.value = textToCopy;
-    document.body.appendChild(textarea);
-
-    // Select the text in the textarea
-    textarea.select();
-    textarea.setSelectionRange(0, textarea.value.length);
-
-    // Copy the selected text to the clipboard
-    document.execCommand('copy');
-
-    // Remove the textarea from the DOM
-    document.body.removeChild(textarea);
-    $('#copy_resp').html('<span class="text-danger">Tax ID Copied</span>');
-    // Optionally, provide some visual feedback (e.g., an alert)
-    setTimeout(function() {
-        $('#copy_resp').html('');
-    }, 3000);
-}
+        // Remove the textarea from the DOM
+        document.body.removeChild(textarea);
+        $('#copy_resp').html('<span class="text-danger">Tax ID Copied</span>');
+        // Optionally, provide some visual feedback (e.g., an alert)
+        setTimeout(function() {
+            $('#copy_resp').html('');
+        }, 3000);
+    }
 </script>
 <?=$this->endSection();?>
