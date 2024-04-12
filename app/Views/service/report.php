@@ -219,11 +219,35 @@
         currentInfo = (currentInfo === initialInfo) ? newInfo : initialInfo;
        
         $(this).attr('title', (currentInfo === initialInfo) ? 'Add Report' : 'Back to Reports');
-    
+        var markButton = document.getElementById("markButton");
+        var convertBtn = document.getElementById("convertBtn");
+        var timerBtn = document.getElementById("timerBtn");
+        var partnerBtn = document.getElementById("partnerBtn");
+        var titheBtn = document.getElementById("titheBtn");
         // Update button class, onclick function, and icon class
         $(this).removeClass().addClass('btn btn-icon ' + currentInfo.class);
         // $(this).attr('onclick', currentInfo.onclick);
         $(this).find('em').removeClass().addClass('icon ni ' + currentInfo.iconClass);
+
+        var url = site_url + 'service/report/manage/attendance';
+        var updatedPageName = url;
+        markButton.setAttribute("pageName", updatedPageName);
+
+        var urls = site_url + 'service/report/manage/new_convert';
+        var updatedPageName = urls;
+        convertBtn.setAttribute("pageName", updatedPageName);
+        
+        var urls = site_url + 'service/report/manage/first_timer';
+        var updatedPageName = urls;
+        timerBtn.setAttribute("pageName", updatedPageName);
+        
+        var urls = site_url + 'service/report/manage/partnership';
+        var updatedPageName = urls;
+        partnerBtn.setAttribute("pageName", updatedPageName);
+        
+        var urls = site_url + 'service/report/manage/tithe';
+        var updatedPageName = urls;
+        titheBtn.setAttribute("pageName", updatedPageName);
     });
 
     $('#back_btn').click(function() {
