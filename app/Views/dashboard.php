@@ -194,37 +194,43 @@
                                         <div class="card-title">
                                             <h6 class="title">Sunday vs Wednesday</h6>
                                         </div>
+                                        
                                         <div class="card-tools shrink-0 d-none d-sm-block">
+                                        
                                             <ul class="nav nav-switch-s2 nav-tabs bg-white">
-                                                <li class="nav-item"><a href="#" class="nav-link">Offering</a></li>
-                                                <li class="nav-item"><a href="#" class="nav-link active">Tithe</a></li>
-                                                <li class="nav-item"><a href="#" class="nav-link">Partnership</a></li>
+                                                
+                                                <li class="nav-item"><a href="javascript:;" onclick="handleClick(this)" class="nav-link active">Offering</a></li>
+                                                <li class="nav-item"><a href="javascript:;" onclick="handleClick(this)" class="nav-link ">Tithe</a></li>
+                                                <li class="nav-item"><a href="javascript:;" onclick="handleClick(this)" class="nav-link">Partnership</a></li>
                                             </ul>
                                         </div>
+                                        <?php
+                                            // Get the current year
+                                            $current_year = date('Y');
+
+                                            // Start year (2024)
+                                            $start_year = 2024;
+
+                                            // Generate the select dropdown
+                                            echo '<select class="form-select" id="current_year" style="width:10%">';
+                                            for ($year = $start_year; $year <= $current_year; $year++) {
+                                                // Set the selected attribute for the current year
+                                                $selected = ($year == $current_year) ? 'selected' : '';
+                                                echo "<option $selected>$year</option>";
+                                            }
+                                            echo '</select>';
+                                        ?>
+
                                     </div>
                                     <div class="analytic-ov">
-                                        <div class="analytic-data-group analytic-ov-group g-3">
-                                            <div class="analytic-data analytic-ov-data">
-                                                <div class="title text-primary">Income</div>
-                                                <div class="amount">2.57K</div>
-                                                <div class="change down"><em
-                                                        class="icon ni ni-arrow-long-down"></em>12.37%
-                                                </div>
-                                            </div>
-                                            <div class="analytic-data analytic-ov-data">
-                                                <div class="title text-danger">Expenses</div>
-                                                <div class="amount">3.5K</div>
-                                                <div class="change down"><em class="icon ni ni-arrow-long-up"></em>8.37%
-                                                </div>
-                                            </div>
-                                        </div>
+                                        
                                         <div class="analytic-ov-ck"><canvas class="analytics-line-large"
                                                 id="analyticOvData"></canvas></div>
                                         <div class="chart-label-group ms-5">
-                                            <div class="chart-label">01 Jan, 2020</div>
-                                            <div class="chart-label d-none d-sm-block">15 Jan, 2020
+                                            <div class="chart-label">Weel 1</div>
+                                            <div class="chart-label d-none d-sm-block">Week 26
                                             </div>
-                                            <div class="chart-label">30 Jan, 2020</div>
+                                            <div class="chart-label">Week 52</div>
                                         </div>
                                     </div>
                                 </div>
@@ -434,24 +440,49 @@
         </div>
     </div>
 </div>
+<input type="hidden" id="finance_type" value="offering">
 <?=$this->endSection();?>
 <?=$this->section('scripts');?>
 
    
 <script>
+    function handleClick(element) {
+        // Remove "active" class from all links
+        var links = document.querySelectorAll('.nav-link');
+        links.forEach(function(link) {
+            link.classList.remove('active');
+        });
+
+        // Add "active" class to the clicked link
+        element.classList.add('active');
+
+        // Set the value of the hidden input to the selected link's text content
+        document.getElementById('finance_type').value = element.textContent;
+        load_finance();
+    }
+
     function analyticsLineLarge(selector, set_data) {
         var $selector = $(selector || ".analytics-line-large");
         $selector.each(function () {
-            for (
-                var $self = $(this), _self_id = $self.attr("id"), _get_data = void 0 === set_data ? eval(_self_id) : set_data, selectCanvas = document.getElementById(_self_id).getContext("2d"), chart_data = [], i = 0;
-                i < _get_data.datasets.length;
-                i++
-            )
+            var $self = $(this),
+                _self_id = $self.attr("id"),
+                _get_data = void 0 === set_data ? eval(_self_id) : set_data,
+                selectCanvas = document.getElementById(_self_id),
+                ctx = selectCanvas.getContext("2d");
+
+            // Destroy existing chart if it exists
+            if (selectCanvas.chart) {
+                selectCanvas.chart.destroy();
+            }
+
+            var chart_data = [];
+
+            for (var i = 0; i < _get_data.datasets.length; i++) {
                 chart_data.push({
                     label: _get_data.datasets[i].label,
                     tension: _get_data.lineTension,
                     backgroundColor: _get_data.datasets[i].background,
-                    fill: !0,
+                    fill: true,
                     borderWidth: 2,
                     borderDash: _get_data.datasets[i].dash,
                     borderColor: _get_data.datasets[i].color,
@@ -466,14 +497,26 @@
                     pointHitRadius: 4,
                     data: _get_data.datasets[i].data,
                 });
-            var chart = new Chart(selectCanvas, {
+            }
+
+            var chart = new Chart(ctx, {
                 type: "line",
-                data: { labels: _get_data.labels, datasets: chart_data },
+                data: {
+                    labels: _get_data.labels,
+                    datasets: chart_data
+                },
                 options: {
                     plugins: {
-                        legend: { display: _get_data.legend || !1, labels: { boxWidth: 12, padding: 20, color: "#6783b8" } },
+                        legend: {
+                            display: _get_data.legend || false,
+                            labels: {
+                                boxWidth: 12,
+                                padding: 20,
+                                color: "#6783b8"
+                            }
+                        },
                         tooltip: {
-                            enabled: !0,
+                            enabled: true,
                             rtl: NioApp.State.isRTL,
                             callbacks: {
                                 label: function (a) {
@@ -491,28 +534,31 @@
                             bodySpacing: 4,
                             padding: 10,
                             footerMarginTop: 0,
-                            displayColors: !1,
-                        },
+                            displayColors: false
+                        }
                     },
-                    maintainAspectRatio: !1,
+                    maintainAspectRatio: false,
                     scales: {
                         y: {
-                            display: !0,
+                            display: true,
                             position: NioApp.State.isRTL ? "right" : "left",
-                            ticks: { beginAtZero: !0, font: { size: 12 }, color: "#9eaecf", padding: 8, stepSize: 2400 },
-                            grid: { color: NioApp.hexRGB("#526484", 0.2), tickLength: 0, zeroLineColor: NioApp.hexRGB("#526484", 0.2), drawTicks: !1 },
+                            ticks: { beginAtZero: true, font: { size: 12 }, color: "#9eaecf", padding: 8, stepSize: 2400 },
+                            grid: { color: NioApp.hexRGB("#526484", 0.2), tickLength: 0, zeroLineColor: NioApp.hexRGB("#526484", 0.2), drawTicks: false },
                         },
                         x: {
-                            display: !1,
+                            display: false,
                             ticks: { font: { size: 12 }, color: "#9eaecf", source: "auto", padding: 0, reverse: NioApp.State.isRTL },
-                            grid: { color: "transparent", tickLength: 0, zeroLineColor: "transparent", offset: !0, drawTicks: !1 },
+                            grid: { color: "transparent", tickLength: 0, zeroLineColor: "transparent", offset: true, drawTicks: false },
                         },
                     },
                 },
             });
+
+            // Store the chart instance on the canvas element
+            selectCanvas.chart = chart;
         });
     }
-
+    
     function analyticsDoughnut(selector, set_data) {
         var $selector = $(selector || ".analytics-doughnut");
         $selector.each(function () {
@@ -594,7 +640,7 @@
     var site_url = '<?php echo site_url(); ?>';
 
     $(function() {
-        metric_load(); load();
+        metric_load(); load();load_finance();
     });
 
     $('.typeBtn').click(function() {
@@ -612,6 +658,27 @@
         }
     });
 
+    // Generate labels for 52 weeks of the year
+    function generateWeekLabels() {
+        var labels = [];
+        var startDate = new Date(); // Get current date
+        var endDate = new Date(startDate);
+        endDate.setDate(endDate.getDate() + 7 * 52); // Add 52 weeks to the current date
+        var weekCount = 1;
+
+        // Loop through each week
+        while (startDate < endDate) {
+            labels.push("Week " + weekCount);
+            startDate.setDate(startDate.getDate() + 7); // Move to the next week
+            weekCount++;
+        }
+
+        return labels;
+    }
+
+    // Example usage
+    var weekLabels = generateWeekLabels();
+    
     function load() {
         $('#service_date').html( '<div class="col-sm-12 text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>' );
         $('#service_key').html( '<div class="col-sm-12 text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>' );
@@ -620,13 +687,15 @@
         var date_type = $('#date_type').val();
         var start_date = $('#start_date').val();
         var end_date = $('#end_date').val();
+        var finance_type = $('#finance_type').val();
 
         $.ajax({
             url: site_url + 'dashboard/service_metric',
             data: {
                 date_type: date_type,
                 start_date: start_date,
-                end_date: end_date
+                end_date: end_date,
+                finance_type: finance_type
             },
             type: 'post',
             success: function(data) {
@@ -637,6 +706,50 @@
                 console.log(dataArray);
                 var BookingData = { labels: ["Male", "Female", "Children", "First Timer"], dataUnit: "People", legend: !1, datasets: [{ borderColor: "#fff", background: ["#798bff", "#1ee0ac", "#f9db7b", "#ffa353"], data: dataArray }] };
                 analyticsDoughnut('#BookingData', BookingData);
+            
+            }
+        });
+    }
+
+     function load_finance() {
+        var finance_type = $('#finance_type').val();
+        var current_year = $('#current_year').val();
+
+        $.ajax({
+            url: site_url + 'dashboard/finance_metric',
+            data: {
+                finance_type: finance_type,
+                current_year: current_year
+            },
+            type: 'post',
+            success: function(data) {
+                var dt = JSON.parse(data);
+                $('#service_date').html(dt.service_date);
+                $('#service_key').html(dt.service_key);
+                var dataArray = JSON.parse(dt.service_data);
+                
+                var analyticOvData = {
+                    labels: weekLabels,
+                    dataUnit: "$",
+                    lineTension: 0.1,
+                    datasets: [
+                        {
+                            label: "Current Year",
+                            color: "#e85347",
+                            dash: [5, 5],
+                            background: "transparent",
+                            data: [3910, 4420, 4110, 5180, 4400, 5170, 6460, 8830, 5290, 5430, 4690, 4350, 4600, 5200, 5650, 6850, 6950, 4150, 4300, 683, 6800, 2250, 6900, 7950, 6900, 4200, 6250, 7650, 8950, 9750, 4400, 5170, 6460, 8830, 5290, 5430, 4690, 4350, 4600, 5200, 5650, 6850, 6950, 4150, 4300, 603, 6800, 2250, 6900, 7950, 6900, 400],
+                        },
+                        {
+                            label: "Current Year",
+                            color: "#798bff",
+                            dash: [0, 0],
+                            background: NioApp.hexRGB("#798bff", 0.15),
+                            data: [4110, 4220, 4810, 5480, 4600, 5670, 6660, 4830, 5590, 5730, 4790, 4950, 5100, 5800, 5950, 5850, 5950, 4450, 4900, 8e3, 7200, 7250, 7900, 8950, 6300, 7200, 7250, 7650, 6950, 4750, 4400, 5170, 646, 8830, 5290, 5430, 4690, 4350, 4600, 5200, 5650, 6850, 6950, 4150, 430, 643, 6800, 2250, 6900, 7950, 6900, 3400],
+                        },
+                    ],
+                };
+                analyticsLineLarge('.analytics-line-large', analyticOvData);
             }
         });
     }
@@ -693,60 +806,6 @@
                 //Progress plugins
                 NioApp.BS.progress('[data-progress]');
 
-              
-                var analyticOvData = {
-                    labels: [
-                        "01 Jan",
-                        "02 Jan",
-                        "03 Jan",
-                        "04 Jan",
-                        "05 Jan",
-                        "06 Jan",
-                        "07 Jan",
-                        "08 Jan",
-                        "09 Jan",
-                        "10 Jan",
-                        "11 Jan",
-                        "12 Jan",
-                        "13 Jan",
-                        "14 Jan",
-                        "15 Jan",
-                        "16 Jan",
-                        "17 Jan",
-                        "18 Jan",
-                        "19 Jan",
-                        "20 Jan",
-                        "21 Jan",
-                        "22 Jan",
-                        "23 Jan",
-                        "24 Jan",
-                        "25 Jan",
-                        "26 Jan",
-                        "27 Jan",
-                        "28 Jan",
-                        "29 Jan",
-                        "30 Feb",
-                    ],
-                    dataUnit: "People",
-                    lineTension: 0.1,
-                    datasets: [
-                        {
-                            label: "Current Month",
-                            color: "#e85347",
-                            dash: [5, 5],
-                            background: "transparent",
-                            data: [3910, 4420, 4110, 5180, 4400, 5170, 6460, 8830, 5290, 5430, 4690, 4350, 4600, 5200, 5650, 6850, 6950, 4150, 4300, 6e3, 6800, 2250, 6900, 7950, 6900, 4200, 6250, 7650, 8950, 9750],
-                        },
-                        {
-                            label: "Current Month",
-                            color: "#798bff",
-                            dash: [0, 0],
-                            background: NioApp.hexRGB("#798bff", 0.15),
-                            data: [4110, 4220, 4810, 5480, 4600, 5670, 6660, 4830, 5590, 5730, 4790, 4950, 5100, 5800, 5950, 5850, 5950, 4450, 4900, 8e3, 7200, 7250, 7900, 8950, 6300, 7200, 7250, 7650, 6950, 4750],
-                        },
-                    ],
-                };
-                analyticsLineLarge('.analytics-line-large', analyticOvData);
             }
         });
     }
