@@ -246,7 +246,6 @@
 
     <script src="<?=site_url(); ?>assets/js/bundle.js"></script>
     <script src="<?=site_url(); ?>assets/js/scriptse5ca.js"></script>
-   
     
     <script>
          var site_url = '<?=site_url(); ?>';
@@ -332,5 +331,4 @@
         });
         </script>
     <?php } ?>
-    <script src="<?=site_url(); ?>assets/js/charts/chart-hotele5ca.js"></script> 
 </html>

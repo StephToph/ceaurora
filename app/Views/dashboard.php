@@ -437,10 +437,162 @@
 <?=$this->endSection();?>
 <?=$this->section('scripts');?>
 
+   
 <script>
-var site_url = '<?php echo site_url(); ?>';
-</script>
-<script>
+    function analyticsLineLarge(selector, set_data) {
+        var $selector = $(selector || ".analytics-line-large");
+        $selector.each(function () {
+            for (
+                var $self = $(this), _self_id = $self.attr("id"), _get_data = void 0 === set_data ? eval(_self_id) : set_data, selectCanvas = document.getElementById(_self_id).getContext("2d"), chart_data = [], i = 0;
+                i < _get_data.datasets.length;
+                i++
+            )
+                chart_data.push({
+                    label: _get_data.datasets[i].label,
+                    tension: _get_data.lineTension,
+                    backgroundColor: _get_data.datasets[i].background,
+                    fill: !0,
+                    borderWidth: 2,
+                    borderDash: _get_data.datasets[i].dash,
+                    borderColor: _get_data.datasets[i].color,
+                    pointBorderColor: "transparent",
+                    pointBackgroundColor: "transparent",
+                    pointHoverBackgroundColor: "#fff",
+                    pointHoverBorderColor: _get_data.datasets[i].color,
+                    pointBorderWidth: 2,
+                    pointHoverRadius: 4,
+                    pointHoverBorderWidth: 2,
+                    pointRadius: 4,
+                    pointHitRadius: 4,
+                    data: _get_data.datasets[i].data,
+                });
+            var chart = new Chart(selectCanvas, {
+                type: "line",
+                data: { labels: _get_data.labels, datasets: chart_data },
+                options: {
+                    plugins: {
+                        legend: { display: _get_data.legend || !1, labels: { boxWidth: 12, padding: 20, color: "#6783b8" } },
+                        tooltip: {
+                            enabled: !0,
+                            rtl: NioApp.State.isRTL,
+                            callbacks: {
+                                label: function (a) {
+                                    return "".concat(a.parsed.y, " ").concat(_get_data.dataUnit);
+                                },
+                            },
+                            backgroundColor: "#fff",
+                            borderColor: "#eff6ff",
+                            borderWidth: 2,
+                            titleFont: { size: 13 },
+                            titleColor: "#6783b8",
+                            titleMarginBottom: 6,
+                            bodyColor: "#9eaecf",
+                            bodyFont: { size: 12 },
+                            bodySpacing: 4,
+                            padding: 10,
+                            footerMarginTop: 0,
+                            displayColors: !1,
+                        },
+                    },
+                    maintainAspectRatio: !1,
+                    scales: {
+                        y: {
+                            display: !0,
+                            position: NioApp.State.isRTL ? "right" : "left",
+                            ticks: { beginAtZero: !0, font: { size: 12 }, color: "#9eaecf", padding: 8, stepSize: 2400 },
+                            grid: { color: NioApp.hexRGB("#526484", 0.2), tickLength: 0, zeroLineColor: NioApp.hexRGB("#526484", 0.2), drawTicks: !1 },
+                        },
+                        x: {
+                            display: !1,
+                            ticks: { font: { size: 12 }, color: "#9eaecf", source: "auto", padding: 0, reverse: NioApp.State.isRTL },
+                            grid: { color: "transparent", tickLength: 0, zeroLineColor: "transparent", offset: !0, drawTicks: !1 },
+                        },
+                    },
+                },
+            });
+        });
+    }
+
+    function analyticsDoughnut(selector, set_data) {
+        var $selector = $(selector || ".analytics-doughnut");
+        $selector.each(function () {
+            var $self = $(this),
+                _self_id = $self.attr("id"),
+                _get_data = void 0 === set_data ? eval(_self_id) : set_data,
+                selectCanvas = document.getElementById(_self_id),
+                ctx = selectCanvas.getContext("2d");
+
+            // Clear the canvas
+            ctx.clearRect(0, 0, selectCanvas.width, selectCanvas.height);
+
+            // Destroy existing chart if it exists
+            if (selectCanvas.chart) {
+                selectCanvas.chart.destroy();
+            }
+
+            var chart_data = [];
+
+            for (var i = 0; i < _get_data.datasets.length; i++) {
+                chart_data.push({
+                    backgroundColor: _get_data.datasets[i].background,
+                    borderWidth: 2,
+                    borderColor: _get_data.datasets[i].borderColor,
+                    hoverBorderColor: _get_data.datasets[i].borderColor,
+                    data: _get_data.datasets[i].data
+                });
+            }
+
+            var chart = new Chart(selectCanvas, {
+                type: "doughnut",
+                data: {
+                    labels: _get_data.labels,
+                    datasets: chart_data
+                },
+                options: {
+                    plugins: {
+                        legend: {
+                            display: _get_data.legend || false,
+                            labels: {
+                                boxWidth: 12,
+                                padding: 20,
+                                color: "#6783b8"
+                            }
+                        },
+                        tooltip: {
+                            enabled: true,
+                            rtl: NioApp.State.isRTL,
+                            callbacks: {
+                                label: function (a) {
+                                    return "".concat(a.parsed, " ").concat(_get_data.dataUnit);
+                                },
+                            },
+                            backgroundColor: "#fff",
+                            borderColor: "#eff6ff",
+                            borderWidth: 2,
+                            titleFont: { size: 13 },
+                            titleColor: "#6783b8",
+                            titleMarginBottom: 6,
+                            bodyColor: "#9eaecf",
+                            bodyFont: { size: 12 },
+                            bodySpacing: 4,
+                            padding: 10,
+                            footerMarginTop: 0,
+                            displayColors: false
+                        }
+                    },
+                    rotation: -1.5,
+                    cutoutPercentage: 70,
+                    maintainAspectRatio: false
+                }
+            });
+
+            // Store the chart instance on the canvas element
+            selectCanvas.chart = chart;
+        });
+    }
+
+    var site_url = '<?php echo site_url(); ?>';
+
     $(function() {
         metric_load(); load();
     });
@@ -481,7 +633,10 @@ var site_url = '<?php echo site_url(); ?>';
                 var dt = JSON.parse(data);
                 $('#service_date').html(dt.service_date);
                 $('#service_key').html(dt.service_key);
-                
+                var dataArray = JSON.parse(dt.service_data);
+                console.log(dataArray);
+                var BookingData = { labels: ["Male", "Female", "Children", "First Timer"], dataUnit: "People", legend: !1, datasets: [{ borderColor: "#fff", background: ["#798bff", "#1ee0ac", "#f9db7b", "#ffa353"], data: dataArray }] };
+                analyticsDoughnut('#BookingData', BookingData);
             }
         });
     }
@@ -534,7 +689,64 @@ var site_url = '<?php echo site_url(); ?>';
                 $('#partnership').html(dt.partnership);
                 $('#partnership_list').html(dt.partnership_list);
                 $('#cell_data').html(dt.cell_data);
+                
+                //Progress plugins
                 NioApp.BS.progress('[data-progress]');
+
+              
+                var analyticOvData = {
+                    labels: [
+                        "01 Jan",
+                        "02 Jan",
+                        "03 Jan",
+                        "04 Jan",
+                        "05 Jan",
+                        "06 Jan",
+                        "07 Jan",
+                        "08 Jan",
+                        "09 Jan",
+                        "10 Jan",
+                        "11 Jan",
+                        "12 Jan",
+                        "13 Jan",
+                        "14 Jan",
+                        "15 Jan",
+                        "16 Jan",
+                        "17 Jan",
+                        "18 Jan",
+                        "19 Jan",
+                        "20 Jan",
+                        "21 Jan",
+                        "22 Jan",
+                        "23 Jan",
+                        "24 Jan",
+                        "25 Jan",
+                        "26 Jan",
+                        "27 Jan",
+                        "28 Jan",
+                        "29 Jan",
+                        "30 Feb",
+                    ],
+                    dataUnit: "People",
+                    lineTension: 0.1,
+                    datasets: [
+                        {
+                            label: "Current Month",
+                            color: "#e85347",
+                            dash: [5, 5],
+                            background: "transparent",
+                            data: [3910, 4420, 4110, 5180, 4400, 5170, 6460, 8830, 5290, 5430, 4690, 4350, 4600, 5200, 5650, 6850, 6950, 4150, 4300, 6e3, 6800, 2250, 6900, 7950, 6900, 4200, 6250, 7650, 8950, 9750],
+                        },
+                        {
+                            label: "Current Month",
+                            color: "#798bff",
+                            dash: [0, 0],
+                            background: NioApp.hexRGB("#798bff", 0.15),
+                            data: [4110, 4220, 4810, 5480, 4600, 5670, 6660, 4830, 5590, 5730, 4790, 4950, 5100, 5800, 5950, 5850, 5950, 4450, 4900, 8e3, 7200, 7250, 7900, 8950, 6300, 7200, 7250, 7650, 6950, 4750],
+                        },
+                    ],
+                };
+                analyticsLineLarge('.analytics-line-large', analyticOvData);
             }
         });
     }
