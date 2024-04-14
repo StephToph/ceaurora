@@ -291,7 +291,7 @@ class Dashboard extends BaseController {
                         $date = date('d F Y', strtotime($date));
 
                         if(count($cell_report) >=2){
-                            $attend = ((int)$attendance - (int)$attendances)/(int)$attendances;
+                            if($attendances > 0)$attend = ((int)$attendance - (int)$attendances)/(int)$attendances;
                             $attends = $attend * 100;
                             if($attends > 0){
                                 $attend_stat = '<span class="change up"><em class="icon ni ni-arrow-long-up"></em></span>';
@@ -299,7 +299,7 @@ class Dashboard extends BaseController {
                                 $attend_stat = '<span class="change down"><em class="icon ni ni-arrow-long-down"></em></span>';
                             }
 
-                            $convert = ((int)$new_convert - (int)$new_converts)/(int)$new_converts;
+                            if($new_converts > 0)$convert = ((int)$new_convert - (int)$new_converts)/(int)$new_converts;
                             $converts = $convert * 100;
                             if($converts > 0){
                                 $convert_stat = '<span class="change up"><em class="icon ni ni-arrow-long-up"></em></span>';
@@ -307,7 +307,7 @@ class Dashboard extends BaseController {
                                 $convert_stat = '<span class="change down"><em class="icon ni ni-arrow-long-down"></em></span>';
                             }
 
-                            $timer = ((int)$first_timer - (int)$first_timers)/(int)$first_timers;
+                            if($first_timers > 0)$timer = ((int)$first_timer - (int)$first_timers)/(int)$first_timers;
                             $timers = $timer * 100;
                             if($timers > 0){
                                 $timer_stat = '<span class="change up"><em class="icon ni ni-arrow-long-up"></em></span>';
