@@ -347,6 +347,7 @@ class Dashboard extends BaseController {
                 $children_per = ((int)$children * 100)/(int)$attend;
                 $ft_per = ((int)$ft * 100)/(int)$attend;
 
+                // $female = 110;$children = 11;
             }
            
             $service_key .= '
@@ -388,9 +389,10 @@ class Dashboard extends BaseController {
                 
             }
         }
-
+        $service_data = array((int)$male, (int)$female, (int)$children, (int)$ft);
         $resp['service_date'] = ($service_date);
         $resp['service_key'] = ($service_key);
+        $resp['service_data'] = json_encode($service_data);
 
         
         echo json_encode($resp);
