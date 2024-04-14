@@ -12,7 +12,8 @@
     <div class="container-fluid">
         <div class="nk-content-inner">
             <div class="nk-content-body">
-                <div class="nk-block-head nk-block-head-sm">
+                <div class="nk-block g-gs">
+                    <div class="mt-3 d-lg-none">.</div>
                     <div class="nk-block-between">
                         <div class="nk-block-head-content">
                             <h3 class="nk-block-title page-title">Dashboard Overview</h3>
@@ -150,11 +151,16 @@
                             <div class="card card-bordered h-100">
                                 <div class="card-inner mb-n2">
                                     <div class="card-title-group">
-                                        <div class="card-title card-title-sm">
+                                        <div class="card-title ">
                                             <h6 class="title">Cell Report</h6>
                                         </div>
-                                        
+                                        <div class="card-tools align-end mb-2">
+                                            <ul class="card-tools-nav">
+                                                <li class="active"><a href="<?=site_url('activity'); ?>"><span>All</span></a></li>
+                                            </ul>
+                                        </div>
                                     </div>
+                                   
                                 </div>
                                 <div class="nk-tb-list is-loose traffic-channel-table" id="cell_data">
                                     
@@ -167,7 +173,7 @@
                                     <div class="card-title-group">
                                         <div class="card-title">
                                             <h6 class="title">Service Attendance Chart</h6>
-                                            <p id="service_date">In last 30 days top selected package.</p>
+                                            <p id="service_date"> </p>
                                         </div>
                                         <div class="card-tools">
                                             <div class="drodown">
