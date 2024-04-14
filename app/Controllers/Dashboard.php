@@ -29,6 +29,95 @@ class Dashboard extends BaseController {
         $data['param3'] = $param3;
 
 
+        
+		// record listing
+		if($param1 == 'activity_load') {
+			$limit = $param2;
+			$offset = $param3;
+
+			$count = 0;
+			$rec_limit = 7;
+			$item = '';
+
+			if($limit == '') {$limit = $rec_limit;}
+			if($offset == '') {$offset = 0;}
+			
+			$search = $this->request->getVar('search');
+			if(!empty($this->request->getPost('start_date'))) { $start_date = $this->request->getPost('start_date'); } else { $start_date = ''; }
+			if(!empty($this->request->getPost('end_date'))) { $end_date = $this->request->getPost('end_date'); } else { $end_date = ''; }
+			
+			if(!$log_id) {
+				$item = '<div class="text-center text-muted">'.translate_phrase('Session Timeout! - Please login again').'</div>';
+			} else {
+				$all_rec = $this->Crud->filter_activity('', '', $log_id, $search);
+                // $all_rec = json_decode($all_rec);
+				if(!empty($all_rec)) { $counts = count($all_rec); } else { $counts = 0; }
+
+				$query = $this->Crud->filter_activity($limit, $offset, $log_id, $search);
+				$data['count'] = $counts;
+				
+				if (!empty($query)) {
+					foreach($query as $q) {
+						$id = $q->id;
+						$type = $q->item;
+						$type_id = $q->item_id;
+						$action = $q->action;
+						$reg_date = date('M d, Y h:i A', strtotime($q->reg_date));
+
+						$timespan = $this->Crud->timespan(strtotime($q->reg_date));
+
+						$icon = 'article';
+						if($type == 'orders') $icon = 'template';
+						if($type == 'branch') $icon = 'reports-alt';
+						if($type == 'business') $icon = 'briefcase';
+						if($type == 'order') $icon = 'bag';
+						if($type == 'user') $icon = 'users';
+						if($type == 'pump') $icon = 'cc-secure';
+						if($type == 'authentication') $icon = 'article';
+						if($type == 'enrolment') $icon = 'property-add';
+						if($type == 'scholarship') $icon = 'award';
+
+						$item .= '
+                            <li class="nk-activity-item">
+                                <div class="nk-activity-media user-avatar bg-success"><img
+                                        src="'.site_url().'assets/images/avatar.png" alt=""></div>
+                                <div class="nk-activity-data">
+                                    <div class="label"> '.translate_phrase($action).'</div>
+                                    <span class="time">'.$timespan.'</span>
+                                </div>
+                            </li>    
+						';
+					}
+				}
+				
+			}
+			if(empty($item)) {
+				$resp['item'] = '
+					<div class="text-center text-muted">
+						<br/><br/><br/><br/>
+						<em class="icon ni ni-property" style="font-size:150px;"></em><br/><br/>'.translate_phrase('No Activity Returned').'
+					</div>
+				';
+			} else {
+				$resp['item'] = $item;
+			}
+
+			$resp['count'] = $counts;
+
+			$more_record = $counts - ($offset + $rec_limit);
+			$resp['left'] = $more_record;
+
+			if($counts > ($offset + $rec_limit)) { // for load more records
+				$resp['limit'] = $rec_limit;
+				$resp['offset'] = $offset + $limit;
+			} else {
+				$resp['limit'] = 0;
+				$resp['offset'] = 0;
+			}
+
+			echo json_encode($resp);
+			die;
+		}
 
 
         $data['log_id'] = $log_id;
@@ -403,74 +492,68 @@ class Dashboard extends BaseController {
         echo json_encode($resp);
         die;
     }
-public function finance_metric(){
+    public function finance_metric(){
         $log_id = $this->session->get('td_id');
         
         $role_id = $this->Crud->read_field('id', $log_id, 'user', 'role_id');
         $role = strtolower($this->Crud->read_field('id', $role_id, 'access_role', 'name'));
 
-        $finance_data = '';
+        $finance_wednesday = [];
       
         
-        $finance_type = $this->request->getPost('finance_type');
+        $finance_type = strtolower($this->request->getPost('finance_type'));
 		$current_year = $this->request->getPost('current_year');
 		$start_date = date($current_year.'-01-01');
-        $end_date = date($current_year.'-m-d');
-        
+        $end_date = date($current_year.'-12-31');
+        // Get the first day of the current year
+        $startDate = strtotime("first Sunday of January $current_year");
+
+        // Get the last day of the current year
+        $endDate = strtotime("last day of December $current_year");
         if($role == 'developer' || $role == 'administrator'){
-            $service = $this->Crud->read_order('service_report','id', 'asc');
+            $sunday_id = $this->Crud->read_field('name', 'Sunday Service', 'service_type', 'id');
+            $sunday = $this->Crud->date_range1($start_date, 'date', $end_date,'date', 'type', $sunday_id, 'service_report');
+            $wednesday_id = $this->Crud->read_field('name', 'Wednesday Service', 'service_type', 'id');
+            $wednesday = $this->Crud->date_range1($start_date, 'date', $end_date, 'date','type', $wednesday_id, 'service_report');
             
-            if(!empty($service)){
-                foreach($service as $u){
-                   
+            // print_r($wednesday);
+            while ($startDate <= $endDate) {
+                if(!empty($sunday)){
+                    foreach($sunday as $s){ 
+                        if($finance_type == 'offering')$amount = (float)$s->offering;
+                        if($finance_type == 'tithe')$amount = (float)$s->tithe;
+                        if($finance_type == 'partnership')$amount = (float)$s->partnership;
+                        if($s->date == date('Y-m-d', $startDate)){
+                            $finance_sunday[] = $amount;
+                        }else{
+                            $finance_sunday[] = 0;
+                        }
+    
+                    }
+                    
+                }else{
+                    $finance_sunday[] = 0;
                 }
-                $type = $this->Crud->read_field('id', $u->type, 'service_type', 'name');
-                $service_date = $type.' - '.date('d F Y', strtotime($u->date));
-                $attend = $u->attendance;
-                $attendance = $u->attendant;
-                $attendant = json_decode($attendance);
-                $attendant = (array)$attendant;
 
-                // echo $attendant['male'];
-                $male = $attendant['male'];
-                $female = $attendant['female'];
-                $children = $attendant['children'];
-                
-                $ft = $u->first_timer;
-
-                $male_per = ((int)$male * 100)/(int)$attend;
-                $female_per = ((int)$female * 100)/(int)$attend;
-                $children_per = ((int)$children * 100)/(int)$attend;
-                $ft_per = ((int)$ft * 100)/(int)$attend;
-
-                // $female = 110;$children = 11;
+                if(!empty($wednesday)){
+                    foreach($wednesday as $s){ 
+                        if($finance_type == 'offering')$amount = (float)$s->offering;
+                        if($finance_type == 'tithe')$amount = (float)$s->tithe;
+                        if($finance_type == 'partnership')$amount = (float)$s->partnership;
+                        if($s->date == date('Y-m-d', strtotime('next Wednesday', $startDate))){
+                            $finance_wednesday[] = $amount;
+                        }else{
+                            $finance_wednesday[] = 0;
+                        }
+                    }
+                } else{
+                    $finance_wednesday[] = 0;
+                }
+                $startDate = strtotime('+1 week', $startDate);
             }
            
-            $service_key .= '
-            <div class="traffic-channel-data">
-                <div class="title"><span class="dot dot-lg sq bg-info" data-bg="#ffa353"></span><span>Male</span></div>
-                <div class="amount">'.number_format($male).' <small>'.number_format($male_per,2).'%</small></div>
-            </div>
-            <div class="traffic-channel-data">
-                <div class="title"><span class="dot dot-lg sq  bg-teal" data-bg="#ffa353"></span><span>Female</span></div>
-                <div class="amount">'.number_format($female).' <small>'.number_format($female_per,2).'%</small></div>
-            </div>
-            <div class="traffic-channel-data">
-                <div class="title"><span class="dot dot-lg sq  bg-warning" data-bg="#ffa353"></span><span>Children</span></div>
-                <div class="amount">'.number_format($children).' <small>'.number_format($children_per,2).'%</small></div>
-            </div>
-            <div class="traffic-channel-data">
-                <div class="title"><span class="dot dot-lg sq  bg-danger" data-bg="#ffa353"></span><span>First Timer</span></div>
-                <div class="amount">'.number_format($ft).' <small>'.number_format($ft_per,2).'%</small></div>
-            </div>
-           
-
-            ';
-           
         }
-        // print_r($service);
-        // echo $offering.' e';
-
+        
         if($role != 'developer' && $role != 'administrator'){
             $trade_id = $this->Crud->read_field('id', $log_id, 'user', 'trade');
             $duration = $this->Crud->read_field('id', $log_id, 'user', 'duration');
@@ -485,10 +568,9 @@ public function finance_metric(){
                 
             }
         }
-        $service_data = array((int)$male, (int)$female, (int)$children, (int)$ft);
-        $resp['service_date'] = ($service_date);
-        $resp['service_key'] = ($service_key);
-        $resp['service_data'] = json_encode($service_data);
+        
+        $resp['finance_sunday'] = json_encode($finance_sunday);
+        $resp['finance_wednesday'] = json_encode($finance_wednesday);
 
         
         echo json_encode($resp);

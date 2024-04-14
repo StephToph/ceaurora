@@ -28,7 +28,7 @@
 
                                         <li>
                                             <div class="drodown">
-                                                <a href="javascript:;" class="dropdown-toggle btn btn-white btn  btn-outline-light" data-bs-toggle="dropdown"><em class="d-none d-sm-inline icon ni ni-calender-date"></em><span id="filter_type"><span class="d-none d-md-inline" id="filter_type"><?=translate_phrase('This'); ?></span> <?=translate_phrase('Month'); ?></span></a>
+                                                <a href="javascript:;" class="dropdown-toggle btn btn-white btn  btn-outline-light" data-bs-toggle="dropdown"><em class="  icon ni ni-calender-date"></em><span id="filter_type"><span class="" id="filter_type"><?=translate_phrase('This'); ?></span> <?=translate_phrase('Month'); ?></span></a>
                                                 <div class="dropdown-menu dropdown-menu-end">
                                                     <ul class="link-list-opt no-bdr">
                                                         <li><a href="javascript:;" class="typeBtn" data-value="Today"><span><?=translate_phrase('Today');?></span></a></li>
@@ -212,7 +212,7 @@
                                             $start_year = 2024;
 
                                             // Generate the select dropdown
-                                            echo '<select class="form-select" id="current_year" style="width:10%">';
+                                            echo '<select class="form-select" id="current_year" style="width:10%" onchange="load_finance();">';
                                             for ($year = $start_year; $year <= $current_year; $year++) {
                                                 // Set the selected attribute for the current year
                                                 $selected = ($year == $current_year) ? 'selected' : '';
@@ -227,7 +227,7 @@
                                         <div class="analytic-ov-ck"><canvas class="analytics-line-large"
                                                 id="analyticOvData"></canvas></div>
                                         <div class="chart-label-group ms-5">
-                                            <div class="chart-label">Weel 1</div>
+                                            <div class="chart-label">Week 1</div>
                                             <div class="chart-label d-none d-sm-block">Week 26
                                             </div>
                                             <div class="chart-label">Week 52</div>
@@ -386,50 +386,13 @@
                                         </div>
                                         <div class="card-tools">
                                             <ul class="card-tools-nav">
-                                                <li><a href="#"><span>Cancel</span></a></li>
-                                                <li class="active"><a href="#"><span>All</span></a></li>
+                                                <li class="active"><a href="<?=site_url('activity'); ?>"><span>All</span></a></li>
                                             </ul>
                                         </div>
                                     </div>
                                 </div>
-                                <ul class="nk-activity">
-                                    <li class="nk-activity-item">
-                                        <div class="nk-activity-media user-avatar bg-success"><img
-                                                src="<?=site_url(); ?>assets/images/avatar.png" alt=""></div>
-                                        <div class="nk-activity-data">
-                                            <div class="label">Keith Jensen requested for room.</div>
-                                            <span class="time">2 hours ago</span>
-                                        </div>
-                                    </li>
-                                    <li class="nk-activity-item">
-                                        <div class="nk-activity-media user-avatar bg-warning">HS</div>
-                                        <div class="nk-activity-data">
-                                            <div class="label">Harry Simpson placed a Order.</div><span class="time">2
-                                                hours ago</span>
-                                        </div>
-                                    </li>
-                                    <li class="nk-activity-item">
-                                        <div class="nk-activity-media user-avatar bg-azure">SM</div>
-                                        <div class="nk-activity-data">
-                                            <div class="label">Stephanie Marshall cancelled booking.
-                                            </div><span class="time">2 hours ago</span>
-                                        </div>
-                                    </li>
-                                    <li class="nk-activity-item">
-                                        <div class="nk-activity-media user-avatar bg-purple"><img
-                                                src="<?=site_url(); ?>assets/images/avatar.png" alt=""></div>
-                                        <div class="nk-activity-data">
-                                            <div class="label">Nicholas Carr confirmed booking.</div>
-                                            <span class="time">2 hours ago</span>
-                                        </div>
-                                    </li>
-                                    <li class="nk-activity-item">
-                                        <div class="nk-activity-media user-avatar bg-pink">TM</div>
-                                        <div class="nk-activity-data">
-                                            <div class="label">Timothy Moreno placed a Order.</div><span class="time">2
-                                                hours ago</span>
-                                        </div>
-                                    </li>
+                                <ul class="nk-activity" id="activity_data">
+                                   
                                 </ul>
                             </div>
                         </div>
@@ -640,7 +603,7 @@
     var site_url = '<?php echo site_url(); ?>';
 
     $(function() {
-        metric_load(); load();load_finance();
+        metric_load(); load();load_finance();load_activity();
     });
 
     $('.typeBtn').click(function() {
@@ -711,7 +674,23 @@
         });
     }
 
-     function load_finance() {
+     
+    function load_activity() {
+        $('#activity_data').html( '<div class="col-sm-12 text-center"><br><br><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>' );
+       
+        $.ajax({
+            url: site_url + 'dashboard/index/activity_load',
+          
+            type: 'get',
+            success: function(data) {
+                var dt = JSON.parse(data);
+                $('#activity_data').html(dt.item);
+               
+            }
+        });
+    }
+
+    function load_finance() {
         var finance_type = $('#finance_type').val();
         var current_year = $('#current_year').val();
 
@@ -724,9 +703,8 @@
             type: 'post',
             success: function(data) {
                 var dt = JSON.parse(data);
-                $('#service_date').html(dt.service_date);
-                $('#service_key').html(dt.service_key);
-                var dataArray = JSON.parse(dt.service_data);
+                var data_sunday = JSON.parse(dt.finance_sunday);
+                var data_wednesday = JSON.parse(dt.finance_wednesday);
                 
                 var analyticOvData = {
                     labels: weekLabels,
@@ -738,14 +716,14 @@
                             color: "#e85347",
                             dash: [5, 5],
                             background: "transparent",
-                            data: [3910, 4420, 4110, 5180, 4400, 5170, 6460, 8830, 5290, 5430, 4690, 4350, 4600, 5200, 5650, 6850, 6950, 4150, 4300, 683, 6800, 2250, 6900, 7950, 6900, 4200, 6250, 7650, 8950, 9750, 4400, 5170, 6460, 8830, 5290, 5430, 4690, 4350, 4600, 5200, 5650, 6850, 6950, 4150, 4300, 603, 6800, 2250, 6900, 7950, 6900, 400],
+                            data: data_sunday,
                         },
                         {
                             label: "Current Year",
                             color: "#798bff",
                             dash: [0, 0],
                             background: NioApp.hexRGB("#798bff", 0.15),
-                            data: [4110, 4220, 4810, 5480, 4600, 5670, 6660, 4830, 5590, 5730, 4790, 4950, 5100, 5800, 5950, 5850, 5950, 4450, 4900, 8e3, 7200, 7250, 7900, 8950, 6300, 7200, 7250, 7650, 6950, 4750, 4400, 5170, 646, 8830, 5290, 5430, 4690, 4350, 4600, 5200, 5650, 6850, 6950, 4150, 430, 643, 6800, 2250, 6900, 7950, 6900, 3400],
+                            data: data_wednesday,
                         },
                     ],
                 };
