@@ -222,6 +222,15 @@
                                         ?>
 
                                     </div>
+                                    <div class="traffic-channel-group g-2">
+                                        <div class="traffic-channel-data">
+                                            <div class="title"><span class="dot dot-lg sq bg-purple" data-bg="#798bff"></span><span>Wednesday</span></div>
+                                        </div>  
+                                        <div class="traffic-channel-data">
+                                            <div class="title"><span class="dot dot-lg sq bg-danger" data-bg="#e85347"></span><span>Sunday</span></div>
+                                        </div>  
+                                           
+                                    </div>
                                     <div class="analytic-ov">
                                         
                                         <div class="analytic-ov-ck"><canvas class="analytics-line-large"

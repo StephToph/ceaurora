@@ -240,8 +240,8 @@ class Dashboard extends BaseController {
         
         if($role == 'developer' || $role == 'administrator'){
             $partners = $this->Crud->date_range1($start_date, 'reg_date', $end_date, 'reg_date', 'status', 1, 'partners_history');
-            $cell_report = $this->Crud->date_range($start_date, 'date', $end_date, 'date', 'cell_report');
-            $service_report = $this->Crud->date_range($start_date, 'date', $end_date, 'date', 'service_report');
+            $cells = $this->Crud->read('cells');
+             $service_report = $this->Crud->date_range($start_date, 'date', $end_date, 'date', 'service_report');
             
             
             if(!empty($partners)){
@@ -251,32 +251,81 @@ class Dashboard extends BaseController {
                 $partnership_part = count($partners);
             }
 
-            if(!empty($cell_report)){
+            if(!empty($cells)){
                 $cell_data .= '
                         <div class="nk-tb-item nk-tb-head">
                         <div class="nk-tb-col nk-tb-channel"><span>Cell</span></div>
-                        <div class="nk-tb-col nk-tb-channel"><span>Meeting</span></div>
-                            <div class="nk-tb-col nk-tb-sessions"><span>Attendant</span>
+                        <div class="nk-tb-col nk-tb-channel"><span>Date</span></div>
+                            <div class="nk-tb-col nk-tb-sessions"><span>ATT</span>
                             </div>
-                            <div class="nk-tb-col nk-tb-prev-sessions"><span>New Convert</span></div>
-                            <div class="nk-tb-col nk-tb-change"><span>First Timer</span></div>
+                            <div class="nk-tb-col nk-tb-prev-sessions"><span>N.C</span></div>
+                            <div class="nk-tb-col nk-tb-change"><span>F.T</span></div>
                             
                         </div>
                 ';
-                foreach($cell_report as $u){
-                    $offering += (float)$u->offering;
-                    if($u->type == 'wk1')$types = 'WK1 - Prayer and Planning';
-                    if($u->type == 'wk2')$types = 'Wk2 - Bible Study';
-                    if($u->type == 'wk3')$types = 'Wk3 - Bible Study';
-                    if($u->type == 'wk4')$types = 'Wk4 - Fellowship / Outreach';
+                foreach($cells as $u){
+                    $cell_report = $this->Crud->read_single_order('cell_id', $u->id, 'cell_report', 'id', 'asc');
+                    $date = '-';
+                    $attendance = 0;$attends = 0;
+                    $new_convert = 0;$converts = 0;
+                    $first_timer = 0;$timers = 0;
+                    $ca = count($cell_report);$ca--;
+                    $i = 1;
+
+                    $attend_stat = ''; $convert_stat = ''; $timer_stat = '';
+                    if(!empty($cell_report)){
+                        foreach($cell_report as $cs){
+                            if($i == $ca){
+                                $attendances = $cs->attendance;
+                                $new_converts = $cs->new_convert;
+                                $first_timers = $cs->first_timer;
+                            }
+
+                            $i++;
+                        }
+                        
+                        $date = $cs->date;
+                        $attendance = $cs->attendance;
+                        $new_convert = $cs->new_convert;
+                        $first_timer = $cs->first_timer;
+                        $date = date('d F Y', strtotime($date));
+
+                        if(count($cell_report) >=2){
+                            $attend = ((int)$attendance - (int)$attendances)/(int)$attendances;
+                            $attends = $attend * 100;
+                            if($attends > 0){
+                                $attend_stat = '<span class="change up"><em class="icon ni ni-arrow-long-up"></em></span>';
+                            } else {
+                                $attend_stat = '<span class="change down"><em class="icon ni ni-arrow-long-down"></em></span>';
+                            }
+
+                            $convert = ((int)$new_convert - (int)$new_converts)/(int)$new_converts;
+                            $converts = $convert * 100;
+                            if($converts > 0){
+                                $convert_stat = '<span class="change up"><em class="icon ni ni-arrow-long-up"></em></span>';
+                            } else {
+                                $convert_stat = '<span class="change down"><em class="icon ni ni-arrow-long-down"></em></span>';
+                            }
+
+                            $timer = ((int)$first_timer - (int)$first_timers)/(int)$first_timers;
+                            $timers = $timer * 100;
+                            if($timers > 0){
+                                $timer_stat = '<span class="change up"><em class="icon ni ni-arrow-long-up"></em></span>';
+                            } else {
+                                $timer_stat = '<span class="change down"><em class="icon ni ni-arrow-long-down"></em></span>';
+                            }
+                        }
+
+                    }
+                    
                     $cell_data .= '
                         
                             <div class="nk-tb-item">
-                                <div class="nk-tb-col nk-tb-channel"><span class="tb-lead">'.ucwords($this->Crud->read_field('id', $u->cell_id, 'cells', 'name')).'</span></div>
-                                <div class="nk-tb-col nk-tb-channel"><span class="tb-lead">'.ucwords($types).'</span></div>
-                                <div class="nk-tb-col nk-tb-sessions"><span class="tb-sub tb-amount"><span>'.number_format($u->attendance).'</span></span></div>
-                                <div class="nk-tb-col nk-tb-prev-sessions"><span class="tb-sub tb-amount"><span>'.number_format($u->new_convert).'</span></span></div>
-                                <div class="nk-tb-col nk-tb-change"><span class="tb-sub"><span>'.number_format($u->first_timer).'</span></span>
+                                <div class="nk-tb-col nk-tb-channel"><span class="tb-lead">'.ucwords($u->name).'</span></div>
+                                <div class="nk-tb-col nk-tb-channel"><span class="tb-lead">'.$date.'</span></div>
+                                <div class="nk-tb-col nk-tb-sessions"><span class="tb-sub tb-amount"><span>'.number_format((int)$attendance).'</span>'.$attend_stat.'</span></div>
+                                <div class="nk-tb-col nk-tb-prev-sessions"><span class="tb-sub tb-amount"><span>'.number_format((int)$new_convert).'</span>'.$convert_stat.'</span></div>
+                                <div class="nk-tb-col nk-tb-change"><span class="tb-sub"><span>'.number_format((int)$first_timer).'</span>'.$timer_stat.'</span>
                                 </div>
                                 
                             </div>
