@@ -174,10 +174,155 @@
                                     <img class="logo-dark logo-img logo-img-lg" src="<?=site_url();?>assets/logo.png?v=0" srcset="<?=site_url();?>assets/logo.png?v=0 2x" width="" alt="logo-dark">
                                 </a>
                             </div>
-                            
+                            <div class="nk-header-tools">
+                                <ul class="nk-quick-nav">
+
+                                    <li class="dropdown language-dropdown d-sm-block me-n1">
+                                        <a href="#" class="dropdown-toggle nk-quick-nav-icon" data-bs-toggle="dropdown">
+                                            <div class="quick-icon border border-light">
+                                                <?php
+                                                    $flags = $current_language;
+                                                    // echo $flags;
+                                                    if($current_language == 'Hausa' || $current_language == 'Igbo' || $current_language == 'Yoruba')$flags = 'Nigerian';
+
+                                                ?>
+                                                <img class="icon" src="<?=site_url(); ?>assets/images/flags/<?=strtolower($flags); ?>.png" alt="">
+                                            </div>
+                                        </a>
+                                        <div class="dropdown-menu dropdown-menu-end dropdown-menu-s1">
+                                            <ul class="language-list">
+                                            <?php
+                                                $lang = $this->Crud->read_single_order('status', 1,'language_code', 'name', 'asc');
+                                                if(!empty($lang)){
+                                                    foreach($lang as $l){
+                                                        $l_name = $l->name;
+                                                        if($l->name == 'Hausa' || $l->name == 'Igbo' || $l->name == 'Yoruba')$l_name = 'Nigerian';
+                                                
+                                            ?>
+                                                <li>
+                                                    <a href="javascript:;" onclick="lang_session(<?=$l->id; ?>)" class="language-item">
+                                                        <img src="<?=site_url(); ?>assets/images/flags/<?=strtolower($l_name); ?>.png" alt="" class="language-flag">
+                                                        <span class="language-name"><?=$l->name; ?></span>
+                                                    </a>
+                                                </li>
+                                                <?php
+
+                                                    }
+                                                    }
+                                                ?>
+                                            </ul>
+                                        </div>
+                                    </li><!-- .dropdown -->
+                                    <li class="dropdown user-dropdown">
+                                        <a href="#" class="dropdown-toggle" data-bs-toggle="dropdown">
+                                            <div class="user-toggle">
+                                                <div class="user-avatar sm">
+                                                    <em class="icon ni ni-user-alt"></em>
+                                                </div>
+                                                <div class="user-info d-none d-md-block">
+                                                    <div class="user-status user-status-verified">
+                                                        <?=translate_phrase(ucwords($log_role).' Account'); ?></div>
+                                                    <div class="user-name dropdown-indicator"><?=ucwords($username); ?>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                        <div class="dropdown-menu dropdown-menu-md dropdown-menu-end dropdown-menu-s1 ">
+                                            <div class="dropdown-inner user-card-wrap bg-lighter d-none d-md-block">
+                                                <div class="user-card">
+                                                    <div class="user-avatar">
+                                                        <em class="icon ni ni-user-alt"></em>
+                                                    </div>
+                                                    <div class="user-info">
+                                                        <span class="lead-text"><?=ucwords($username); ?></span>
+                                                        <span class="sub-text"><?=ucwords($email); ?></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="dropdown-inner">
+                                                <ul class="link-list">
+                                                    <li><a href="<?=site_url('profile'); ?>"><em class="icon ni ni-user-alt"></em><span><?=translate_phrase('View Profile');?></span></a></li>
+                                                    <li><a href="<?=site_url('activity'); ?>"><em class="icon ni ni-activity-alt"></em><span><?=translate_phrase('My Activity') ;?></span></a></li>
+                                                </ul>
+                                            </div>
+                                            <div class="dropdown-inner">
+                                                <ul class="link-list">
+                                                    <li><a href="<?=site_url('auth/logout'); ?>"><em class="icon ni ni-signout"></em><span><?=translate_phrase('Sign out'); ?></span></a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li class="dropdown notification-dropdown me-n1">
+                                        <a href="#" class="dropdown-toggle nk-quick-nav-icon" data-bs-toggle="dropdown">
+                                            <?php 
+                                                $sta = '';
+                                                if($this->Crud->check2('to_id', $log_id, 'new', '1', 'notify') > 0){
+                                                    $sta = 'icon-status-info';
+                                                }
+                                            
+                                            ?>
+                                            <div class="icon-status <?=$sta; ?>"><em class="icon ni ni-bell"></em></div>
+                                        </a>
+                                        <div class="dropdown-menu dropdown-menu-xl dropdown-menu-end dropdown-menu-s1">
+                                            <div class="dropdown-head">
+                                                <span class="sub-title nk-dropdown-title"><?=translate_phrase('Notifications'); ?></span>
+                                            </div>
+                                            <div class="dropdown-body">
+                                                <div class="nk-notification">
+                                                    <?php 
+                                                        $notify = $this->Crud->read2('to_id', $log_id, 'new', 1, 'notify');
+                                                        if(!empty($notify)){
+                                                           
+                                                            $a = 0;
+                                                            foreach($notify as $n){
+                                                                if($a>5) continue;
+                                                                $pos = 'left';
+                                                                $code = 'success';
+
+                                                                if($n->item == 'withdraw' || $n->item == 'transact'){
+                                                                    $pos = 'right';
+                                                                    $code = 'danger';
+                                                                }
+                                                           
+                                                    ?><a href="javascript:;" onclick="mark_read(<?=$n->id; ?>)">
+                                                        <div class="nk-notification-item dropdown-inner">
+
+                                                            <div class="nk-notification-icon">
+                                                                <em
+                                                                    class="icon icon-circle bg-<?=$code; ?>-dim ni ni-curve-down-<?=$pos; ?>"></em>
+                                                            </div>
+                                                            <div class="nk-notification-content">
+                                                                <div class="nk-notification-text">
+                                                                    <?=translate_phrase(ucwords($n->content)); ?></div>
+                                                                <div class="nk-notification-time">
+                                                                    <?=$this->Crud->timespan(strtotime($n->reg_date));; ?>
+                                                                </div>
+                                                            </div>
+
+                                                        </div><!-- .dropdown-inner -->
+                                                    </a>
+                                                    <?php 
+                                                        $a++;
+                                                        }
+
+                                                    } else {
+                                                        echo '<div class="text-center">'.translate_phrase('No Notification').'</div>';
+                                                    }
+                                                    ?>
+                                                </div>
+                                            </div><!-- .nk-dropdown-body -->
+                                            <div class="dropdown-foot center">
+                                                <a href="<?=site_url('notification/list'); ?>"><?=translate_phrase('View All'); ?></a>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </div>
+               <div class="col-12 my-2">.</div>
                 
                 <?=$this->renderSection('content');?>
         
