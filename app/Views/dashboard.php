@@ -13,7 +13,7 @@
         <div class="nk-content-inner">
             <div class="nk-content-body">
                 <div class="nk-block g-gs">
-                    <div class="mt-3 d-lg-none">.</div>
+                    <div class="mt-1 d-lg-none">.</div>
                     <div class="nk-block-between">
                         <div class="nk-block-head-content">
                             <h3 class="nk-block-title page-title">Dashboard Overview</h3>
