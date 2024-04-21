@@ -259,135 +259,12 @@
                                             <div class="card-title">
                                                 <h6 class="title">First Timer</h6>
                                             </div>
-                                            <div class="card-tools"><a href="customers.html" class="link">View All</a>
+                                            <div class="card-tools"><a href="<?=site_url('service/report'); ?>" class="link">View All</a>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="card-inner card-inner-md">
-                                        <div class="user-card">
-                                            <div class="user-avatar bg-primary-dim"><span>AB</span>
-                                            </div>
-                                            <div class="user-info"><span class="lead-text">Abu Bin
-                                                    Ishtiyak</span><span class="sub-text">info@softnio.com</span></div>
-                                            <div class="user-action">
-                                                <div class="drodown"><a href="#"
-                                                        class="dropdown-toggle btn btn-icon btn-trigger me-n1"
-                                                        data-bs-toggle="dropdown" aria-expanded="false"><em
-                                                            class="icon ni ni-more-h"></em></a>
-                                                    <div class="dropdown-menu dropdown-menu-end">
-                                                        <ul class="link-list-opt no-bdr">
-                                                            <li><a href="#"><em
-                                                                        class="icon ni ni-setting"></em><span>Action
-                                                                        Settings</span></a></li>
-                                                            <li><a href="#"><em
-                                                                        class="icon ni ni-notify"></em><span>Push
-                                                                        Notification</span></a></li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="card-inner card-inner-md">
-                                        <div class="user-card">
-                                            <div class="user-avatar bg-pink-dim"><span>SW</span></div>
-                                            <div class="user-info"><span class="lead-text">Sharon
-                                                    Walker</span><span class="sub-text">sharon-90@example.com</span>
-                                            </div>
-                                            <div class="user-action">
-                                                <div class="drodown"><a href="#"
-                                                        class="dropdown-toggle btn btn-icon btn-trigger me-n1"
-                                                        data-bs-toggle="dropdown" aria-expanded="false"><em
-                                                            class="icon ni ni-more-h"></em></a>
-                                                    <div class="dropdown-menu dropdown-menu-end">
-                                                        <ul class="link-list-opt no-bdr">
-                                                            <li><a href="#"><em
-                                                                        class="icon ni ni-setting"></em><span>Action
-                                                                        Settings</span></a></li>
-                                                            <li><a href="#"><em
-                                                                        class="icon ni ni-notify"></em><span>Push
-                                                                        Notification</span></a></li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="card-inner card-inner-md">
-                                        <div class="user-card">
-                                            <div class="user-avatar bg-warning-dim"><span>GO</span>
-                                            </div>
-                                            <div class="user-info"><span class="lead-text">Gloria
-                                                    Oliver</span><span class="sub-text">gloria_72@example.com</span>
-                                            </div>
-                                            <div class="user-action">
-                                                <div class="drodown"><a href="#"
-                                                        class="dropdown-toggle btn btn-icon btn-trigger me-n1"
-                                                        data-bs-toggle="dropdown" aria-expanded="false"><em
-                                                            class="icon ni ni-more-h"></em></a>
-                                                    <div class="dropdown-menu dropdown-menu-end">
-                                                        <ul class="link-list-opt no-bdr">
-                                                            <li><a href="#"><em
-                                                                        class="icon ni ni-setting"></em><span>Action
-                                                                        Settings</span></a></li>
-                                                            <li><a href="#"><em
-                                                                        class="icon ni ni-notify"></em><span>Push
-                                                                        Notification</span></a></li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="card-inner card-inner-md">
-                                        <div class="user-card">
-                                            <div class="user-avatar bg-success-dim"><span>PS</span>
-                                            </div>
-                                            <div class="user-info"><span class="lead-text">Phillip
-                                                    Sullivan</span><span class="sub-text">phillip-85@example.com</span>
-                                            </div>
-                                            <div class="user-action">
-                                                <div class="drodown"><a href="#"
-                                                        class="dropdown-toggle btn btn-icon btn-trigger me-n1"
-                                                        data-bs-toggle="dropdown" aria-expanded="false"><em
-                                                            class="icon ni ni-more-h"></em></a>
-                                                    <div class="dropdown-menu dropdown-menu-end">
-                                                        <ul class="link-list-opt no-bdr">
-                                                            <li><a href="#"><em
-                                                                        class="icon ni ni-setting"></em><span>Action
-                                                                        Settings</span></a></li>
-                                                            <li><a href="#"><em
-                                                                        class="icon ni ni-notify"></em><span>Push
-                                                                        Notification</span></a></li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="card-inner card-inner-md">
-                                        <div class="user-card">
-                                            <div class="user-avatar bg-danger-dim"><span>TI</span></div>
-                                            <div class="user-info"><span class="lead-text">Tasnim
-                                                    Ifrat</span><span class="sub-text">tasif-85@example.com</span></div>
-                                            <div class="user-action">
-                                                <div class="drodown"><a href="#"
-                                                        class="dropdown-toggle btn btn-icon btn-trigger me-n1"
-                                                        data-bs-toggle="dropdown" aria-expanded="false"><em
-                                                            class="icon ni ni-more-h"></em></a>
-                                                    <div class="dropdown-menu dropdown-menu-end">
-                                                        <ul class="link-list-opt no-bdr">
-                                                            <li><a href="#"><em
-                                                                        class="icon ni ni-setting"></em><span>Action
-                                                                        Settings</span></a></li>
-                                                            <li><a href="#"><em
-                                                                        class="icon ni ni-notify"></em><span>Push
-                                                                        Notification</span></a></li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                    <div id="timer_data">
+                                        
                                     </div>
                                 </div>
                             </div>
@@ -692,6 +569,7 @@
      
     function load_activity() {
         $('#activity_data').html( '<div class="col-sm-12 text-center"><br><br><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>' );
+       $('#timer_data').html( '<div class="col-sm-12 text-center"><br><br><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>' );
        
         $.ajax({
             url: site_url + 'dashboard/index/activity_load',
@@ -700,6 +578,7 @@
             success: function(data) {
                 var dt = JSON.parse(data);
                 $('#activity_data').html(dt.item);
+                $('#timer_data').html(dt.timer_item);
                
             }
         });

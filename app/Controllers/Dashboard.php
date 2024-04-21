@@ -38,6 +38,7 @@ class Dashboard extends BaseController {
 			$count = 0;
 			$rec_limit = 7;
 			$item = '';
+            $timer_item = '';
 
 			if($limit == '') {$limit = $rec_limit;}
 			if($offset == '') {$offset = 0;}
@@ -89,6 +90,66 @@ class Dashboard extends BaseController {
 						';
 					}
 				}
+
+                //timer Records
+                $timer_data = [];
+                $service_query = $this->Crud->read_order('service_report', 'id', 'desc');
+				
+				if (!empty($service_query)) {
+					foreach($service_query as $q) {
+						$datas['type'] = 'service';
+						$datas['id'] = $q->id;
+						$datas['date'] = $q->date;
+						$datas['timers'] = $q->timers;
+
+                        $timer_data[] = $datas;
+
+                    }
+                }
+                $cell_query = $this->Crud->read_order('cell_report', 'id', 'desc');
+				
+				if (!empty($cell_query)) {
+					foreach($cell_query as $q) {
+						$datas['type'] = 'cell';
+						$datas['id'] = $q->id;
+						$datas['date'] = $q->date;
+						$datas['timers'] = $q->timers;
+                        $timer_data[] = $datas;
+                    }
+                }
+
+                
+                if(!empty($timer_data)){
+                    foreach($timer_data as $td){
+                        if(empty($td['timers']))continue;
+                        $timer = $td['timers'];
+                        $date = date('d F Y', strtotime($td['date']));
+                        if(!empty($timer)){
+                            $timer = json_decode($timer);
+                            if(is_array($timer) && !empty($timer)){
+                                foreach($timer as $val){
+                                    $time = (array)$val;
+                                    foreach($time as $t=> $vals){
+                                        if($t == 'fullname'){
+                                            $timer_item .= '
+                                                <div class="card-inner card-inner-md">
+                                                    <div class="user-card">
+                                                        
+                                                        <div class="user-info"><span class="lead-text">'.strtoupper($vals).'</span>
+                                                        <span class="sub-text text-info">'.strtoupper($td['type']).'</span></div>
+                                                        <div class="user-action">
+                                                            <span class="small">'.$date.'</span>
+                                                        </div>
+                                                    </div>
+                                                </div>  
+                                            ';
+                                        }
+                                    }
+                                }
+                            }
+                        }
+					}
+				}
 				
 			}
 			if(empty($item)) {
@@ -100,6 +161,17 @@ class Dashboard extends BaseController {
 				';
 			} else {
 				$resp['item'] = $item;
+			}
+
+            if(empty($timer_item)) {
+				$resp['timer_item'] = '
+					<div class="text-center text-muted">
+						<br/><br/><br/><br/>
+						<em class="icon ni ni-users" style="font-size:150px;"></em><br/><br/>'.translate_phrase('No First Timer Returned').'
+					</div>
+				';
+			} else {
+				$resp['timer_item'] = $timer_item;
 			}
 
 			$resp['count'] = $counts;
