@@ -118,7 +118,12 @@ class Dashboard extends BaseController {
                     }
                 }
 
-                
+                // Sort array by 'date' in descending order
+                usort($timer_data, function($a, $b) {
+                    return strtotime($b['date']) - strtotime($a['date']);
+                });
+
+                // print_r($timer_data);
                 if(!empty($timer_data)){
                     foreach($timer_data as $td){
                         if(empty($td['timers']))continue;
@@ -127,8 +132,10 @@ class Dashboard extends BaseController {
                         if(!empty($timer)){
                             $timer = json_decode($timer);
                             if(is_array($timer) && !empty($timer)){
+                               
                                 foreach($timer as $val){
                                     $time = (array)$val;
+                                    
                                     foreach($time as $t=> $vals){
                                         if($t == 'fullname'){
                                             $timer_item .= '
