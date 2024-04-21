@@ -83,7 +83,7 @@ class Dashboard extends BaseController {
                                 <div class="nk-activity-media user-avatar bg-success"><img
                                         src="'.site_url().'assets/images/avatar.png" alt=""></div>
                                 <div class="nk-activity-data">
-                                    <div class="label"> '.translate_phrase($action).'</div>
+                                    <div class="label lead-text"> '.translate_phrase($action).'</div>
                                     <span class="time">'.$timespan.'</span>
                                 </div>
                             </li>    
@@ -145,7 +145,7 @@ class Dashboard extends BaseController {
                                                         <div class="user-info"><span class="lead-text">'.strtoupper($vals).'</span>
                                                         <span class="sub-text text-info">'.strtoupper($td['type']).'</span></div>
                                                         <div class="user-action">
-                                                            <span class="small">'.$date.'</span>
+                                                            <span class="sub-text">'.$date.'</span>
                                                         </div>
                                                     </div>
                                                 </div>  
