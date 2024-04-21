@@ -142,7 +142,7 @@ class Dashboard extends BaseController {
                                                 <div class="card-inner card-inner-md">
                                                     <div class="user-card">
                                                         
-                                                        <div class="user-info"><span class="lead-text">'.strtoupper($vals).'</span>
+                                                        <div class="user-info"><span class="lead-text">'.ucwords($vals).'</span>
                                                         <span class="sub-text text-info">'.strtoupper($td['type']).'</span></div>
                                                         <div class="user-action">
                                                             <span class="sub-text">'.$date.'</span>
