@@ -560,6 +560,59 @@ $this->Crud = new Crud();
             <div class="col-sm-12"><div id="bb_ajax_msg2"></div></div>
         </div>
     <?php } ?>
+    <?php if($param2 == 'offering'){
+        // echo $table_rec;
+        $converts = json_decode($this->Crud->read_field('id', $param3, 'service_report', 'offering_givers'));
+        $total =0 ;
+        $member = 0;
+        $guest = 0;
+        if(!empty($converts)){
+            $total = $converts->total;
+            $member = $converts->member;
+            $guest = $converts->guest;
+            
+        }
+        ?>
+        <div class="row">
+            <span class="text-danger mb-2">Enter Member's Offering in the Table Below</span>
+            <div class="col-sm-4 mb-3 ">
+                <label>Total</label>
+                <input class="form-control" id="total_offering" type="text" name="total_offering"  readonly value="<?=number_format($total,2); ?>">
+            </div>
+            <div class="col-sm-4 mb-3">
+                <label>Member</label>
+                <input class="form-control" id="member_offering" type="text" name="member_offering"  readonly value="<?=number_format($member,2); ?>">
+            </div>
+            <div class="col-sm-4 mb-3">
+                <label>Guest</label>
+                <input class="form-control" id="guest_offering" type="text" name="guest_offering" oninput="get_offering();this.value = this.value.replace(/[^\d.]/g,'');this.value = this.value.replace(/(\..*)\./g,'$1')" value="<?=number_format($guest,2); ?>">
+            </div>
+        </div>
+        <hr>
+        <div class="table-responsive">
+            <table id="dtable" class="table table-striped table-hover mt-5">
+                <thead>
+                    <tr>
+                        <th>Member</th>
+                        <th width="200px">Offering</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+        <hr>
+        <div class="row mt-5" >
+            <div class="col-sm-12 text-center mt-5">
+                <button class="btn btn-primary bb_fo_btn" type="submit">
+                    <i class="icon ni ni-save"></i> <?=translate_phrase('Save Record');?>
+                </button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12"><div id="bb_ajax_msg2"></div></div>
+        </div>
+    <?php } ?>
     
     <?php if($param2 == 'partnership'){
         $total =0 ;
@@ -1580,6 +1633,30 @@ $this->Crud = new Crud();
             }
         });
     }
+
+    function calculateTotals() {
+        
+        var tithesInputs = document.querySelectorAll('.offerings');
+        var total = 0;
+        tithesInputs.forEach(function(input) {
+            var value = parseFloat(input.value);
+            total += isNaN(value) ? 0 : value;
+        });
+        console.log(total);
+        var guest = $('#guest_offering').val();
+        
+        $('#member_offering').val(total.toFixed(2));
+        total += parseFloat(guest);
+        total = total.toFixed(2);
+        $('#total_offering').val(total);
+
+        // Set value to 0 if the textbox is empty
+        tithesInputs.forEach(function(input) {
+            if (input.value === '') {
+                input.value = '';
+            }
+        });
+    }
     // Trigger the change event on page load
     $('select[name="invited_by[]"]').trigger('change');
 
@@ -1633,6 +1710,15 @@ $this->Crud = new Crud();
         var total = parseFloat(member) + parseFloat(guest);
         total = total.toFixed(2);
         $('#total_tithe').val(total);
+    }
+
+    function get_offering(){
+        var member = $('#member_offering').val();
+        var guest = $('#guest_offering').val();
+        
+        var total = parseFloat(member) + parseFloat(guest);
+        total = total.toFixed(2);
+        $('#total_offering').val(total);
     }
 
     function calculateSum() {

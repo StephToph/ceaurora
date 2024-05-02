@@ -125,7 +125,16 @@
                                         <div class="col-sm-4 mb-3">
                                             <div class="form-group">
                                                 <label for="name">*<?=translate_phrase('Offering'); ?></label>
-                                                <input class="form-control" id="offering" type="text" id="offering" oninput="this.value = this.value.replace(/[^\d.]/g,'');this.value = this.value.replace(/(\..*)\./g,'$1')" name="offering"  required>
+                                                <div class="form-control-wrap">    
+                                                    <div class="input-group">        
+                                                        <input type="text" readonly name="offering" id="offering" oninput="this.value = this.value.replace(/[^\d.]/g,'');this.value = this.value.replace(/(\..*)\./g,'$1')" class="form-control" placeholder="0">        
+                                                        <div class="input-group-append">            
+                                                            <button type="button"  class="btn btn-outline-primary btn-dim pop" pageTitle="Enter Offering" pageSize="modal-lg" pageName="<?php echo  site_url('service/report/manage/offering'); ?>" id="offeringBtn">ADD</button>        
+                                                        </div>    
+                                                    </div>
+                                                    <span class="text-danger"></span>
+                                                </div>
+                                                
                                             </div>
                                         </div>
                                         
@@ -168,6 +177,7 @@
                                         <input type="hidden" name="converts" id="converts">
                                         <input type="hidden" name="timers" id="timers">
                                         <input type="hidden" name="tither" id="tither">
+                                        <input type="hidden" name="offering_givers" id="offering_givers">
                                         <input type="hidden" name="partners" id="partners">
                                         
                                         <div class="col-sm-12 text-center mt-3">
@@ -224,6 +234,7 @@
         var timerBtn = document.getElementById("timerBtn");
         var partnerBtn = document.getElementById("partnerBtn");
         var titheBtn = document.getElementById("titheBtn");
+        var offeringBtn = document.getElementById("offeringBtn");
         // Update button class, onclick function, and icon class
         $(this).removeClass().addClass('btn btn-icon ' + currentInfo.class);
         // $(this).attr('onclick', currentInfo.onclick);
@@ -248,6 +259,10 @@
         var urls = site_url + 'service/report/manage/tithe';
         var updatedPageName = urls;
         titheBtn.setAttribute("pageName", updatedPageName);
+
+        var urls = site_url + 'service/report/manage/offering';
+        var updatedPageName = urls;
+        offeringBtn.setAttribute("pageName", updatedPageName);
     });
 
     $('#back_btn').click(function() {
@@ -265,6 +280,7 @@
         var timerBtn = document.getElementById("timerBtn");
         var partnerBtn = document.getElementById("partnerBtn");
         var titheBtn = document.getElementById("titheBtn");
+        var offeringBtn = document.getElementById("offeringBtn");
         $('#bb_ajax_msg').html('<div class="col-sm-12 text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>');
         $('#show').hide(500);
         $('#form').show(500);
@@ -316,6 +332,11 @@
                 var urls = site_url + 'service/report/manage/tithe';
                 var updatedPageName = urls + "/" + dt.e_id;
                 titheBtn.setAttribute("pageName", updatedPageName);
+
+                
+                var urls = site_url + 'service/report/manage/offering';
+                var updatedPageName = urls + "/" + dt.e_id;
+                offeringBtn.setAttribute("pageName", updatedPageName);
                 $('#bb_ajax_msg').html('');
             }
         });
@@ -329,6 +350,7 @@
         var timerBtn = document.getElementById("timerBtn");
         var partnerBtn = document.getElementById("partnerBtn");
         var titheBtn = document.getElementById("titheBtn");
+        var offeringBtn = document.getElementById("offeringBtn");
         
         var selectedValue = selectElement.value;
        
@@ -351,6 +373,10 @@
         var urls = site_url + 'service/report/manage/tithe';
         var updatedPageName = urls + "/" + selectedValue;
         titheBtn.setAttribute("pageName", updatedPageName);
+        
+        var urls = site_url + 'service/report/manage/offering';
+        var updatedPageName = urls + "/" + selectedValue;
+        offeringBtn.setAttribute("pageName", updatedPageName);
         
     }
 

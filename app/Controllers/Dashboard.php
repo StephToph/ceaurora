@@ -322,7 +322,7 @@ class Dashboard extends BaseController {
             $cells = $this->Crud->read('cells');
              $service_report = $this->Crud->date_range($start_date, 'date', $end_date, 'date', 'service_report');
             
-            
+             $partnership = 0;
             if(!empty($partners)){
                 foreach($partners as $u){
                     $partnership += (float)$u->amount_paid;
@@ -449,7 +449,11 @@ class Dashboard extends BaseController {
                     }
                     
                     
-                    $paids = ((float)$paid * 100)/(float)$partnership;
+                    if($partnership > 0){
+                        $paids = ((float)$paid * 100)/(float)$partnership;
+                    } else {
+                        $paids = 0;
+                    }
                     // Select a random key
                     $random_key = array_rand($col);
 
