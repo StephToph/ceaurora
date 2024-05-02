@@ -600,6 +600,73 @@ class Service extends BaseController {
 					die;
 				}
 
+			} elseif($param2 == 'offering'){
+				if($param3){
+					$data['table_rec'] = 'service/report/offering_list/'.$param3; // ajax table
+				
+				} else {
+					$data['table_rec'] = 'service/report/offering_list'; // ajax table
+				
+				}
+				$data['order_sort'] = '0, "asc"'; // default ordering (0, 'asc')
+				$data['no_sort'] = '1'; // sort disable columns (1,3,5)
+		
+				if($param3) {
+					$edit = $this->Crud->read2('type_id', $param3, 'type', 'cell', 'attendance');
+					if(!empty($edit)) {
+						foreach($edit as $e) {
+							$data['d_id'] = $e->id;
+							$data['d_attendant'] = $e->attendant;
+						}
+					}
+					
+				}
+				//When Adding Save in Session
+				if($this->request->getMethod() == 'post'){
+					$guest_offering = $this->request->getPost('guest_offering');
+					$total_offering = $this->request->getPost('total_offering');
+					$member_offering = $this->request->getPost('member_offering');
+
+					$member = $this->request->getPost('members');
+					$offering = $this->request->getPost('offering');
+					
+
+					$tither = [];
+					if (!empty($member) && !empty($offering)) {
+						$count = count($offering); 
+						for ($i = 0; $i < $count; $i++) {
+							if ($offering[$i] <= 0) {
+								continue; 
+							}
+							
+							if (!isset($tither[$member[$i]])) {
+								$tither[$member[$i]] = $offering[$i];
+							}
+							
+						}
+					}
+
+					$offering_list['total'] = $total_offering;
+					$offering_list['member'] = $member_offering;
+					$offering_list['guest'] = $guest_offering;
+					$offering_list['list'] = $tither;
+					 
+					// print_r($tithe_list);
+					$this->session->set('service_offering', json_encode($offering_list));
+					
+					echo $this->Crud->msg('success', 'Service Offering Report Submitted');
+					// echo json_encode($mark);
+					echo '<script> setTimeout(function() {
+						var jsonData = ' . json_encode($offering_list) . ';
+						var jsonString = JSON.stringify(jsonData);
+						$("#offering_givers").val(jsonString);
+						$("#offering").val('.($total_offering).');
+						$("#modal").modal("hide");
+					}, 2000); </script>';
+					
+					die;
+				}
+
 			} elseif($param2 == 'new_convert'){
 				
 					$edit = $this->Crud->read2('type_id', $param3, 'type', 'cell', 'attendance');
@@ -745,6 +812,7 @@ class Service extends BaseController {
 					$tithe = $this->request->getVar('tithe');
 					$partnership = $this->request->getVar('partnership');
 					$tither = $this->request->getVar('tither');
+					$offering_givers = $this->request->getVar('offering_givers');
 					$partners = $this->request->getVar('partners');
 					$offering = $this->request->getVar('offering');
 					$note = $this->request->getVar('note');
@@ -771,6 +839,7 @@ class Service extends BaseController {
 					$ins_data['timers'] = $timers;
 					$ins_data['tithe'] = $tithe;
 					$ins_data['partners'] = $partners;
+					$ins_data['offering_givers'] = $offering_givers;
 			
 					
 
@@ -784,6 +853,7 @@ class Service extends BaseController {
 							$this->session->set('service_converts', '');
 							$this->session->set('service_timers', '');
 							$this->session->set('service_tithe', '');
+							$this->session->set('service_offering', '');
 							$this->session->set('service_timer_count', '');
 
 							///// store activities
@@ -932,6 +1002,7 @@ class Service extends BaseController {
 								$this->session->set('service_partnership', '');
 								$this->session->set('service_converts', '');
 								$this->session->set('service_timers', '');
+								$this->session->set('service_offering', '');
 								$this->session->set('service_tithe', '');
 								$this->session->set('service_timer_count', '');
 								///// store activities
@@ -1140,6 +1211,78 @@ class Service extends BaseController {
 				$all_btn = '
 					<div class="text-center">
 						<input type="text" class="form-control tithes" name="tithe[]" id="tithe_'.$item->id.'" value="'.$value.'" oninput="calculateTotal();this.value = this.value.replace(/[^\d.]/g,\'\');this.value = this.value.replace(/(\..*)\./g,\'$1\')">
+					</div>
+				';
+
+				
+				
+				$row = array();
+				$row[] = '<div class="user-card">
+							<div class="user-avatar ">
+								<img alt="" src="'.site_url($img).'" height="40px"/>
+							</div>
+							<div class="user-info">
+								<span class="tb-lead">'.ucwords($item->firstname.' '.$item->surname).'</span>
+							</div>
+							<input type="hidden" name="members[]" value="'.$item->id.'">
+						</div>';
+				$row[] = $all_btn;
+	
+				$data[] = $row;
+				$count += 1;
+			}
+	
+			$output = array(
+				"draw" => intval($_POST['draw']),
+				"recordsTotal" => $this->Crud->datatable_count($table, $where),
+				"recordsFiltered" => $this->Crud->datatable_filtered($table, $column_order, $column_search, $order, $where),
+				"data" => $data,
+			);
+			
+			//output to json format
+			echo json_encode($output);
+			exit;
+		}
+
+		if($param1 == 'offering_list') {
+			// DataTable parameters
+			$table = 'user';
+			$column_order = array('firstname', 'surname');
+			$column_search = array('firstname', 'surname');
+			$order = array('firstname' => 'asc');
+			$member_id = $this->Crud->read_field('name', 'Member', 'access_role', 'id');
+			$where = array('role_id' => $member_id);
+			
+			// load data into table
+			$list = $this->Crud->datatable_load($table, $column_order, $column_search, $order, $where);
+			$data = array();
+			// $no = $_POST['start'];
+			
+			$count = 1;
+			foreach ($list as $item) {
+				$id = $item->id;
+				$name = $item->firstname;
+				$surname = $item->surname;
+				$img = $this->Crud->image($item->img_id, 'big');
+				// add manage buttons
+				$value = '0';
+				if($param2){
+					$convertsa = json_decode($this->Crud->read_field('id', $param2, 'service_report', 'offering_givers'));
+					if(!empty($convertsa)){
+						$converts =(array) $convertsa->list;
+						if(!empty($converts)){
+							foreach($converts as $co => $val){
+								if($id == $co){
+									$value = $val;
+								}
+							}
+						}
+					}	
+				}
+				
+				$all_btn = '
+					<div class="text-center">
+						<input type="text" class="form-control offerings" name="offering[]" id="offering_'.$item->id.'" value="'.$value.'" oninput="calculateTotals();this.value = this.value.replace(/[^\d.]/g,\'\');this.value = this.value.replace(/(\..*)\./g,\'$1\')">
 					</div>
 				';
 
