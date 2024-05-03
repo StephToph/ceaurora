@@ -601,6 +601,10 @@ class Service extends BaseController {
 				}
 
 			} elseif($param2 == 'offering'){
+				$timer_count = $this->session->get('service_timers');
+				// $first = json_decode($timer_count);
+				// echo $timer_count;
+				$data['first'] = $timer_count;
 				if($param3){
 					$data['table_rec'] = 'service/report/offering_list/'.$param3; // ajax table
 				
@@ -629,6 +633,8 @@ class Service extends BaseController {
 
 					$member = $this->request->getPost('members');
 					$offering = $this->request->getPost('offering');
+					$guests = $this->request->getPost('guests');
+					$guest_offerings = $this->request->getPost('guest_offerings');
 					
 
 					$tither = [];
@@ -646,12 +652,27 @@ class Service extends BaseController {
 						}
 					}
 
+					if (!empty($guests) && !empty($guest_offerings)) {
+						$count = count($guest_offerings); 
+						for ($i = 0; $i < $count; $i++) {
+							if ($guest_offerings[$i] <= 0) {
+								continue; 
+							}
+							
+							if (!isset($tithers[$guests[$i]])) {
+								$tithers[$guests[$i]] = $guest_offerings[$i];
+							}
+							
+						}
+					}
+
 					$offering_list['total'] = $total_offering;
 					$offering_list['member'] = $member_offering;
 					$offering_list['guest'] = $guest_offering;
 					$offering_list['list'] = $tither;
+					$offering_list['guest_list'] = $tithers;
 					 
-					// print_r($tithe_list);
+					
 					$this->session->set('service_offering', json_encode($offering_list));
 					
 					echo $this->Crud->msg('success', 'Service Offering Report Submitted');

@@ -562,32 +562,85 @@ $this->Crud = new Crud();
     <?php } ?>
     <?php if($param2 == 'offering'){
         // echo $table_rec;
-        $converts = json_decode($this->Crud->read_field('id', $param3, 'service_report', 'offering_givers'));
+        $first = json_decode($first);
         $total =0 ;
         $member = 0;
         $guest = 0;
-        if(!empty($converts)){
-            $total = $converts->total;
-            $member = $converts->member;
-            $guest = $converts->guest;
-            
+        
+        if($param3){
+            $converts = json_decode($this->Crud->read_field('id', $param3, 'service_report', 'offering_givers'));
+            if(!empty($converts)){
+                $total = $converts->total;
+                $member = $converts->member;
+                $guest = $converts->guest;
+                $first = (array)$converts->guest_list;
+            }
+          
+            if(empty($first)){
+                $first = json_decode($this->Crud->read_field('id', $param3, 'service_report', 'timers'));
+                
+            }
         }
         ?>
         <div class="row">
             <span class="text-danger mb-2">Enter Member's Offering in the Table Below</span>
             <div class="col-sm-4 mb-3 ">
                 <label>Total</label>
-                <input class="form-control" id="total_offering" type="text" name="total_offering"  readonly value="<?=number_format($total,2); ?>">
+                <input class="form-control" id="total_offering" type="text" name="total_offering"  readonly value="<?=($total); ?>">
             </div>
             <div class="col-sm-4 mb-3">
                 <label>Member</label>
-                <input class="form-control" id="member_offering" type="text" name="member_offering"  readonly value="<?=number_format($member,2); ?>">
+                <input class="form-control" id="member_offering" type="text" name="member_offering"  readonly value="<?=($member); ?>">
             </div>
             <div class="col-sm-4 mb-3">
                 <label>Guest</label>
-                <input class="form-control" id="guest_offering" type="text" name="guest_offering" oninput="get_offering();this.value = this.value.replace(/[^\d.]/g,'');this.value = this.value.replace(/(\..*)\./g,'$1')" value="<?=number_format($guest,2); ?>">
+                <input class="form-control" id="guest_offering" type="text" name="guest_offering" oninput="get_offering();this.value = this.value.replace(/[^\d.]/g,'');this.value = this.value.replace(/(\..*)\./g,'$1')" value="<?=($guest); ?>">
             </div>
         </div>
+        <?php if(!empty($first)){?>
+            <hr>
+            <div class="table-responsive">
+                <table id="dtables" class="table table-striped table-hover mt-5">
+                    <thead>
+                        <tr>
+                            <th>First Timer</th>
+                            <th width="200px">Offering</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php 
+                           if($param3){
+                                foreach($first as $mm => $val){
+                                    if(empty($val))$val = 0;
+                                    ?>
+                                    
+                                <tr>
+                                    <td><?=strtoupper($mm); ?> <input type="hidden" name="guests[]" value="<?=strtoupper($mm); ?>"></td>
+                                
+                                    <td>
+                                        <input type="text" class="form-control guest_offerings" name="guest_offerings[]" id="offering_<?php echo $mm; ?>" value="<?=$val; ?>" oninput="guest_offerings();this.value = this.value.replace(/[^\d.]/g,'');this.value = this.value.replace(/(\..*)\./g,'$1')">
+
+                                    </td>
+                                </tr>
+                           <?php } } else{
+                            if(!empty((array)$first)){
+                                foreach($first as $mm => $val){
+                                    
+                            ?>
+                            <tr>
+                                <td><?=strtoupper($val->fullname); ?> <input type="hidden" name="guests[]" value="<?=strtoupper($val->fullname); ?>"></td>
+                            
+                                <td>
+                                    <input type="text" class="form-control guest_offerings" name="guest_offerings[]" id="offering_<?php echo $mm; ?>" value="0" oninput="guest_offerings();this.value = this.value.replace(/[^\d.]/g,'');this.value = this.value.replace(/(\..*)\./g,'$1')">
+
+                                </td>
+                            </tr>
+
+                        <?php } } }?>
+                    </tbody>
+                </table>
+            </div>
+        <?php } ?>
         <hr>
         <div class="table-responsive">
             <table id="dtable" class="table table-striped table-hover mt-5">
@@ -1646,6 +1699,31 @@ $this->Crud = new Crud();
         var guest = $('#guest_offering').val();
         
         $('#member_offering').val(total.toFixed(2));
+        total += parseFloat(guest);
+        total = total.toFixed(2);
+        $('#total_offering').val(total);
+
+        // Set value to 0 if the textbox is empty
+        tithesInputs.forEach(function(input) {
+            if (input.value === '') {
+                input.value = '';
+            }
+        });
+    }
+
+    
+    function guest_offerings() {
+        
+        var tithesInputs = document.querySelectorAll('.guest_offerings');
+        var total = 0;
+        tithesInputs.forEach(function(input) {
+            var value = parseFloat(input.value);
+            total += isNaN(value) ? 0 : value;
+        });
+        console.log(total);
+        var guest = $('#member_offering').val();
+        
+        $('#guest_offering').val(total.toFixed(2));
         total += parseFloat(guest);
         total = total.toFixed(2);
         $('#total_offering').val(total);
