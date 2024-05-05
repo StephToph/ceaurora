@@ -592,7 +592,7 @@ $this->Crud = new Crud();
             </div>
             <div class="col-sm-4 mb-3">
                 <label>Guest</label>
-                <input class="form-control" id="guest_offering" type="text" name="guest_offering" oninput="get_offering();this.value = this.value.replace(/[^\d.]/g,'');this.value = this.value.replace(/(\..*)\./g,'$1')" value="<?=($guest); ?>">
+                <input class="form-control" id="guest_offering" type="text" name="guest_offering" readonly oninput="get_offering();this.value = this.value.replace(/[^\d.]/g,'');this.value = this.value.replace(/(\..*)\./g,'$1')" value="<?=($guest); ?>">
             </div>
         </div>
         <?php if(!empty($first)){?>
@@ -614,7 +614,7 @@ $this->Crud = new Crud();
                                         foreach($guest_list as $guest => $amount){
                                             if($guest == strtoupper($val->fullname)){
                                                 $vals = $amount;
-                                                echo $vals.' ';
+                                                // echo $vals.' ';
                                             }
                                         }
                                     }
@@ -622,7 +622,7 @@ $this->Crud = new Crud();
                                     ?>
                                     
                                 <tr>
-                                    <td><?=strtoupper($val->fullname); ?> <input type="hidden" name="guests[]" value="<?=strtoupper($val->fullname); ?>"></td>
+                                    <td><span class="text-muted"><?=ucwords($val->fullname); ?></span> <input type="hidden" name="guests[]" value="<?=strtoupper($val->fullname); ?>"></td>
                                 
                                     <td>
                                         <input type="text" class="form-control guest_offerings" name="guest_offerings[]" id="offering_<?php echo $val->fullname; ?>" value="<?=$vals; ?>" oninput="guest_offerings();this.value = this.value.replace(/[^\d.]/g,'');this.value = this.value.replace(/(\..*)\./g,'$1')">
@@ -635,7 +635,7 @@ $this->Crud = new Crud();
                                     
                             ?>
                             <tr>
-                                <td><?=strtoupper($val->fullname); ?> <input type="hidden" name="guests[]" value="<?=strtoupper($val->fullname); ?>"></td>
+                                <td><span class="text-muted"><?=ucwords($val->fullname); ?></span><input type="hidden" name="guests[]" value="<?=strtoupper($val->fullname); ?>"></td>
                             
                                 <td>
                                     <input type="text" class="form-control guest_offerings" name="guest_offerings[]" id="offering_<?php echo $mm; ?>" value="0" oninput="guest_offerings();this.value = this.value.replace(/[^\d.]/g,'');this.value = this.value.replace(/(\..*)\./g,'$1')">
