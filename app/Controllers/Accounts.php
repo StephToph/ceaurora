@@ -1088,10 +1088,13 @@ class Accounts extends BaseController {
 					//When Adding Save in Session
 					if($this->request->getMethod() == 'post'){
 						$mark = $this->request->getPost('mark');
+						$total = 0;
+						
 						if(empty($mark)){
 							echo $this->Crud->msg('danger', 'Mark Meeting Attendance');
 							die;
 						} else{
+							$total = count($mark);
 							$this->session->set('cell_attendance', json_encode($mark));
 							echo $this->Crud->msg('success', 'Meeting Attendance Submitted');
 							// echo json_encode($mark);
@@ -1099,11 +1102,88 @@ class Accounts extends BaseController {
 								var jsonData = ' . json_encode($mark) . ';
 								var jsonString = JSON.stringify(jsonData);
 								$("#converts").val(jsonString);
+								$("#attendance").val('.$total.');
 								$("#modal").modal("hide");
 							}, 2000); </script>';
 						}
 						die;
 					}
+				}
+
+			}  elseif($param2 == 'offering'){
+				$timer_count = $this->session->get('cell_timers');
+				// $first = json_decode($timer_count);
+				// echo $timer_count;
+				$data['first'] = $timer_count;
+				$data['table_rec'] = 'accounts/creport/offering_list/'.$param3; 
+				if($param4){
+					$data['table_rec'] = 'accounts/creport/offering_list/'.$param3.'/'.$param4; 
+				}
+				$data['order_sort'] = '0, "asc"'; // default ordering (0, 'asc')
+				$data['no_sort'] = '1'; // sort disable columns (1,3,5)
+		
+				//When Adding Save in Session
+				if($this->request->getMethod() == 'post'){
+					$guest_offering = $this->request->getPost('guest_offering');
+					$total_offering = $this->request->getPost('total_offering');
+					$member_offering = $this->request->getPost('member_offering');
+
+					$member = $this->request->getPost('members');
+					$offering = $this->request->getPost('offering');
+					$guests = $this->request->getPost('guests');
+					$guest_offerings = $this->request->getPost('guest_offerings');
+					
+
+					$tither = [];
+					$tithers = [];
+					if (!empty($member) && !empty($offering)) {
+						$count = count($offering); 
+						for ($i = 0; $i < $count; $i++) {
+							if ($offering[$i] <= 0) {
+								continue; 
+							}
+							
+							if (!isset($tither[$member[$i]])) {
+								$tither[$member[$i]] = $offering[$i];
+							}
+							
+						}
+					}
+
+					if (!empty($guests) && !empty($guest_offerings)) {
+						$count = count($guest_offerings); 
+						for ($i = 0; $i < $count; $i++) {
+							if ($guest_offerings[$i] <= 0) {
+								continue; 
+							}
+							
+							if (!isset($tithers[$guests[$i]])) {
+								$tithers[$guests[$i]] = $guest_offerings[$i];
+							}
+							
+						}
+					}
+
+					$offering_list['total'] = $total_offering;
+					$offering_list['member'] = $member_offering;
+					$offering_list['guest'] = $guest_offering;
+					$offering_list['list'] = $tither;
+					$offering_list['guest_list'] = $tithers;
+					 
+					
+					$this->session->set('cell_offering', json_encode($offering_list));
+					
+					echo $this->Crud->msg('success', 'Cell Offering Report Submitted');
+					// echo json_encode($mark);
+					echo '<script> setTimeout(function() {
+						var jsonData = ' . json_encode($offering_list) . ';
+						var jsonString = JSON.stringify(jsonData);
+						$("#offering_givers").val(jsonString);
+						$("#offering").val('.($total_offering).');
+						$("#modal").modal("hide");
+					}, 2000); </script>';
+					
+					die;
 				}
 
 			} elseif($param2 == 'new_convert'){
@@ -1148,6 +1228,8 @@ class Accounts extends BaseController {
 								var jsonData = ' . json_encode($convert) . ';
 								var jsonString = JSON.stringify(jsonData);
 								$("#converts").val(jsonString);
+								$("#new_convert").val('.count($convert).');
+								
 								$("#modal").modal("hide");
 							}, 2000); </script>';
 						}
@@ -1201,7 +1283,8 @@ class Accounts extends BaseController {
 							echo '<script> setTimeout(function() {
 								var jsonData = ' . json_encode($convert) . ';
 								var jsonString = JSON.stringify(jsonData);
-								$("#converts").val(jsonString);
+								$("#timers").val(jsonString);
+								$("#first_timer").val('.count($convert).');
 								$("#modal").modal("hide");
 							}, 2000); </script>';
 						}
@@ -1242,6 +1325,7 @@ class Accounts extends BaseController {
 					$date = $this->request->getVar('dates');
 					$attendant = $this->request->getVar('attendant');
 					$converts = $this->request->getVar('converts');
+					$offering_givers = $this->request->getVar('offering_givers');
 					$timers = $this->request->getVar('timers');
 					
 					// echo $date;die;
@@ -1255,6 +1339,7 @@ class Accounts extends BaseController {
 					$ins_data['new_convert'] = $new_convert;
 					$ins_data['first_timer'] = $first_timer;
 					$ins_data['offering'] = $offering;
+					$ins_data['offering_givers'] = $offering_givers;
 					$ins_data['note'] = $note;
 					
 					if(!empty($attendant)){$attend = $attendant;}else{$attend = $this->session->get('cell_attendance');}
@@ -1327,6 +1412,78 @@ class Accounts extends BaseController {
 
 		}
 
+		if($param1 == 'offering_list') {
+			// DataTable parameters
+			$cell_id = $param2;
+			$table = 'user';
+			$column_order = array('firstname', 'surname');
+			$column_search = array('firstname', 'surname');
+			$order = array('firstname' => 'asc');
+			$member_id = $this->Crud->read_field('name', 'Member', 'access_role', 'id');
+			$where = array('role_id' => $member_id, 'cell_id' => $cell_id);
+			
+			// load data into table
+			$list = $this->Crud->datatable_load($table, $column_order, $column_search, $order, $where);
+			$data = array();
+			// $no = $_POST['start'];
+			
+			$count = 1;
+			foreach ($list as $item) {
+				$id = $item->id;
+				$name = $item->firstname;
+				$surname = $item->surname;
+				$img = $this->Crud->image($item->img_id, 'big');
+				// add manage buttons
+				$value = '0';
+				if($param3){
+					$convertsa = json_decode($this->Crud->read_field('id', $param3, 'cell_report', 'offering_givers'));
+					if(!empty($convertsa)){
+						$converts =(array) $convertsa->list;
+						if(!empty($converts)){
+							foreach($converts as $co => $val){
+								if($id == $co){
+									$value = $val;
+								}
+							}
+						}
+					}	
+				}
+				
+				$all_btn = '
+					<div class="text-center">
+						<input type="text" class="form-control offerings" name="offering[]" id="offering_'.$item->id.'" value="'.$value.'" oninput="calculateTotals();this.value = this.value.replace(/[^\d.]/g,\'\');this.value = this.value.replace(/(\..*)\./g,\'$1\')">
+					</div>
+				';
+
+				
+				
+				$row = array();
+				$row[] = '<div class="user-card">
+							<div class="user-avatar ">
+								<img alt="" src="'.site_url($img).'" height="40px"/>
+							</div>
+							<div class="user-info">
+								<span class="tb-lead">'.ucwords($item->firstname.' '.$item->surname).'</span>
+							</div>
+							<input type="hidden" name="members[]" value="'.$item->id.'">
+						</div>';
+				$row[] = $all_btn;
+	
+				$data[] = $row;
+				$count += 1;
+			}
+	
+			$output = array(
+				"draw" => intval($_POST['draw']),
+				"recordsTotal" => $this->Crud->datatable_count($table, $where),
+				"recordsFiltered" => $this->Crud->datatable_filtered($table, $column_order, $column_search, $order, $where),
+				"data" => $data,
+			);
+			
+			//output to json format
+			echo json_encode($output);
+			exit;
+		}
         // record listing
 		if($param1 == 'load') {
 			$limit = $param2;

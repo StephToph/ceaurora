@@ -325,6 +325,126 @@ $this->Crud = new Crud();
             <div class="col-sm-12"><div id="bb_ajax_msg2"></div></div>
         </div>
     <?php }} ?>
+
+    
+    <?php if($param2 == 'offering'){
+        if(empty($param3)){?>
+            <div class="row">
+                <div class="col-sm-12 text-danger text-center">Select a Cell First</div>
+            </div>
+        <?php }else{
+        // echo $table_rec;
+        $first = json_decode($first);
+        $total =0 ;
+        $member = 0;
+        $guest = 0;
+        
+        if($param3){
+            $converts = json_decode($this->Crud->read_field('id', $param3, 'cell_report', 'offering_givers'));
+            if(!empty($converts)){
+                $total = $converts->total;
+                $member = $converts->member;
+                $guest = $converts->guest;
+                $guest_list = (array)$converts->guest_list;
+            }
+          
+            $first = json_decode($this->Crud->read_field('id', $param3, 'cell_report', 'timers'));
+            
+        }
+        ?>
+        <div class="row">
+            <span class="text-danger mb-2">Enter Member's Offering in the Table Below</span>
+            <div class="col-sm-4 mb-3 ">
+                <label>Total</label>
+                <input class="form-control" id="total_offering" type="text" name="total_offering"  readonly value="<?=($total); ?>">
+            </div>
+            <div class="col-sm-4 mb-3">
+                <label>Member</label>
+                <input class="form-control" id="member_offering" type="text" name="member_offering"  readonly value="<?=($member); ?>">
+            </div>
+            <div class="col-sm-4 mb-3">
+                <label>Guest</label>
+                <input class="form-control" id="guest_offering" type="text" name="guest_offering" readonly oninput="get_offering();this.value = this.value.replace(/[^\d.]/g,'');this.value = this.value.replace(/(\..*)\./g,'$1')" value="<?=($guest); ?>">
+            </div>
+        </div>
+        <?php if(!empty($first)){?>
+            <hr>
+            <div class="table-responsive">
+                <table id="dtables" class="table table-striped table-hover mt-5">
+                    <thead>
+                        <tr>
+                            <th>First Timer</th>
+                            <th width="200px">Offering</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php 
+                           if($param3 && !empty((array)$first)){
+                                foreach($first as $mm => $val){
+                                    $vals = 0;
+                                    if(!empty($guest_list)){
+                                        foreach($guest_list as $guest => $amount){
+                                            if($guest == strtoupper($val->fullname)){
+                                                $vals = $amount;
+                                                // echo $vals.' ';
+                                            }
+                                        }
+                                    }
+                                   
+                                    ?>
+                                    
+                                <tr>
+                                    <td><span class="text-muted"><?=ucwords($val->fullname); ?></span> <input type="hidden" name="guests[]" value="<?=strtoupper($val->fullname); ?>"></td>
+                                
+                                    <td>
+                                        <input type="text" class="form-control guest_offerings" name="guest_offerings[]" id="offering_<?php echo $val->fullname; ?>" value="<?=$vals; ?>" oninput="guest_offerings();this.value = this.value.replace(/[^\d.]/g,'');this.value = this.value.replace(/(\..*)\./g,'$1')">
+
+                                    </td>
+                                </tr>
+                           <?php } } else{
+                            if(!empty((array)$first)){
+                                foreach($first as $mm => $val){
+                                    
+                            ?>
+                            <tr>
+                                <td><span class="text-muted"><?=ucwords($val->fullname); ?></span><input type="hidden" name="guests[]" value="<?=strtoupper($val->fullname); ?>"></td>
+                            
+                                <td>
+                                    <input type="text" class="form-control guest_offerings" name="guest_offerings[]" id="offering_<?php echo $mm; ?>" value="0" oninput="guest_offerings();this.value = this.value.replace(/[^\d.]/g,'');this.value = this.value.replace(/(\..*)\./g,'$1')">
+
+                                </td>
+                            </tr>
+
+                        <?php } } }?>
+                    </tbody>
+                </table>
+            </div>
+        <?php } ?>
+        <hr>
+        <div class="table-responsive">
+            <table id="dtable" class="table table-striped table-hover mt-5">
+                <thead>
+                    <tr>
+                        <th>Member</th>
+                        <th width="200px">Offering</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+        <hr>
+        <div class="row mt-5" >
+            <div class="col-sm-12 text-center mt-5">
+                <button class="btn btn-primary bb_fo_btn" type="submit">
+                    <i class="icon ni ni-save"></i> <?=translate_phrase('Save Record');?>
+                </button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12"><div id="bb_ajax_msg2"></div></div>
+        </div>
+    <?php } } ?>
     <!-- insert/edit view -->
     <?php if($param2 == 'new_convert') { ?>
         <?php if(empty($param3)){?>
@@ -703,7 +823,99 @@ $this->Crud = new Crud();
 
     // Trigger the change event on page load
     $('select[name="invited_by[]"]').trigger('change');
-</script>
 
+    function calculateTotals() {
+        
+        var tithesInputs = document.querySelectorAll('.offerings');
+        var total = 0;
+        tithesInputs.forEach(function(input) {
+            var value = parseFloat(input.value);
+            total += isNaN(value) ? 0 : value;
+        });
+        console.log(total);
+        var guest = $('#guest_offering').val();
+        
+        $('#member_offering').val(total.toFixed(2));
+        total += parseFloat(guest);
+        total = total.toFixed(2);
+        $('#total_offering').val(total);
+
+        // Set value to 0 if the textbox is empty
+        tithesInputs.forEach(function(input) {
+            if (input.value === '') {
+                input.value = '';
+            }
+        });
+    }
+
+    
+    function guest_offerings() {
+        
+        var tithesInputs = document.querySelectorAll('.guest_offerings');
+        var total = 0;
+        tithesInputs.forEach(function(input) {
+            var value = parseFloat(input.value);
+            total += isNaN(value) ? 0 : value;
+        });
+        console.log(total);
+        var guest = $('#member_offering').val();
+        
+        $('#guest_offering').val(total.toFixed(2));
+        total += parseFloat(guest);
+        total = total.toFixed(2);
+        $('#total_offering').val(total);
+
+        // Set value to 0 if the textbox is empty
+        tithesInputs.forEach(function(input) {
+            if (input.value === '') {
+                input.value = '';
+            }
+        });
+    }
+    // Trigger the change event on page load
+    function get_offering(){
+        var member = $('#member_offering').val();
+        var guest = $('#guest_offering').val();
+        
+        var total = parseFloat(member) + parseFloat(guest);
+        total = total.toFixed(2);
+        $('#total_offering').val(total);
+    }
 </script>
+<?php if(!empty($table_rec)){ ?>
+    <!-- <script src="<?=site_url();?>assets/backend/vendors/datatables/jquery.dataTables.min.js"></script>
+        <script src="<?=site_url();?>assets/backend/vendors/datatables/dataTables.bootstrap.min.js"></script>
+        <script src="<?=site_url();?>assets/backend/js/pages/datatables.js"></script> -->
+    <script type="text/javascript">
+    $(document).ready(function() {
+        //datatables
+        var table = $('#dtable').DataTable({
+            "processing": true, //Feature control the processing indicator.
+            "serverSide": true, //Feature control DataTables' server-side processing mode.
+            "order": [<?php if(!empty($order_sort)){echo '['.$order_sort.']';} ?>], //Initial order.
+            "language": {
+                "processing": "<i class='icon ni ni-loader' aria-hidden='true'></i> <?=translate_phrase('Processing... please wait'); ?>"
+            },
+            // "pagingType": "full",
+
+            // Load data for the table's content from an Ajax source
+            "ajax": {
+                url: "<?php echo site_url($table_rec); ?>",
+                type: "POST",
+               
+            },
+
+            //Set column definition initialisation properties.
+            "columnDefs": [{
+                "targets": [
+                <?php if(!empty($no_sort)){echo $no_sort;} ?>], //columns not sortable
+                "orderable": false, //set not orderable
+            }, ],
+
+        });
+
+    });
+    
+    </script>
+<?php } ?>
 

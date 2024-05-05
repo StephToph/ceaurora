@@ -107,7 +107,7 @@
                                                 <label for="name">*<?=translate_phrase('Attendance'); ?></label>
                                                 <div class="form-control-wrap">    
                                                     <div class="input-group">        
-                                                        <input type="text" name="attendance" id="attendance" oninput="this.value = this.value.replace(/[^\d.]/g,'');this.value = this.value.replace(/(\..*)\./g,'$1')" class="form-control" placeholder="">        
+                                                        <input type="text" name="attendance" id="attendance" oninput="this.value = this.value.replace(/[^\d.]/g,'');this.value = this.value.replace(/(\..*)\./g,'$1')" class="form-control" readonly placeholder="">        
                                                         <div class="input-group-append">            
                                                             <button type="button"  class="btn btn-outline-primary btn-dim pop" pageTitle="Mark Meeting Attendance" pageSize="modal-lg" pageName="<?php echo  site_url('accounts/creport/manage/attendance/'.$celss); ?>" id="markButton">MARK</button>        
                                                         </div>    
@@ -120,7 +120,7 @@
                                                 <label for="name"><?=translate_phrase('New Convert'); ?></label>
                                                 <div class="form-control-wrap">    
                                                     <div class="input-group">        
-                                                        <input type="text" id="new_convert" class="form-control" oninput="this.value = this.value.replace(/[^\d.]/g,'');this.value = this.value.replace(/(\..*)\./g,'$1')" name="new_convert" placeholder="">        
+                                                        <input type="text" id="new_convert" class="form-control" oninput="this.value = this.value.replace(/[^\d.]/g,'');this.value = this.value.replace(/(\..*)\./g,'$1')" readonly name="new_convert" placeholder="">        
                                                         <div class="input-group-append">            
                                                             <button type="button"  class="btn btn-outline-primary btn-dim pop" pageTitle="New Convert" pageSize="modal-xl" pageName="<?=site_url('accounts/creport/manage/new_convert/'.$celss); ?>" id="convertBtn">ADD</button>        
                                                         </div>    
@@ -133,7 +133,7 @@
                                                 <label for="name"><?=translate_phrase('First Timer'); ?></label>
                                                 <div class="form-control-wrap">    
                                                     <div class="input-group">        
-                                                        <input type="text" id="first_timer" name="first_timer" oninput="this.value = this.value.replace(/[^\d.]/g,'');this.value = this.value.replace(/(\..*)\./g,'$1')" class="form-control" placeholder="">        
+                                                        <input type="text" readonly id="first_timer" name="first_timer" oninput="this.value = this.value.replace(/[^\d.]/g,'');this.value = this.value.replace(/(\..*)\./g,'$1')" class="form-control" placeholder="">        
                                                         <div class="input-group-append">            
                                                             <button type="button"  class="btn btn-outline-primary btn-dim pop" pageTitle="First Timer" pageSize="modal-xl" pageName="<?=site_url('accounts/creport/manage/first_timer/'.$celss); ?>" id="timerBtn">ADD</button>        
                                                         </div>    
@@ -144,7 +144,16 @@
                                         <div class="col-sm-4 mb-3">
                                             <div class="form-group">
                                                 <label for="name">*<?=translate_phrase('Offering'); ?></label>
-                                                <input class="form-control" id="offering" type="text" id="offering" oninput="this.value = this.value.replace(/[^\d.]/g,'');this.value = this.value.replace(/(\..*)\./g,'$1')" name="offering"  required>
+                                                <div class="form-control-wrap">    
+                                                    <div class="input-group">        
+                                                        <input type="text" readonly name="offering" id="offering" oninput="this.value = this.value.replace(/[^\d.]/g,'');this.value = this.value.replace(/(\..*)\./g,'$1')" class="form-control" placeholder="0">        
+                                                        <div class="input-group-append">            
+                                                            <button type="button"  class="btn btn-outline-primary btn-dim pop" pageTitle="Enter Offering" pageSize="modal-lg" pageName="<?php echo  site_url('accounts/creport/manage/offering/'.$celss); ?>" id="offeringBtn">ADD</button>        
+                                                        </div>    
+                                                    </div>
+                                                    <span class="text-danger"></span>
+                                                </div>
+                                                
                                             </div>
                                         </div>
                                         <div class="col-sm-12 mb-3">
@@ -156,6 +165,7 @@
                                         <input type="hidden" name="attendant" id="attendant">
                                         <input type="hidden" name="converts" id="converts">
                                         <input type="hidden" name="timers" id="timers">
+                                        <input type="hidden" name="offering_givers" id="offering_givers">
                                         
                                         <div class="col-sm-12 text-center mt-3">
                                             <button class="btn btn-primary bb_fo_btn" type="submit">
@@ -262,6 +272,10 @@
                 var updatedPageName = urls + "/" + dt.e_cell_id + "/" + dt.e_id;
                 timerBtn.setAttribute("pageName", updatedPageName);
                 $('#bb_ajax_msg').html('');
+                
+                var urls = site_url + 'accounts/creport/manage/offering';
+                var updatedPageName = urls + "/" + dt.e_cell_id + "/" + dt.e_id;
+                offeringBtn.setAttribute("pageName", updatedPageName);
             }
         });
 
@@ -272,6 +286,7 @@
         var markButton = document.getElementById("markButton");
         var convertBtn = document.getElementById("convertBtn");
         var timerBtn = document.getElementById("timerBtn");
+        var offeringBtn = document.getElementById("offeringBtn");
         
         var selectedValue = selectElement.value;
        
@@ -287,7 +302,9 @@
         var updatedPageName = urls + "/" + selectedValue;
         timerBtn.setAttribute("pageName", updatedPageName);
                 
-        
+        var urls = site_url + 'accounts/creport/manage/offering';
+        var updatedPageName = urls + "/" + selectedValue;
+        offeringBtn.setAttribute("pageName", updatedPageName);
     }
 
     function load(x, y) {
